@@ -27,16 +27,32 @@ namespace GuchiBot
                 var update = await Parent.Client.GetUpdatesAsync(offset);
                 foreach (var up in update)
                 {
-                    Console.WriteLine($"[{up.Id}]{up.Message.Text}");
                     offset = up.Id + 1;
                     new Thread(()=> { MessageSynk(up.Message); }).Start();
                 }
             }
         }
+        private void ShowInf()
+        {
+            Console.Clear();
+            Console.WriteLine("Active Users: {");
+            foreach (UserM um in Parent.ActiveUsers)
+            {
+                Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
+            }
+            Console.WriteLine("}\nMessages: {");
+            foreach (Message ms in Parent.Messages)
+            {
+                Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
+            }
+            Console.WriteLine("}");
+        }
         private bool GachiAttakTrigger = false;
         private async void MessageSynk(Message ms){
             if(ms.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
             {
+                Parent.Messages.Add(ms);
+                LogSystem(ms.From);
                 switch (ms.Text)
                 {
                     case "/gachiattak@guchimuchibot":
@@ -56,16 +72,70 @@ namespace GuchiBot
                     case "/sendrandimg@guchimuchibot":
                     case "/sendrandimg":
                         await ClearCommandAsync(ms.Chat.Id, ms.MessageId);
-                        GetLocalGachi(ms.Chat.Id);
+                        if (Parent.GachiImage != null)
+                        {
+                            await ClearCommandAsync(ms.Chat.Id, ms.MessageId);
+                            GetLocalGachi(ms.Chat.Id);
+                        }
+                        else await Parent.Client.SendTextMessageAsync(ms.Chat.Id,"Sorry, but my creator dont have Gachi Photoes.");
                         break;
                     case "/sendrandwebm@guchimuchibot":
                     case "/sendrandwebm":
                         await ClearCommandAsync(ms.Chat.Id, ms.MessageId);
-                        if (!WebmTrigger)
+                        if (Parent.WebmDir != null)
                         {
-                            WebmTrigger = true;
-                            await GetLocalWebmAsync(ms.Chat.Id);
-                        }
+                            if (!WebmTrigger)
+                            {
+                                WebmTrigger = true;
+                                try
+                                {
+                                    await GetLocalWebmAsync(ms.Chat.Id);
+                                } catch (Exception ex) { Console.WriteLine($"{ex.Message}"); }
+                            }
+                        } else await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have any webm.");
+                        break;
+                    case "/testmemory":
+                        Parent.CommandsSynk.Add(new Command(ms.Text,ms.From.Id,ms.Chat.Id));
+                        await Parent.Client.SendTextMessageAsync(ms.Chat.Id,"Say somethink");
+                        break;
+                    default:
+                        CommandAdd(ms);
+                        CommandSynk();
+                        break;
+                }
+                ShowInf();
+            }
+        }
+        private void LogSystem(User us)
+        {
+            UserM mu = Parent.ActiveUsers.Find(f => f.Id == us.Id && f.Username == us.Username);
+            if (mu == null)
+            {
+                Parent.ActiveUsers.Add(new UserM(us,1));
+            }else
+            {
+                mu.MessageCount++;
+            }
+        }
+        private void CommandAdd(Message ms)
+        {
+            Command cm = Parent.CommandsSynk.Find(fn => fn.ChatId == ms.Chat.Id && fn.UserId == ms.From.Id);
+            if (cm != null)
+            {
+                cm.AddArgc(ms.Text);
+                ClearCommandAsync(ms.Chat.Id, ms.MessageId);
+            }
+        }
+        private void CommandSynk()
+        {
+            Command[] arg = Parent.CommandsSynk.Where(fn => fn.cArgs.Count > 0).ToArray<Command>();
+            for (int i = 0; i < arg.Length; i++)
+            {
+                switch (arg[i].cCommand)
+                {
+                    case "/testmemory":
+                        Parent.Client.SendTextMessageAsync(arg[i].ChatId, $"You said: {arg[i].cArgs[0]}");
+                        Parent.CommandsSynk.Remove(arg[i]);
                         break;
                 }
             }
@@ -92,7 +162,7 @@ namespace GuchiBot
         }
         private void GetLocalGachi(long chatid)
         {
-            String[] files = Directory.GetFiles("C:/Users/user/Desktop/GachiArch","*");
+            String[] files = Directory.GetFiles(Parent.GachiImage, "*");
             int index = Parent.rand.Next(0, files.Length);
             Parent.Client.SendPhotoAsync(chatid, new FileToSend(Path.GetFileName(files[index]), System.IO.File.Open(files[index],FileMode.Open)));
         }
@@ -105,13 +175,13 @@ namespace GuchiBot
             if (Webms == null)
             {
                 Webms = new List<string>();
-                Webms.AddRange(Directory.EnumerateFiles("G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "*.*")
+                Webms.AddRange(Directory.EnumerateFiles(Parent.WebmDir, "*.*")
                 .Where(s => s.EndsWith(".webm") || s.EndsWith(".mp4")));
             }
             int index = Parent.rand.Next(0, Webms.Count);
             GetPreViewOfFile(Webms[index]);
-            await Parent.Client.SendPhotoAsync(chatid, new FileToSend($"{AppDomain.CurrentDomain.BaseDirectory}/previews/{Path.GetFileName(Webms[index])}.jpg",
-                System.IO.File.Open($"{AppDomain.CurrentDomain.BaseDirectory}/previews/{Path.GetFileName(Webms[index])}.jpg", FileMode.Open)));
+            await Parent.Client.SendPhotoAsync(chatid, new FileToSend($"{Path.GetFileName(Webms[index])}.jpg",
+                System.IO.File.Open($"{Parent.PreViewDir}{Path.GetFileName(Webms[index])}.jpg", FileMode.Open)));
             await Parent.Client.SendDocumentAsync(chatid, new FileToSend(Path.GetFileName(Webms[index]), System.IO.File.Open(Webms[index], FileMode.Open)));
             WebmTrigger = false;
         }
@@ -119,7 +189,7 @@ namespace GuchiBot
         private void GetPreViewOfFile(string videopath)
         {
             var ffMpeg = new NReco.VideoConverter.FFMpegConverter();
-            ffMpeg.GetVideoThumbnail(videopath, $"{AppDomain.CurrentDomain.BaseDirectory}/previews/{Path.GetFileName(videopath)}.jpg", 5);
+            ffMpeg.GetVideoThumbnail(videopath, $"{Parent.PreViewDir}{Path.GetFileName(videopath)}.jpg", 5);
         }
 
     }
