@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GuchiBot;
 using Telegram.Bot.Types;
 
-namespace GuchiBot
+namespace Pes7BotCrator
 {
     public class WebmModule
     {
@@ -46,7 +47,7 @@ namespace GuchiBot
                     {
                         await GetLocalWebmAsync(ms.Chat.Id, Parent);
                     }
-                    catch (Exception ex) { Console.WriteLine($"{ex.Message}"); }
+                    catch (Exception ex) { Parent.Exceptions.Add(ex); }
                 }
             }
             else await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have any webm.");

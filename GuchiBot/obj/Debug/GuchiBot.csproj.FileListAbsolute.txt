@@ -6,13 +6,10 @@ c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\De
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.dll
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
-c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Telegram.Bot.dll
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.xml
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Main.resources
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.GenerateResource.Cache
-C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.dll
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.dll
-C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.xml
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.xml
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe.config
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe
@@ -29,3 +26,7 @@ C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.exe
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.dll
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.pdb
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.dll
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.pdb
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.dll
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.xml

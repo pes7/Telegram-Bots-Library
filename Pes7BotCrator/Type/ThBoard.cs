@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GuchiBot
+namespace Pes7BotCrator.Type
 {
     public class ThBoard
     {

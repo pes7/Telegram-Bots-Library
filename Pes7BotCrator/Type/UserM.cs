@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace GuchiBot
+namespace Pes7BotCrator.Type
 {
     public class UserM : User
     {
@@ -21,6 +21,10 @@ namespace GuchiBot
         public static string nameGet(User us)
         {
             return $"{us.FirstName} {us.LastName}";
+        }
+        public static string usernameGet(User us)
+        {
+            return us.Username != null ? us.Username : $"{us.FirstName} {us.LastName}";
         }
     }
 }

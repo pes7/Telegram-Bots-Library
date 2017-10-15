@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace GuchiBot
+namespace Pes7BotCrator.Type
 {
     public class SynkCommand
     {

@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
-namespace GuchiBot
+namespace Pes7BotCrator
 {
     public class WebHook
     {
@@ -32,26 +33,11 @@ namespace GuchiBot
                 }
             }
         }
-        private void ShowInf()
-        {
-            Console.Clear();
-            Console.WriteLine("Active Users: {");
-            foreach (UserM um in Parent.ActiveUsers)
-            {
-                Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
-            }
-            Console.WriteLine("}\nMessages: {");
-            foreach (Message ms in Parent.Messages)
-            {
-                Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
-            }
-            Console.WriteLine("}");
-        }
-        
+
         private async void MessageSynk(Message ms){
             if(ms.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
             {
-                Parent.Messages.Add(ms);
+                Parent.MessagesLast.Add(ms);
                 LogSystem(ms.From);
                 bool iser = false;
                 foreach(SynkCommand sy in Parent.Commands)
@@ -74,12 +60,12 @@ namespace GuchiBot
                         cm.doFunc(ms, Parent);
                     }
                 }
-                ShowInf();
+                //Parent.ShowInf();
             }
         }
         private void LogSystem(User us)
         {
-            UserM mu = Parent.ActiveUsers.Find(f => f.Id == us.Id && f.Username == us.Username);
+            UserM mu = Parent.ActiveUsers.Find(f => f.Id == us.Id && UserM.usernameGet(f) == UserM.usernameGet(us));
             if (mu == null)
             {
                 Parent.ActiveUsers.Add(new UserM(us,1));
