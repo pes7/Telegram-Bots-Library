@@ -18,18 +18,14 @@ C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe.config
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.pdb
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.dll
-C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\NReco.dll
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.dll
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
-C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Telegram.Bot.dll
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.xml
-C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\NReco.xml
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.xml
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csprojResolveAssemblyReference.cache
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Main.resources
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.GenerateResource.Cache
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.exe
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
-C:\Users\user\Documents\Visual Studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.dll
-C:\Users\user\Documents\Visual Studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.pdb
-C:\Users\user\Documents\Visual Studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
+C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.dll
+C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.pdb

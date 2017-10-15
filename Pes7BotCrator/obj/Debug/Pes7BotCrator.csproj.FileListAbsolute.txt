@@ -1,0 +1,10 @@
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.pdb
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\Telegram.Bot.dll
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\NReco.xml
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.xml
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\Newtonsoft.Json.xml
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.dll
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.pdb
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojResolveAssemblyReference.cache
+C:\Users\ukolo\Desktop\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.dll

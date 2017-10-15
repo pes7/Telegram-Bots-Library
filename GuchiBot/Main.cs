@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace GuchiBot
 {
@@ -23,7 +22,30 @@ namespace GuchiBot
         public Main()
         {
             InitializeComponent();
-            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/Webm");
+            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "F:/Webm");
+            Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot,new List<string>()
+            {
+                "/sendrandwebm@guchimuchibot",
+                "/sendrandwebm"
+            }));
+            Bot.Commands.Add(new SynkCommand(new BotLogic().GachiAttakSynk, new List<string>()
+            {
+                "/gachiattak@guchimuchibot",
+                "/gachiattak"
+            }));
+            Bot.Commands.Add(new SynkCommand(new BotLogic().GetGachiImageLogic, new List<string>()
+            {
+                "/sendrandimg@guchimuchibot",
+                "/sendrandimg"
+            }));
+            Bot.Commands.Add(new SynkCommand(new BotLogic().GetArgkSynk, new List<string>()
+            {
+                "/testmemory"
+            }));
+            Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
+            {
+                "default"
+            }));
             label1.Text = $"{Ms} ms";
         }
 
@@ -91,9 +113,15 @@ namespace GuchiBot
 
         private void button1_Click(object sender, EventArgs e)
         {
+            ParseWebmsFromDvach();
+        }
+
+        private void ParseWebmsFromDvach()
+        {
             List<ThBoard> Th = new List<ThBoard>();
             dynamic s = ThBoard.GetJson("http://2ch.hk/b/catalog_num.json");
-            foreach (dynamic h in s.threads) {
+            foreach (dynamic h in s.threads)
+            {
                 if (h.num != null && h.files_count != null)
                 {
                     ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count);
@@ -106,6 +134,8 @@ namespace GuchiBot
 
         private async Task DvochSynkAsync(List<ThBoard> th)
         {
+            /* StreamWriter writetext = new StreamWriter("simple.txt");
+            writetext.WriteLine(file.path);*/
             foreach (ThBoard t in th)
             {
                 if (t.Discription.Contains("WEBM"))
@@ -129,8 +159,35 @@ namespace GuchiBot
                         }
                     }
                 }
+                /*
+                if (t.Discription.Contains("WEBM") || t.Discription.Contains("webm"))
+                {
+                    dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
+                    Console.WriteLine($"Loaded http://2ch.hk/b/res/{t.Id}.json");
+                    foreach (dynamic h in s.threads)
+                    {
+                        foreach (dynamic c in h)
+                        {
+                            foreach (dynamic f in c)
+                            {
+                                foreach (JObject d in (JArray)f)
+                                {
+                                    Console.WriteLine($"{d}");
+                                    var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
+                                    string format = ((string)file.path).Split('.')[2];
+                                    if (format == "webm")
+                                    {
+                                        Console.WriteLine($"{format}|{file.fullname}|{file.path}|{file.thumbnail}");
+                                        await Bot.Client.SendTextMessageAsync(Bot.Messages.Last().Chat.Id, file.thumbnail);
+                                        await Bot.Client.SendTextMessageAsync(Bot.Messages.Last().Chat.Id, file.path);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                */
             }
         }
-
     }
 }
