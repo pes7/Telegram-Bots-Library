@@ -69,6 +69,7 @@ namespace Pes7BotCrator.Modules
                     dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
                     foreach (dynamic h in s.threads)
                     {
+                        Console.WriteLine(h);
                         foreach (dynamic c in h.posts)
                         {
                             foreach (dynamic f in c.files)
@@ -101,12 +102,18 @@ namespace Pes7BotCrator.Modules
                 Webms.Remove(webm);
                 Thread th = new Thread(async () =>
                 {
-                    await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path);
+                    var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                        new [] {
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("Like","like"),
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("Dislike","dislike")
+                        }
+                    });
+                    await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path,false,0, keyboard);
                 });
                 th.Start();
             }
             else
                 Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
-        } 
+        }
     }
 }

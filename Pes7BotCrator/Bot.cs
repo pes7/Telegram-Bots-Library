@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pes7BotCrator
 {
@@ -26,6 +28,7 @@ namespace Pes7BotCrator
         public List<Command> CommandsSynk { get; set; }
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
+        public List<Likes> LLikes { get; set; } 
 
         public List<SynkCommand> Commands { get; set; }
 
@@ -46,6 +49,7 @@ namespace Pes7BotCrator
             ActiveUsers = new List<UserM>();
             Commands = new List<SynkCommand>();
             Exceptions = new List<Exception>();
+            LLikes = new List<Likes>();
             WebmDir = webmdir;
             GachiImage = gachiimage;
             PreViewDir = preViewDir;
@@ -163,6 +167,11 @@ namespace Pes7BotCrator
                 Console.WriteLine($"{ex.Message}");
             }
             Console.WriteLine("}");
+        }
+
+        internal void SendTextMessageAsync(object id, string v1, bool v2, bool v3, int v4, InlineKeyboardMarkup keyboard, ParseMode @default)
+        {
+            throw new NotImplementedException();
         }
     }
 }
