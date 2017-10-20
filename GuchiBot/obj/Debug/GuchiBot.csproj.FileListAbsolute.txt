@@ -10,7 +10,6 @@ c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\De
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Main.resources
 c:\users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.GenerateResource.Cache
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.dll
-C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.xml
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe.config
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe
 C:\Users\ukolo\Desktop\TelegramBots\GuchiBot\bin\Debug\GuchiBot.pdb

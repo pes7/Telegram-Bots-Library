@@ -22,12 +22,17 @@ namespace GuchiBot
         private int Ms = 20000;
         private int CurTime = 0;
         private _2chModule Ch = new _2chModule();
+        private string LikePath = AppDomain.CurrentDomain.BaseDirectory + "like.bot";
         //private string loc = $"{AppDomain.CurrentDomain.BaseDirectory}bot.xml";
 
         public Main()
         {
             InitializeComponent();
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch");
+            if (Directory.Exists(LikePath))
+            {
+                Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
+            }
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm@guchimuchibot",
@@ -144,6 +149,10 @@ namespace GuchiBot
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            if (Bot.LLikes.Count > 0)
+            {
+                SaveLoadModule.SaveLikesToFile(Bot.LLikes, LikePath);
+            }
             Bot.Dispose();
             base.OnFormClosed(e);
         }

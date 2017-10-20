@@ -13,9 +13,7 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\o
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.pdb
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Telegram.Bot.dll
-C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Newtonsoft.Json.xml
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.xml
-C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.xml
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.dll
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.dll
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojResolveAssemblyReference.cache

@@ -66,29 +66,48 @@ namespace Pes7BotCrator
                     Likes ll = Parent.LLikes.Find(ff => ff.MessageId == ms.MessageId);
                     if (ll == null)
                     {
-                        Parent.LLikes.Add(new Likes(ms.MessageId));
+                        Parent.LLikes.Add(new Likes(ms.MessageId,ms.Chat.Id));
                         ll = Parent.LLikes.Last();
                     }
                     if (Up.CallbackQuery.Data == "like")
                     {
-                        Nullable<long> li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        if (li == null)
+                        long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                        long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                        if (li == 0 && ld == 0)
                             ll.LikeId.Add(Up.CallbackQuery.From.Id);
+                        else if(li == 0 && ld != 0)
+                        {
+                            ll.LikeId.Add(ld);
+                            ll.DisLikeId.Remove(ld);
+                        }
+                        else
+                            ll.LikeId.Remove(li);
                     }
                     else if (Up.CallbackQuery.Data == "dislike")
                     {
-                        Nullable<long> li = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        if (li == null)
+                        long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                        long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                        if (li == 0 && ld == 0)
                             ll.DisLikeId.Add(Up.CallbackQuery.From.Id);
+                        else if (li != 0 && ld == 0)
+                        {
+                            ll.DisLikeId.Add(li);
+                            ll.LikeId.Remove(li);
+                        }
+                        else
+                            ll.DisLikeId.Remove(ld);
                     }
                     var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
                         new [] {
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"Like {ll.LikeId.Count}","like"),
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"Dislike {ll.DisLikeId.Count}","dislike")
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {ll.LikeId.Count}","like"),
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {ll.DisLikeId.Count}","dislike")
                         }
                     });
-                    await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id,ms.MessageId, keyboard);
-                    //Parent.Exceptions.Add(new Exception($"From = {UserM.usernameGet(Up.CallbackQuery.From)} Id = {Up.CallbackQuery.InlineMessageId} PostId = {Up.CallbackQuery.Message.MessageId} What = {Up.CallbackQuery.Data}"));
+                    try
+                    {
+                        await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                    }
+                    catch (Exception ex) { };
                     break;
             }
         }

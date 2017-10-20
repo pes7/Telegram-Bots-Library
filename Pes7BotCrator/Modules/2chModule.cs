@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Pes7BotCrator.Modules
 {
@@ -64,12 +65,11 @@ namespace Pes7BotCrator.Modules
             List<ThBoard> Th = Get2chBoards(Parent);
             foreach (ThBoard t in Th)
             {
-                if (t.Discription.Contains("WEBM"))
+                if (t.Discription.Contains("WEBM") || t.Discription.Contains("webm"))
                 {
                     dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
                     foreach (dynamic h in s.threads)
                     {
-                        Console.WriteLine(h);
                         foreach (dynamic c in h.posts)
                         {
                             foreach (dynamic f in c.files)
@@ -104,8 +104,8 @@ namespace Pes7BotCrator.Modules
                 {
                     var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
                         new [] {
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("Like","like"),
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("Dislike","dislike")
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","like"),
+                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","dislike")
                         }
                     });
                     await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path,false,0, keyboard);
