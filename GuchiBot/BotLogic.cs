@@ -13,14 +13,24 @@ namespace GuchiBot
 {
     class BotLogic
     {
+        delegate void Error(Bot parent);
         public async void GetGachiImageLogic(Message ms, Bot Parent)
         {
+            Error error = async delegate (Bot parent) { await parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have Gachi Photoes."); };
             if (Parent.GachiImage != null)
             {
                 //await ClearCommandAsync(ms.Chat.Id, ms.MessageId);
-                GetLocalGachi(ms.Chat.Id, Parent);
+                try
+                {
+                    GetLocalGachi(ms.Chat.Id, Parent);
+                }
+                catch (Exception ex)
+                {
+                    Parent.Exceptions.Add(ex);
+                    error(Parent);
+                }
             }
-            else await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have Gachi Photoes.");
+            else error(Parent);
         }
 
         private void GetLocalGachi(long chatid, Bot Parent)
@@ -50,6 +60,8 @@ namespace GuchiBot
 
         public async void GachiAttakSynk(Message ms, Bot Parent)
         {
+            await Parent.Client.SendTextMessageAsync(ms.Chat.Id,"Sorry, but it is to strong weapon for u.");
+            return;
             if (!GachiAttakTrigger)
             {
                 await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Prepare your NyanuS.");

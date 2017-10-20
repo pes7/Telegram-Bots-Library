@@ -14,6 +14,7 @@ namespace Pes7BotCrator
         /* Webm Module */
         private List<string> Webms;
         private static bool WebmTrigger = false;
+        delegate void Error(Bot parent);
         private async Task GetLocalWebmAsync(long chatid, Bot Parent)
         {
             if (Webms == null)
@@ -38,6 +39,7 @@ namespace Pes7BotCrator
 
         public async void WebmFuncForBot(Message ms,Bot Parent)
         {
+            Error error = async delegate (Bot parent) { await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have any webm."); };
             if (Parent.WebmDir != null)
             {
                 if (!WebmTrigger)
@@ -47,10 +49,14 @@ namespace Pes7BotCrator
                     {
                         await GetLocalWebmAsync(ms.Chat.Id, Parent);
                     }
-                    catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                    catch (Exception ex) {
+                        WebmTrigger = false;
+                        error(Parent);
+                        Parent.Exceptions.Add(ex);
+                    }
                 }
             }
-            else await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have any webm.");
+            else error(Parent);
         }
     }
 }

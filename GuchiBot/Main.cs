@@ -21,6 +21,7 @@ namespace GuchiBot
         private Bot Bot;
         private int Ms = 20000;
         private int CurTime = 0;
+        private _2chModule Ch = new _2chModule();
         //private string loc = $"{AppDomain.CurrentDomain.BaseDirectory}bot.xml";
 
         public Main()
@@ -41,6 +42,16 @@ namespace GuchiBot
             {
                 "/sendrandimg@guchimuchibot",
                 "/sendrandimg"
+            }));
+            Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
+            {
+                "/2ch@guchimuchibot",
+                "/2ch"
+            }));
+            Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
+            {
+                "/regenerate@guchimuchibot",
+                "/regenerate"
             }));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetArgkSynk, new List<string>()
             {
@@ -117,7 +128,7 @@ namespace GuchiBot
 
         private void button1_Click(object sender, EventArgs e)
         {
-            new _2chModule().ParseWebmsFromDvach(Bot);
+            Ch.ParseWebmsFromDvach(Bot);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -135,6 +146,11 @@ namespace GuchiBot
         {
             Bot.Dispose();
             base.OnFormClosed(e);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Bot.Client.SendTextMessageAsync("@Pro100RedBull", "Kek TI PIDOR");
         }
     }
 }
