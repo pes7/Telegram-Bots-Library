@@ -63,40 +63,53 @@ namespace Pes7BotCrator.Modules
         {
             List<dynamic> Dy = new List<dynamic>();
             List<ThBoard> Th = Get2chBoards(Parent);
-            foreach (ThBoard t in Th)
+            try
             {
-                if (t.Discription.Contains("WEBM") || t.Discription.Contains("webm"))
+                foreach (ThBoard t in Th)
                 {
-                    dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
-                    foreach (dynamic h in s.threads)
+                    if (t.Discription.Contains("WEBM") || t.Discription.Contains("webm"))
                     {
-                        foreach (dynamic c in h.posts)
+                        dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
+                        foreach (dynamic h in s.threads)
                         {
-                            foreach (dynamic f in c.files)
+                            foreach (dynamic c in h.posts)
                             {
-                                var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
-                                string format = ((string)file.path).Split('.')[2];
-                                if (format == "webm")
+                                foreach (dynamic f in c.files)
                                 {
-                                    Dy.Add(file);
+                                    var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
+                                    string format = ((string)file.path).Split('.')[2];
+                                    if (format == "webm")
+                                    {
+                                        Dy.Add(file);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }catch(Exception ex)
+            {
+                Parent.Exceptions.Add(ex);
             }
             return Dy;
         }
 
+        public static int WebmCount = 0;
         private List<dynamic> Webms;
         public void Ragenerated(Message ms, Bot Parent)
         {
-            Webms = getWebms(Parent);
+            if (ms.From.Username == "nazarpes7")
+            {
+                Webms = getWebms(Parent);
+                WebmCount = Webms.Count;
+                Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {Webms.Count} webms.");
+            }
+            else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
         public void get2chSmartRandWebm(Message ms,Bot Parent)
         {
-            if (Webms != null && Webms.Count > 0)
+            if (Webms != null && Webms?.Count > 0)
             {
                 dynamic webm = Webms[Parent.rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
@@ -108,7 +121,14 @@ namespace Pes7BotCrator.Modules
                             new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","dislike")
                         }
                     });
-                    await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path,false,0, keyboard);
+                    try
+                    {
+                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, keyboard);
+                    }catch(Exception ex)
+                    {
+                        Parent.Exceptions.Add(ex);
+                        return;
+                    }
                 });
                 th.Start();
             }

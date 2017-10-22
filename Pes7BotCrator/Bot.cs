@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -81,7 +82,13 @@ namespace Pes7BotCrator
         }
         public static async Task ClearCommandAsync(long id, int msgid, Bot Parent)
         {
-            await Parent.Client.DeleteMessageAsync(id, msgid);
+            try
+            {
+                await Parent.Client.DeleteMessageAsync(id, msgid);
+            }catch(Exception ex)
+            {
+                Parent.Exceptions.Add(ex);
+            }
         }
         public void SendMessage(long ChatId, string text, UserM user = null)
         {
@@ -132,11 +139,26 @@ namespace Pes7BotCrator
             }
         }
 
+        private string TimeToString(int i)
+        {
+            string str;
+            if (i / 60 > 1)
+            {
+                if (i / 60 / 60 > 1)
+                {
+                    str = $"{i / 60 / 60} hrs.";
+                }
+                else str = $"{i / 60} min.";
+            }
+            else str = $"{i} sec.";
+            return str;
+        }
+
         public void ShowInf()
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {RunTime} sec.");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCount}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)
@@ -162,9 +184,19 @@ namespace Pes7BotCrator
             }
             Console.WriteLine("}");
             Console.WriteLine("Exceptions: {");
-            foreach(Exception ex in Exceptions)
+            if (Exceptions.Count > 10)
             {
-                Console.WriteLine($"{ex.Message}");
+                for (int i = Exceptions.Count - 10; i < Exceptions.Count; i++)
+                {
+                    Console.WriteLine($"    {Exceptions[i]}");
+                }
+            }
+            else
+            {
+                foreach (Exception ms in Exceptions)
+                {
+                    Console.WriteLine($"    {ms}");
+                }
             }
             Console.WriteLine("}");
         }
