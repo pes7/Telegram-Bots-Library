@@ -99,8 +99,7 @@ namespace Pes7BotCrator.Modules
             return Dy;
         }
 
-        public static int WebmCountW = 0;
-        public static int WebmCountA = 0;
+        public static int WebmCount = 0;
         private List<dynamic> WebmsW;
         private List<dynamic> WebmsA;
         public void Ragenerated(Message ms, Bot Parent)
@@ -109,8 +108,7 @@ namespace Pes7BotCrator.Modules
             {
                 WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
                 WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
-                WebmCountW = WebmsW.Count;
-                WebmCountA = WebmsA.Count;
+                WebmCount = WebmsW.Count;
                 Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
             }
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
@@ -127,14 +125,6 @@ namespace Pes7BotCrator.Modules
             {
                 dynamic webm = Webms[Parent.rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
-                SendWebms(Parent, webm);
-            } else Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
-        }
-
-        public static void SendWebms(Bot Parent, dynamic webm)
-        {
-            try
-            {
                 Thread th = new Thread(async () =>
                 {
                     var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
@@ -146,8 +136,7 @@ namespace Pes7BotCrator.Modules
                     try
                     {
                         await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, keyboard);
-                    }
-                    catch (Exception ex)
+                    }catch(Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
                         return;
@@ -155,10 +144,8 @@ namespace Pes7BotCrator.Modules
                 });
                 th.Start();
             }
-            catch
-            {
-
-            }
-        } 
+            else
+                Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
+        }
     }
 }
