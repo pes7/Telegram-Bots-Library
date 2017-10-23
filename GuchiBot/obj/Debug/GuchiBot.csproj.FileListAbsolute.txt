@@ -43,5 +43,5 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debu
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Main.resources
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.GenerateResource.Cache
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\NReco.dll
-C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\NReco.xml
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\NReco.VideoConverter.dll

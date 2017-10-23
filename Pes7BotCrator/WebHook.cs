@@ -107,7 +107,7 @@ namespace Pes7BotCrator
                     {
                         await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
                     }
-                    catch (Exception ex) { };
+                    catch { };
                     break;
             }
         }

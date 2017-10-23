@@ -128,7 +128,30 @@ namespace GuchiBot
         private void timer1_Tick(object sender, EventArgs e)
         {
             CurTime++;
+            TimerSynk();
             label1.Text = $"{CurTime} sec";
+        }
+
+        private void TimerSynk()
+        {
+            if (Bot != null)
+            {
+                if (CurTime >= Ms)
+                {
+                    if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
+                    {
+                        if (Bot.rand.Next(0, 1) == 0)
+                        {
+                            _2chModule.SendWebms(Bot, Bot.rand.Next(0, _2chModule.WebmCountW));
+                        }
+                        else
+                        {
+                            _2chModule.SendWebms(Bot, Bot.rand.Next(0, _2chModule.WebmCountA));
+                        }
+                    }
+                    CurTime = 0;
+                }
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
