@@ -24,6 +24,5 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.pdb
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.dll
-C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.xml
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\NReco.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\NReco.xml

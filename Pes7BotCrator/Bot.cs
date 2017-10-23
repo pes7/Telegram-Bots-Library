@@ -61,9 +61,9 @@ namespace Pes7BotCrator
                 WebHook.Start();
             });
             WebThread.Start();
-            TMessageQueueSynk = new Thread(() =>
+            TMessageQueueSynk = new Thread(async () =>
             {
-                MessageQueueSynkAsync();
+                await MessageQueueSynkAsync();
             });
             TMessageQueueSynk.Start();
             TimeSynk = new Thread(TimeT);

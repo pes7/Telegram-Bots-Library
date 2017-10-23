@@ -15,13 +15,18 @@ namespace Pes7BotCrator.Modules
         private List<ThBoard> Get2chBoards(Bot Parent)
         {
             List<ThBoard> Th = new List<ThBoard>();
-            dynamic s = ThBoard.GetJson("http://2ch.hk/b/catalog_num.json");
-            foreach (dynamic h in s.threads)
-            {
-                if (h.num != null && h.files_count != null)
+            string[] boards = {
+                "http://2ch.hk/b/catalog_num.json"
+            };
+            foreach (string adress in boards) {
+                dynamic s = ThBoard.GetJson(adress);
+                foreach (dynamic h in s.threads)
                 {
-                    ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count);
-                    Th.Add(th);
+                    if (h.num != null && h.files_count != null)
+                    {
+                        ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count);
+                        Th.Add(th);
+                    }
                 }
             }
             return Th;
@@ -59,7 +64,7 @@ namespace Pes7BotCrator.Modules
             }
         }
 
-        private List<dynamic> getWebms(Bot Parent)
+        private List<dynamic> getWebms(Bot Parent, string adress)
         {
             List<dynamic> Dy = new List<dynamic>();
             List<ThBoard> Th = Get2chBoards(Parent);
@@ -69,7 +74,7 @@ namespace Pes7BotCrator.Modules
                 {
                     if (t.Discription.Contains("WEBM") || t.Discription.Contains("webm"))
                     {
-                        dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
+                        dynamic s = ThBoard.GetJson($"{adress}");
                         foreach (dynamic h in s.threads)
                         {
                             foreach (dynamic c in h.posts)
@@ -95,20 +100,27 @@ namespace Pes7BotCrator.Modules
         }
 
         public static int WebmCount = 0;
-        private List<dynamic> Webms;
+        private List<dynamic> WebmsW;
+        private List<dynamic> WebmsA;
         public void Ragenerated(Message ms, Bot Parent)
         {
             if (ms.From.Username == "nazarpes7")
             {
-                Webms = getWebms(Parent);
-                WebmCount = Webms.Count;
-                Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {Webms.Count} webms.");
+                WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
+                WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
+                WebmCount = WebmsW.Count;
+                Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
             }
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
         public void get2chSmartRandWebm(Message ms,Bot Parent)
         {
+            List<dynamic> Webms;
+            if (ms.Text.Split('-')?[1] != "a")
+                Webms = WebmsW;
+            else
+                Webms = WebmsA;
             if (Webms != null && Webms?.Count > 0)
             {
                 dynamic webm = Webms[Parent.rand.Next(0, Webms.Count)];

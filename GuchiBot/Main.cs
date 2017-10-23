@@ -53,6 +53,11 @@ namespace GuchiBot
                 "/2ch@guchimuchibot",
                 "/2ch"
             }));
+            Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
+            {
+                "/2ch@guchimuchibot -a",
+                "/2ch -a"
+            }));
             Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
             {
                 "/regenerate@guchimuchibot",
