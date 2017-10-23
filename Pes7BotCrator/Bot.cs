@@ -146,7 +146,10 @@ namespace Pes7BotCrator
             {
                 if (i / 60 / 60 > 1)
                 {
-                    str = $"{i / 60 / 60} hrs.";
+                    if (i / 60 / 60 > 24)
+                    {
+                        str = $"{i / 60 / 60 / 24} days.";
+                    } else str = $"{i / 60 / 60} hrs.";
                 }
                 else str = $"{i / 60} min.";
             }
@@ -158,7 +161,7 @@ namespace Pes7BotCrator
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCount}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)

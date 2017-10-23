@@ -85,7 +85,7 @@ namespace GuchiBot
         private bool TimerTrigger = false;
         private void TimeMinus_Click(object sender, EventArgs e)
         {
-            if (!TimerTrigger)
+            if (!TimerTrigger && Ms > 0)
             {
                 Ms -= 1000;
                 label1.Text = $"{Ms} ms";
@@ -128,7 +128,30 @@ namespace GuchiBot
         private void timer1_Tick(object sender, EventArgs e)
         {
             CurTime++;
+            TimerSynk();
             label1.Text = $"{CurTime} sec";
+        }
+
+        private void TimerSynk()
+        {
+            if (Bot != null)
+            {
+                if (CurTime >= Ms/1000)
+                {
+                    if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
+                    {
+                        if (Bot.rand.Next(0, 1) == 0)
+                        {
+                            Ch.SendWebm(Bot,  Ch.WebmsW[Bot.rand.Next(0, _2chModule.WebmCountW)]);
+                        }
+                        else
+                        {
+                            Ch.SendWebm(Bot, Ch.WebmsA[Bot.rand.Next(0, _2chModule.WebmCountA)]);
+                        }
+                    }
+                    CurTime = 0;
+                }
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -165,6 +188,12 @@ namespace GuchiBot
         private void button3_Click(object sender, EventArgs e)
         {
             Bot.Client.SendTextMessageAsync("@Pro100RedBull", "Kek TI PIDOR");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if(Bot != null)
+                Bot.Exceptions.Clear();
         }
     }
 }

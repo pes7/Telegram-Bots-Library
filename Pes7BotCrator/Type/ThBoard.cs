@@ -13,12 +13,14 @@ namespace Pes7BotCrator.Type
         public string Date { get; }
         public string Files_count { get; }
         public string Id { get; }
-        public ThBoard(string id = null, string disc = null, string date = null, string file_count = null)
+        public string Subject { get; }
+        public ThBoard(string id = null, string disc = null, string date = null, string file_count = null, string subject = null)
         {
             Discription = disc;
             Date = date;
             Files_count = file_count;
             Id = id;
+            Subject = subject;
         }
         public override string ToString()
         {
