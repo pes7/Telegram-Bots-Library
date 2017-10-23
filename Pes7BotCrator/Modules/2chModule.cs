@@ -116,7 +116,7 @@ namespace Pes7BotCrator.Modules
                 }
                 catch (Exception ex)
                 {
-                    Parent.Exceptions.Add(ex);
+                    //Parent.Exceptions.Add(ex);
                 }
             }
             return Dy;
@@ -153,13 +153,14 @@ namespace Pes7BotCrator.Modules
             {
                 dynamic webm = Webms[Parent.rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
-                SendWebm(Parent, webm);
+                SendWebm(Parent, webm, d);
             }
             else
                 Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
         }
 
-        public void SendWebm(Bot Parent, dynamic webm)
+        /*Be wery careful because we have there unless send if webm is not valid*/
+        public void SendWebm(Bot Parent, dynamic webm, string[] d = null)
         {
             if (webm != null)
             {
@@ -177,7 +178,22 @@ namespace Pes7BotCrator.Modules
                     }
                     catch (Exception ex)
                     {
-                        Parent.Exceptions.Add(ex);
+                        //Parent.Exceptions.Add(ex);
+                        if (d != null)
+                        {
+                            List<dynamic> Webms;
+                            if (d != null && d.Length > 1)
+                                if (d[1] == "а" || d[1] == "a")
+                                    Webms = WebmsA;
+                                else Webms = WebmsW;
+                            else Webms = WebmsW;
+                            if (Webms.Count > 0)
+                            {
+                                dynamic Webm = Webms[Parent.rand.Next(0, Webms.Count)];
+                                Webms.Remove(webm);
+                                SendWebm(Parent, webm, d);
+                            }
+                        }
                         return;
                     }
                 });

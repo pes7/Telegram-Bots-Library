@@ -21,14 +21,22 @@ namespace GuchiBot
         private Bot Bot;
         private int Ms = 20000;
         private int CurTime = 0;
-        private _2chModule Ch = new _2chModule();
+        private static _2chModule Ch = null;
+        private static SaveLoadModule Sv = null;
         private string LikePath = AppDomain.CurrentDomain.BaseDirectory + "like.bot";
         //private string loc = $"{AppDomain.CurrentDomain.BaseDirectory}bot.xml";
 
         public Main()
         {
             InitializeComponent();
-            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch");
+            Ch = new _2chModule();
+            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch", 
+                modules: new List<Module> {
+                    new Module("_2chModule",Ch),
+                    new Module("SaveLoadModule",Sv)
+                }
+            );
+            Bot.Modules.Find(fn=>fn.Name=="SaveLoadModule").Modulle = new SaveLoadModule(60, LikePath, Bot);
             if (Directory.Exists(LikePath))
             {
                 Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
@@ -142,11 +150,17 @@ namespace GuchiBot
                     {
                         if (Bot.rand.Next(0, 1) == 0)
                         {
-                            Ch.SendWebm(Bot,  Ch.WebmsW[Bot.rand.Next(0, _2chModule.WebmCountW)]);
+                            int rd = Bot.rand.Next(0, _2chModule.WebmCountW);
+                            Ch.SendWebm(Bot,  Ch.WebmsW[rd]);
+                            Ch.WebmsW.RemoveAt(rd);
+                            _2chModule.WebmCountW = Ch.WebmsW.Count;
                         }
                         else
                         {
-                            Ch.SendWebm(Bot, Ch.WebmsA[Bot.rand.Next(0, _2chModule.WebmCountA)]);
+                            int rd = Bot.rand.Next(0, _2chModule.WebmCountA);
+                            Ch.SendWebm(Bot, Ch.WebmsA[rd]);
+                            Ch.WebmsA.RemoveAt(rd);
+                            _2chModule.WebmCountA = Ch.WebmsA.Count;
                         }
                     }
                     CurTime = 0;

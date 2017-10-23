@@ -29,7 +29,9 @@ namespace Pes7BotCrator
         public List<Command> CommandsSynk { get; set; }
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
-        public List<Likes> LLikes { get; set; } 
+        public List<Likes> LLikes { get; set; }
+
+        public List<Module> Modules { get; set; }
 
         public List<SynkCommand> Commands { get; set; }
 
@@ -40,10 +42,11 @@ namespace Pes7BotCrator
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
 
-        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null)
+        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, List<Module> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             rand = new Random();
+            Modules = modules;
             CommandsSynk = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();

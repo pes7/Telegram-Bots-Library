@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -14,6 +15,34 @@ namespace Pes7BotCrator.Modules
 {
     public class SaveLoadModule
     {
+        public int InterVal { get; set; }
+        public string FileName { get; set; }
+        public Bot Parent { get; set; }
+        public SaveLoadModule(int i, string fn, Bot par)
+        {
+            InterVal = i;
+            FileName = fn;
+            Parent = par;
+        }
+
+        private int Curtime;
+        public void Start()
+        {
+            Curtime = 0;
+            Thread th = new Thread(Synk);
+            th.Start();
+        }
+
+        private void Synk()
+        {
+            if(Curtime >= InterVal)
+            {
+                SaveLikesToFile(Parent.LLikes, FileName);
+                Curtime = 0;
+            }
+            Curtime++;
+        }
+
         public static void SaveLikesToFile(List<Likes> likes, string fileName)
         {
             if (likes == null) { return; }
