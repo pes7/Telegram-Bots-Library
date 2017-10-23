@@ -36,11 +36,11 @@ namespace GuchiBot
                     new Module("SaveLoadModule",Sv)
                 }
             );
-            Bot.Modules.Find(fn=>fn.Name=="SaveLoadModule").Modulle = new SaveLoadModule(60, LikePath, Bot);
             if (Directory.Exists(LikePath))
             {
                 Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
+            Bot.Modules.Find(fn=>fn.Name=="SaveLoadModule").Modulle = new SaveLoadModule(60, LikePath, Bot);
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm@guchimuchibot",

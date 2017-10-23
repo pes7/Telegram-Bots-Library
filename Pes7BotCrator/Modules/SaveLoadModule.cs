@@ -37,7 +37,8 @@ namespace Pes7BotCrator.Modules
         {
             if(Curtime >= InterVal)
             {
-                SaveLikesToFile(Parent.LLikes, FileName);
+                if (Parent.LLikes.Count > 0)
+                    SaveLikesToFile(Parent.LLikes, FileName);
                 Curtime = 0;
             }
             Curtime++;

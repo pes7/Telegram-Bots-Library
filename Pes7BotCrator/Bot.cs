@@ -30,6 +30,7 @@ namespace Pes7BotCrator
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
         public List<Likes> LLikes { get; set; }
+        public List<dynamic> LastWebms { get; set; } //Need to done. we need to save names of webms that was posted, and when use regenerate del them. 
 
         public List<Module> Modules { get; set; }
 
@@ -54,6 +55,7 @@ namespace Pes7BotCrator
             Commands = new List<SynkCommand>();
             Exceptions = new List<Exception>();
             LLikes = new List<Likes>();
+            LastWebms = new List<dynamic>();
             WebmDir = webmdir;
             GachiImage = gachiimage;
             PreViewDir = preViewDir;

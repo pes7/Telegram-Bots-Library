@@ -179,6 +179,7 @@ namespace Pes7BotCrator.Modules
                     catch (Exception ex)
                     {
                         //Parent.Exceptions.Add(ex);
+                        /*
                         if (d != null)
                         {
                             List<dynamic> Webms;
@@ -194,6 +195,9 @@ namespace Pes7BotCrator.Modules
                                 SendWebm(Parent, webm, d);
                             }
                         }
+                        return;
+                        */
+                        await Parent.Client.SendTextMessageAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.");
                         return;
                     }
                 });
