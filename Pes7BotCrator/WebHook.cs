@@ -50,11 +50,11 @@ namespace Pes7BotCrator
                             if (sy.CommandLine.Exists(fn => fn == ms.Text))
                             {
                                 await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                Thread th = new Thread(() =>
+                                Thread the = new Thread(() =>
                                 {
                                     sy.doFunc(ms, Parent);
                                 });
-                                th.Start();
+                                the.Start();
                                 iser = true;
                                 break;
                             }
@@ -97,6 +97,16 @@ namespace Pes7BotCrator
                         else
                             ll.DisLikeId.Remove(ld);
                     }
+                    if(ll.DisLikeId.Count >= Parent.LikeDislikeQuata[1])
+                    {
+                        Thread sd = new Thread(async () =>
+                        {
+                            await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                        });
+                        sd.Start();
+                        break;
+                    }
+                        
                     var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
                         new [] {
                             new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {ll.LikeId.Count}","like"),

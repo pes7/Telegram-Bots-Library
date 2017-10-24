@@ -24,6 +24,8 @@ namespace Pes7BotCrator
         private Thread TimeSynk { get; set; }
         public WebHook WebHook { get; }
 
+        public int[] LikeDislikeQuata { get; set; }
+
         public List<Message> MessagesLast { get; set; }
         public List<dynamic> MessagesQueue { get; set; }
         public List<Command> CommandsSynk { get; set; }
@@ -43,11 +45,13 @@ namespace Pes7BotCrator
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
 
-        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, List<ModuleInterface> modules = null)
+        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             rand = new Random();
             Modules = modules;
+            if(likeDislikeQuata==null)
+                LikeDislikeQuata = new int[]{3,3};
             CommandsSynk = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
