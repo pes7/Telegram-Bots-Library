@@ -103,11 +103,15 @@ namespace Pes7BotCrator
                             new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {ll.DisLikeId.Count}","dislike")
                         }
                     });
-                    try
+                    Thread th = new Thread(async () =>
                     {
-                        await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
-                    }
-                    catch{ };
+                        try
+                        {
+                            await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                        }
+                        catch { };
+                    });
+                    th.Start();
                     break;
             }
         }

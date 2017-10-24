@@ -135,8 +135,8 @@ namespace Pes7BotCrator.Modules
 
         public static int WebmCountW = 0;
         public static int WebmCountA = 0;
-        public List<dynamic> WebmsW;
-        public List<dynamic> WebmsA;
+        public List<dynamic> WebmsW = null;
+        public List<dynamic> WebmsA = null;
         public void Ragenerated(Message ms, Bot Parent)
         {
             if (ms.From.Username == "nazarpes7")
