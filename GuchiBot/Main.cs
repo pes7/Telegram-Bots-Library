@@ -31,7 +31,7 @@ namespace GuchiBot
         {
             InitializeComponent();
             Ch = new _2chModule();
-            Sv = new SaveLoadModule(5, LikePath, this);
+            Sv = new SaveLoadModule(60, LikePath, this);
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
                 modules: new List<ModuleInterface> {
                     Ch,

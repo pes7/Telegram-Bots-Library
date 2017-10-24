@@ -141,6 +141,10 @@ namespace Pes7BotCrator.Modules
         {
             if (ms.From.Username == "nazarpes7")
             {
+                if (WebmsA != null)
+                    WebmsA.Clear();
+                if (WebmsW != null)
+                    WebmsW.Clear();
                 WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
                 WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
                 WebmCountW = WebmsW.Count;
