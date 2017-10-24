@@ -10,8 +10,13 @@ using System.Diagnostics;
 
 namespace Pes7BotCrator.Modules
 {
-    public class _2chModule
+    public class _2chModule : Module
     {
+        public _2chModule() : base("_2chModule")
+        {
+            Modulle = this;
+        }
+
         private List<ThBoard> Get2chBoards(Bot Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
@@ -20,7 +25,13 @@ namespace Pes7BotCrator.Modules
             {
                 if (h.num != null && h.files_count != null)
                 {
-                    ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count, (string)h.subject);
+                    string subj = null;
+                    try
+                    {
+                        subj = h.subject;
+                    }
+                    catch { }
+                    ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count, subj);
                     Th.Add(th);
                 }
             }

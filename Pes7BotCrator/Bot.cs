@@ -32,7 +32,7 @@ namespace Pes7BotCrator
         public List<Likes> LLikes { get; set; }
         public List<dynamic> LastWebms { get; set; } //Need to done. we need to save names of webms that was posted, and when use regenerate del them. 
 
-        public List<Module> Modules { get; set; }
+        public List<ModuleInterface> Modules { get; set; }
 
         public List<SynkCommand> Commands { get; set; }
 
@@ -43,7 +43,7 @@ namespace Pes7BotCrator
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
 
-        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, List<Module> modules = null)
+        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, List<ModuleInterface> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             rand = new Random();
@@ -73,6 +73,10 @@ namespace Pes7BotCrator
             TMessageQueueSynk.Start();
             TimeSynk = new Thread(TimeT);
             TimeSynk.Start();
+
+            ModuleInterface md = Modules.Find(fn => fn.Name == "SaveLoadModule");
+            if (md != null && md?.Modulle != null)
+                (md.Modulle as SaveLoadModule).Start();
         }
         private void GenerePreViewDir()
         {
@@ -123,6 +127,13 @@ namespace Pes7BotCrator
             WebThread.Abort();
             TMessageQueueSynk.Abort();
             TimeSynk.Abort();
+            foreach (ModuleInterface md in Modules)
+            {
+                if (md.Name == "SaveLoadModule" && md.MainThread != null)
+                {
+                    ((SaveLoadModule)md).AbortThread();
+                }
+            }
         }
 
         private void TimeT()
@@ -166,7 +177,7 @@ namespace Pes7BotCrator
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)
@@ -207,11 +218,6 @@ namespace Pes7BotCrator
                 }
             }
             Console.WriteLine("}");
-        }
-
-        internal void SendTextMessageAsync(object id, string v1, bool v2, bool v3, int v4, InlineKeyboardMarkup keyboard, ParseMode @default)
-        {
-            throw new NotImplementedException();
         }
     }
 }

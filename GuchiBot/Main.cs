@@ -13,12 +13,13 @@ using System.IO;
 using Pes7BotCrator;
 using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
+using System.Threading;
 
 namespace GuchiBot
 {
     public partial class Main : Form
     {
-        private Bot Bot;
+        public Bot Bot;
         private int Ms = 20000;
         private int CurTime = 0;
         private static _2chModule Ch = null;
@@ -30,17 +31,17 @@ namespace GuchiBot
         {
             InitializeComponent();
             Ch = new _2chModule();
-            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch", 
-                modules: new List<Module> {
-                    new Module("_2chModule",Ch),
-                    new Module("SaveLoadModule",Sv)
+            Sv = new SaveLoadModule(5, LikePath, this);
+            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
+                modules: new List<ModuleInterface> {
+                    Ch,
+                    Sv
                 }
             );
-            if (Directory.Exists(LikePath))
+            if (File.Exists(LikePath))
             {
                 Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
-            Bot.Modules.Find(fn=>fn.Name=="SaveLoadModule").Modulle = new SaveLoadModule(60, LikePath, Bot);
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm@guchimuchibot",

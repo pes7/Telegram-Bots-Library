@@ -13,35 +13,53 @@ using Pes7BotCrator.Type;
 
 namespace Pes7BotCrator.Modules
 {
-    public class SaveLoadModule
+    public class SaveLoadModule : ModuleInterface
     {
         public int InterVal { get; set; }
         public string FileName { get; set; }
-        public Bot Parent { get; set; }
-        public SaveLoadModule(int i, string fn, Bot par)
+        public dynamic Parent { get; set; }
+
+        public string Name { get; set; }
+        public dynamic Modulle { get; set; }
+        public Thread MainThread { get; set; }
+
+        public void AbortThread()
+        {
+            MainThread.Abort();
+        }
+
+        public SaveLoadModule(int i, string fn, dynamic parent)
         {
             InterVal = i;
             FileName = fn;
-            Parent = par;
+            Parent = parent;
+            Name = "SaveLoadModule";
+            Modulle = this;
         }
 
-        private int Curtime;
+        private int Curtime = 0;
         public void Start()
         {
             Curtime = 0;
-            Thread th = new Thread(Synk);
-            th.Start();
+            MainThread = new Thread(async () => { await SynkAsync(); });
+            MainThread.Start();
         }
 
-        private void Synk()
+        private async Task SynkAsync()
         {
-            if(Curtime >= InterVal)
+            while (true)
             {
-                if (Parent.LLikes.Count > 0)
-                    SaveLikesToFile(Parent.LLikes, FileName);
-                Curtime = 0;
+                if (Curtime >= InterVal)
+                {
+                    if (Parent?.Bot.LLikes.Count > 0) {
+                        List<Likes> ls = (List<Likes>)Parent.Bot.LLikes;
+                        SaveLikesToFile(ls, FileName);
+                    }
+                    Curtime = 0;
+                }
+                Curtime++;
+                Thread.Sleep(1000);
             }
-            Curtime++;
         }
 
         public static void SaveLikesToFile(List<Likes> likes, string fileName)
