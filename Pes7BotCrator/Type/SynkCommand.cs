@@ -12,7 +12,7 @@ namespace Pes7BotCrator.Type
         public List<string> CommandLine { get; set; }
         public dynamic doFunc { get; set; }
         public int SecondsSilents { get; set; }
-        public SynkCommand(Action<Message, Bot> act, int sec = 0, List<string> cm = null)
+        public SynkCommand(Action<Message, Bot> act, List<string> cm = null, int sec = 0)
         {
             SecondsSilents = sec;
             Incialize(act, cm);
