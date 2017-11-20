@@ -7,6 +7,7 @@ using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using System.Threading;
 using System.Diagnostics;
+using Pes7BotCrator.Commands;
 
 namespace Pes7BotCrator.Modules
 {
@@ -181,37 +182,12 @@ namespace Pes7BotCrator.Modules
             {
                 Thread th = new Thread(async () =>
                 {
-                    var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
-                        new [] {
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","like"),
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","dislike")
-                        }
-                        });
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, keyboard);
+                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, LikeDislikeComponent.getKeyBoard());
                     }
                     catch (Exception ex)
                     {
-                        //Parent.Exceptions.Add(ex);
-                        /*
-                        if (d != null)
-                        {
-                            List<dynamic> Webms;
-                            if (d != null && d.Length > 1)
-                                if (d[1] == "а" || d[1] == "a")
-                                    Webms = WebmsA;
-                                else Webms = WebmsW;
-                            else Webms = WebmsW;
-                            if (Webms.Count > 0)
-                            {
-                                dynamic Webm = Webms[Parent.rand.Next(0, Webms.Count)];
-                                Webms.Remove(webm);
-                                SendWebm(Parent, webm, d);
-                            }
-                        }
-                        return;
-                        */
                         await Parent.Client.SendTextMessageAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.");
                         return;
                     }

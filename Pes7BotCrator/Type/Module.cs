@@ -16,6 +16,7 @@ namespace Pes7BotCrator.Type
         {
             Name = name;
         }
+        public void Start() { }
         public void AbortThread()
         {
             if (MainThread != null)

@@ -22,7 +22,6 @@ namespace Pes7BotCrator
         public async void Start()
         {
             int offset = 0;
-            //Console.Clear();
             while (true)
             {
                 var update = await Parent.Client.GetUpdatesAsync(offset);
@@ -44,84 +43,33 @@ namespace Pes7BotCrator
                     {
                         Parent.MessagesLast.Add(ms);
                         LogSystem(ms.From);
-                        bool iser = false;
-                        foreach (SynkCommand sy in Parent.Commands)
+                        foreach (SynkCommand sy in Parent.Commands.Where(
+                            fn=>fn.Type == SynkCommand.TypeOfCommand.Standart && 
+                            fn.CommandLine.Exists(nf => nf == ms.Text)))
                         {
-                            if (sy.CommandLine.Exists(fn => fn == ms.Text))
+                            await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                            Thread the = new Thread(() =>
                             {
-                                await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                Thread the = new Thread(() =>
-                                {
-                                    sy.doFunc(ms, Parent);
-                                });
-                                the.Start();
-                                iser = true;
-                                break;
-                            }
+                                sy.doFunc(ms, Parent);
+                            });
+                            the.Start();
+                            break;
                         }
                     }
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
                     ms = Up.CallbackQuery.Message;
-                    Likes ll = Parent.LLikes.Find(ff => ff.MessageId == ms.MessageId);
-                    if (ll == null)
+                    foreach (SynkCommand sy in Parent.Commands.Where(
+                        fn=>fn.Type == SynkCommand.TypeOfCommand.Query 
+                        && fn.CommandLine.Exists(nf => nf == Up.CallbackQuery.Data)))
                     {
-                        Parent.LLikes.Add(new Likes(ms.MessageId,ms.Chat.Id));
-                        ll = Parent.LLikes.Last();
-                    }
-                    if (Up.CallbackQuery.Data == "like")
-                    {
-                        long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        if (li == 0 && ld == 0)
-                            ll.LikeId.Add(Up.CallbackQuery.From.Id);
-                        else if(li == 0 && ld != 0)
+                        Thread the = new Thread(() =>
                         {
-                            ll.LikeId.Add(ld);
-                            ll.DisLikeId.Remove(ld);
-                        }
-                        else
-                            ll.LikeId.Remove(li);
-                    }
-                    else if (Up.CallbackQuery.Data == "dislike")
-                    {
-                        long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                        if (li == 0 && ld == 0)
-                            ll.DisLikeId.Add(Up.CallbackQuery.From.Id);
-                        else if (li != 0 && ld == 0)
-                        {
-                            ll.DisLikeId.Add(li);
-                            ll.LikeId.Remove(li);
-                        }
-                        else
-                            ll.DisLikeId.Remove(ld);
-                    }
-                    if(ll.DisLikeId.Count >= Parent.LikeDislikeQuata[1])
-                    {
-                        Thread sd = new Thread(async () =>
-                        {
-                            await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                            sy.doFunc(ms, Parent, Up);
                         });
-                        sd.Start();
+                        the.Start();
                         break;
                     }
-                        
-                    var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
-                        new [] {
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {ll.LikeId.Count}","like"),
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {ll.DisLikeId.Count}","dislike")
-                        }
-                    });
-                    Thread th = new Thread(async () =>
-                    {
-                        try
-                        {
-                            await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
-                        }
-                        catch { };
-                    });
-                    th.Start();
                     break;
             }
         }

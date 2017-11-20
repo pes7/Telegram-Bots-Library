@@ -14,6 +14,7 @@ using Pes7BotCrator;
 using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using System.Threading;
+using Pes7BotCrator.Commands;
 
 namespace GuchiBot
 {
@@ -33,7 +34,7 @@ namespace GuchiBot
             Ch = new _2chModule();
             Sv = new SaveLoadModule(60, LikePath, this);
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
-                modules: new List<ModuleInterface> {
+                modules : new List<ModuleInterface> {
                     Ch,
                     Sv
                 }
@@ -42,6 +43,7 @@ namespace GuchiBot
             {
                 Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
+            Bot.Commands.Add(new LikeDislikeComponent());
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm@guchimuchibot",

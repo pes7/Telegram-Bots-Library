@@ -27,3 +27,4 @@ C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\b
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.VideoConverter.dll
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Newtonsoft.Json.xml
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\NReco.xml
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Newtonsoft.Json.xml

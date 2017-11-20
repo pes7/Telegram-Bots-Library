@@ -15,8 +15,10 @@ namespace Pes7BotCrator
 {
     public class Bot
     {
-        private String Key { get; set; }
+        private string Key { get; set; }
+        
         public Telegram.Bot.TelegramBotClient Client { get; set; }
+
         public Random rand { get; }
 
         private Thread WebThread { get; set; }
@@ -64,23 +66,31 @@ namespace Pes7BotCrator
             GachiImage = gachiimage;
             PreViewDir = preViewDir;
             GenerePreViewDir();
+
             WebHook = new WebHook(this);
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
             });
             WebThread.Start();
+
             TMessageQueueSynk = new Thread(async () =>
             {
                 await MessageQueueSynkAsync();
             });
             TMessageQueueSynk.Start();
+
             TimeSynk = new Thread(TimeT);
             TimeSynk.Start();
 
-            ModuleInterface md = Modules.Find(fn => fn.Name == "SaveLoadModule");
-            if (md != null && md?.Modulle != null)
-                (md.Modulle as SaveLoadModule).Start();
+            SynkModules();
+        }
+        private void SynkModules()
+        {
+            foreach (ModuleInterface nd in Modules)
+            {
+                nd.Start();
+            }
         }
         private void GenerePreViewDir()
         {
