@@ -9,9 +9,13 @@ namespace Pes7BotCrator.Type
 {
     public class SynkCommand
     {
+        private Action<CallbackQuery, Bot, Update> act;
+        private List<string> list;
+
         public enum TypeOfCommand {
             Standart,
-            Query
+            Query,
+            InlineQuery
         }
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
@@ -25,6 +29,7 @@ namespace Pes7BotCrator.Type
             Type = TypeOfCommand.Standart;
             Incialize(act, cm);
         }
+
         public SynkCommand(Action<Message, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
@@ -32,6 +37,23 @@ namespace Pes7BotCrator.Type
             Type = TypeOfCommand.Query;
             Incialize(act, cm);
         }
+
+        public SynkCommand(Action<InlineQuery, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        {
+            SecondsSilents = sec;
+            EndMessage = endMessage;
+            Type = TypeOfCommand.InlineQuery;
+            Incialize(act, cm);
+        }
+
+        public SynkCommand(Action<CallbackQuery, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        {
+            SecondsSilents = sec;
+            EndMessage = endMessage;
+            Type = TypeOfCommand.Query;
+            Incialize(act, cm);
+        }
+
         private void Incialize(dynamic ds, List<string> cm)
         {
             if (cm == null)

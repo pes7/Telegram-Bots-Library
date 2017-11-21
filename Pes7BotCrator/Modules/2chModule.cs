@@ -18,6 +18,8 @@ namespace Pes7BotCrator.Modules
             Modulle = this;
         }
 
+        public static List<dynamic> WebmsSent = new List<dynamic>();
+
         private List<ThBoard> Get2chBoards(Bot Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
@@ -184,7 +186,8 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, LikeDislikeComponent.getKeyBoard());
+                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, LikeDislikeComponent.getKeyBoard(webm.path));
+                        WebmsSent.Add(webm);
                     }
                     catch (Exception ex)
                     {

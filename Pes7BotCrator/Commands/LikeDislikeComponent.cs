@@ -12,78 +12,154 @@ namespace Pes7BotCrator.Commands
 {
     public class LikeDislikeComponent : SynkCommand
     {
-        public static InlineKeyboardMarkup getKeyBoard()
+        public static InlineKeyboardMarkup getKeyBoard(string query = null)
         {
-            var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
-                new [] {
-                    new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","like"),
-                    new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","dislike")
-                }
-            });
+            InlineKeyboardMarkup keyboard = null;
+            if (query == null)
+            {
+                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","type:like:l:0:d:0"),
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","type:dislike:l:0:d:0")
+                    }
+                });
+            }
+            else
+            {
+                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","type:like:l:0:d:0"),
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","type:dislike:l:0:d:0")
+                    },
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                    }
+                });
+            }
             return keyboard;
         }
 
-        public static void Act(Message ms, Bot Parent, Update Up)
+        public static InlineKeyboardMarkup getKeyBoard(int l, int d, string query = null)
         {
-            Likes ll = Parent.LLikes.Find(ff => ff.MessageId == ms.MessageId);
-            if (ll == null)
+            InlineKeyboardMarkup keyboard = null;
+            if (query == null)
             {
-                Parent.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
-                ll = Parent.LLikes.Last();
-            }
-            if (Up.CallbackQuery.Data == "like")
-            {
-                long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                if (li == 0 && ld == 0)
-                    ll.LikeId.Add(Up.CallbackQuery.From.Id);
-                else if (li == 0 && ld != 0)
-                {
-                    ll.LikeId.Add(ld);
-                    ll.DisLikeId.Remove(ld);
-                }
-                else
-                    ll.LikeId.Remove(li);
-            }
-            else if (Up.CallbackQuery.Data == "dislike")
-            {
-                long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                if (li == 0 && ld == 0)
-                    ll.DisLikeId.Add(Up.CallbackQuery.From.Id);
-                else if (li != 0 && ld == 0)
-                {
-                    ll.DisLikeId.Add(li);
-                    ll.LikeId.Remove(li);
-                }
-                else
-                    ll.DisLikeId.Remove(ld);
-            }
-            if (ll.DisLikeId.Count >= Parent.LikeDislikeQuata[1])
-            {
-                Thread sd = new Thread(async () =>
-                {
-                    await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {l}",$"type:like:l:{l}:d:{d}"),
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {d}",$"type:dislike:l:{l}:d:{d}")
+                    }
                 });
-                sd.Start();
-                return;
             }
-
-            var keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
-                        new [] {
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {ll.LikeId.Count}","like"),
-                            new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {ll.DisLikeId.Count}","dislike")
-                        }
-                    });
-            Thread th = new Thread(async () =>
+            else
             {
-                try
+                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {l}",$"type:like:l:{l}:d:{d}:query:{query}"),
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {d}",$"type:dislike:l:{l}:d:{d}:query:{query}")
+                    },
+                    new [] {
+                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                    }
+                });
+            }
+            return keyboard;
+        }
+
+        public static void Act(CallbackQuery re, Bot Parent, Update Up)
+        {
+            Message ms = re.Message;
+            if (ms != null)
+            {
+                Likes ll = Parent.LLikes.Find(ff => ff.MessageId == ms.MessageId);
+                if (ll == null)
                 {
-                    await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                    Parent.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
+                    ll = Parent.LLikes.Last();
                 }
-                catch { };
-            });
-            th.Start();
+                string[] Dd = Up.CallbackQuery.Data.Split(':');
+                if (Dd[1] == "like")
+                {
+                    long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    if (li == 0 && ld == 0)
+                        ll.LikeId.Add(Up.CallbackQuery.From.Id);
+                    else if (li == 0 && ld != 0)
+                    {
+                        ll.LikeId.Add(ld);
+                        ll.DisLikeId.Remove(ld);
+                    }
+                    else
+                        ll.LikeId.Remove(li);
+                }
+                else if (Dd[1] == "dislike")
+                {
+                    long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    if (li == 0 && ld == 0)
+                        ll.DisLikeId.Add(Up.CallbackQuery.From.Id);
+                    else if (li != 0 && ld == 0)
+                    {
+                        ll.DisLikeId.Add(li);
+                        ll.LikeId.Remove(li);
+                    }
+                    else
+                        ll.DisLikeId.Remove(ld);
+                }
+                if (ll.DisLikeId.Count >= Parent.LikeDislikeQuata[1])
+                {
+                    Thread sd = new Thread(async () =>
+                    {
+                        await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                    });
+                    sd.Start();
+                    return;
+                }
+
+                InlineKeyboardMarkup keyboard = null;
+                if (Dd.Length>6)
+                    keyboard = getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count,Dd[7]);
+                else
+                    keyboard = getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count);
+                Thread th = new Thread(async () =>
+                {
+                    try
+                    {
+                        await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                    }
+                    catch { };
+                });
+                th.Start();
+            }
+            else
+            {
+                /*
+                 * 
+                 * Сделать привязку к ЮЗВЕРЮ который лайкал!!!
+                 * 
+                 * */
+
+
+                string[] query = re.Data.Split(':');
+                int l = int.Parse(query[3]);
+                int d = int.Parse(query[5]);
+                if (query[1] == "like") l++; else d++;
+
+                InlineKeyboardMarkup keyboard = null;
+                if (query.Length > 6)
+                    keyboard = getKeyBoard(l,d, query[7]);
+                else
+                    keyboard = getKeyBoard(l,d);
+                Thread th = new Thread(async () =>
+                {
+                    try
+                    {
+                        await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId,keyboard);
+                    }
+                    catch { };
+                });
+                th.Start();
+            }
         }
 
         public LikeDislikeComponent() : base(Act, new List<string> {"like", "dislike" }) { }

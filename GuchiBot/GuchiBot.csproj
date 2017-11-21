@@ -42,9 +42,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Pes7BotCrator\bin\Debug\NReco.VideoConverter.dll</HintPath>
     </Reference>
-    <Reference Include="Pes7BotCrator">
-      <HintPath>..\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -86,6 +83,12 @@
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pes7BotCrator\Pes7BotCrator.csproj">
+      <Project>{6e631153-5c32-4327-987d-8085330157f7}</Project>
+      <Name>Pes7BotCrator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

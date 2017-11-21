@@ -15,6 +15,7 @@ using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using System.Threading;
 using Pes7BotCrator.Commands;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace GuchiBot
 {
@@ -80,7 +81,7 @@ namespace GuchiBot
             }));
             Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
             {
-                "default"
+                "Default"
             }));
             label1.Text = $"{Ms} ms";
         }
@@ -187,8 +188,10 @@ namespace GuchiBot
             {
                 try
                 {
-                    Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
-                }catch(Exception ex) { Bot.Exceptions.Add(ex); }
+                    //Bot.Client.SendTextMessageAsync(chatId: Bot.MessagesLast.Last().Chat.Id,text: "@Pro100RedBull ЛГБТ", replyMarkup: (new ForceReply() { Force = true }));
+                    //Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
+                }
+                catch (Exception ex) { Bot.Exceptions.Add(ex); }
             }
         }
 

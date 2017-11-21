@@ -67,6 +67,10 @@ namespace Pes7BotCrator
             PreViewDir = preViewDir;
             GenerePreViewDir();
 
+            //Client.OnInlineQuery += Client_OnInlineQuery;
+            //Client.OnInlineResultChosen += Client_OnInlineResultChosen;
+            //Client.StartReceiving();
+
             WebHook = new WebHook(this);
             WebThread = new Thread(() =>
             {
@@ -85,6 +89,7 @@ namespace Pes7BotCrator
 
             SynkModules();
         }
+
         private void SynkModules()
         {
             foreach (ModuleInterface nd in Modules)
