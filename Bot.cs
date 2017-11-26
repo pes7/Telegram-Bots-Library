@@ -16,6 +16,7 @@ namespace Pes7BotCrator
 {
     public class Bot : BotBase
     {
+        public Random rand { get; }
         public List<dynamic> LastWebms { get; set; } //Need to done. we need to save names of webms that was posted, and when use regenerate del them. 
 
         public string WebmDir { get; set; }
@@ -25,6 +26,7 @@ namespace Pes7BotCrator
         public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null) :
             base (key,likeDislikeQuata,modules)
         {
+            rand = new Random();
             if (LikeDislikeComponent.LikeDislikeQuata == null)
                 LikeDislikeComponent.LikeDislikeQuata = new int[] { 3, 3 };
             LikeDislikeComponent.LLikes = new List<Likes>();

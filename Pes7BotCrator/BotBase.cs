@@ -1,92 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pes7BotCrator
 {
-    public class Bot
+    public abstract class BotBase : BotInteface
     {
-        private string Key { get; set; }
-        
+        public string Key { get; set; }
+        public Random Rand { get; set; } = new Random();
         public Telegram.Bot.TelegramBotClient Client { get; set; }
-
-        public Random rand { get; }
-
-        private Thread WebThread { get; set; }
-        private Thread TMessageQueueSynk { get; set; }
-        private Thread TimeSynk { get; set; }
-        public WebHook WebHook { get; }
-
-        public int[] LikeDislikeQuata { get; set; }
-
+        public Thread WebThread { get; set; }
+        public Thread TMessageQueueSynk { get; set; }
+        public Thread TimeSynk { get; set; }
+        public WebHook WebHook { get; set; }
         public List<Message> MessagesLast { get; set; }
         public List<dynamic> MessagesQueue { get; set; }
         public List<Command> CommandsSynk { get; set; }
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
-        public List<Likes> LLikes { get; set; }
-        public List<dynamic> LastWebms { get; set; } //Need to done. we need to save names of webms that was posted, and when use regenerate del them. 
 
         public List<ModuleInterface> Modules { get; set; }
+        public ModuleInterface GetModule(string name)
+        {
+            return this.Modules.Find(fn => fn.Name == name);
+        }
 
         public List<SynkCommand> Commands { get; set; }
-
         public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
         public int RunTime { get; set; } = 0;
 
-        public string WebmDir { get; set; }
-        public string GachiImage { get; set; }
-        public string PreViewDir { get; set; } //If nun, generated.
-
-        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null)
+        public BotBase(string key, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
-            rand = new Random();
             Modules = modules;
-            if(likeDislikeQuata==null)
-                LikeDislikeQuata = new int[]{3,3};
             CommandsSynk = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
             ActiveUsers = new List<UserM>();
             Commands = new List<SynkCommand>();
             Exceptions = new List<Exception>();
-            LLikes = new List<Likes>();
-            LastWebms = new List<dynamic>();
-            WebmDir = webmdir;
-            GachiImage = gachiimage;
-            PreViewDir = preViewDir;
-            GenerePreViewDir();
-
-            //Client.OnInlineQuery += Client_OnInlineQuery;
-            //Client.OnInlineResultChosen += Client_OnInlineResultChosen;
-            //Client.StartReceiving();
-
             WebHook = new WebHook(this);
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
             });
             WebThread.Start();
-
             TMessageQueueSynk = new Thread(async () =>
             {
                 await MessageQueueSynkAsync();
             });
             TMessageQueueSynk.Start();
-
             TimeSynk = new Thread(TimeT);
             TimeSynk.Start();
-
             SynkModules();
         }
 
@@ -97,30 +67,20 @@ namespace Pes7BotCrator
                 nd.Start();
             }
         }
-        private void GenerePreViewDir()
-        {
-            if (PreViewDir == null)
-            {
-                if (!Directory.Exists(PreViewDir))
-                {
-                    Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}/previews/");
-                    PreViewDir = $"{AppDomain.CurrentDomain.BaseDirectory}/previews/";
-                }
-            }
-        }
-        public static async Task ClearCommandAsync(long id, int msgid, Bot Parent)
+        public static async Task ClearCommandAsync(long id, int msgid, BotInteface Parent)
         {
             try
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Parent.Exceptions.Add(ex);
             }
         }
-        public void SendMessage(long ChatId, string text, UserM user = null)
+        public virtual void SendMessage(long ChatId, string text, UserM user = null)
         {
-           MessagesQueue.Add(new { id = ChatId, text = text });
+            MessagesQueue.Add(new { id = ChatId, text = text });
         }
         public async Task MessageQueueSynkAsync()
         {
@@ -136,26 +96,22 @@ namespace Pes7BotCrator
                     }
                     catch (Exception ex) { Exceptions.Add(ex); }
                     MessagesQueue.RemoveAt(0);
-                    //ShowInf();
                 }
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             WebThread.Abort();
             TMessageQueueSynk.Abort();
             TimeSynk.Abort();
             foreach (ModuleInterface md in Modules)
             {
-                if (md.Name == "SaveLoadModule" && md.MainThread != null)
-                {
-                    ((SaveLoadModule)md).AbortThread();
-                }
+                md.AbortThread();
             }
         }
 
-        private void TimeT()
+        private  void TimeT()
         {
             while (true)
             {
@@ -168,7 +124,7 @@ namespace Pes7BotCrator
 
         public void BotSynk()
         {
-            if(RunTime % 60 == 0)
+            if (RunTime % 60 == 0)
             {
                 CountOfAvailableMessages = 20;
             }
@@ -184,7 +140,8 @@ namespace Pes7BotCrator
                     if (i / 60 / 60 > 24)
                     {
                         str = $"{i / 60 / 60 / 24} days.";
-                    } else str = $"{i / 60 / 60} hrs.";
+                    }
+                    else str = $"{i / 60 / 60} hrs.";
                 }
                 else str = $"{i / 60} min.";
             }
@@ -192,11 +149,11 @@ namespace Pes7BotCrator
             return str;
         }
 
-        public void ShowInf()
+        public virtual void ShowInf()
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {LLikes.Count}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)

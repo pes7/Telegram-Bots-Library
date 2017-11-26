@@ -9,7 +9,7 @@ namespace Pes7BotCrator.Type
 {
     public class SynkCommand
     {
-        private Action<CallbackQuery, Bot, Update> act;
+        private Action<CallbackQuery, BotBase, Update> act;
         private List<string> list;
 
         public enum TypeOfCommand {
@@ -22,7 +22,7 @@ namespace Pes7BotCrator.Type
         public dynamic doFunc { get; set; }
         public int SecondsSilents { get; set; }
         public string EndMessage { get; set; }
-        public SynkCommand(Action<Message, Bot> act, List<string> cm = null,int sec = 0, string endMessage = null)
+        public SynkCommand(Action<Message, BotInteface> act, List<string> cm = null,int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
@@ -30,7 +30,7 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
-        public SynkCommand(Action<Message, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<Message, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
@@ -38,7 +38,7 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
-        public SynkCommand(Action<InlineQuery, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<InlineQuery, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
@@ -46,7 +46,7 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
-        public SynkCommand(Action<CallbackQuery, Bot, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<CallbackQuery, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;

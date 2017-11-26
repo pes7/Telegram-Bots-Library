@@ -10,8 +10,22 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pes7BotCrator.Commands
 {
-    public class LikeDislikeComponent : SynkCommand
+    public class LikeDislikeComponent : Module
     {
+        /*
+         * НУЖНО ЗАНОСИТЬ В JSON всех кто лайкнул и дизлайкнул
+         */
+
+        public LikeDislikeComponent() : base("LikeDislikeModule") { Command = new LikeSynkCommand(); }
+        public static List<Likes> LLikes { get; set; } = new List<Likes>();
+        public static int[] LikeDislikeQuata { get; set; }
+        public LikeSynkCommand Command { get; set; }
+
+        public class LikeSynkCommand : SynkCommand
+        {
+            public LikeSynkCommand() : base(Act, new List<string> { "like", "dislike" }) { }
+        }
+
         public static InlineKeyboardMarkup getKeyBoard(string query = null)
         {
             InlineKeyboardMarkup keyboard = null;
@@ -66,16 +80,16 @@ namespace Pes7BotCrator.Commands
             return keyboard;
         }
 
-        public static void Act(CallbackQuery re, Bot Parent, Update Up)
+        public static void Act(CallbackQuery re, BotInteface Parent, Update Up)
         {
             Message ms = re.Message;
             if (ms != null)
             {
-                Likes ll = Parent.LLikes.Find(ff => ff.MessageId == ms.MessageId);
+                Likes ll = LLikes.Find(ff => ff.MessageId == ms.MessageId);
                 if (ll == null)
                 {
-                    Parent.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
-                    ll = Parent.LLikes.Last();
+                    LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
+                    ll = LLikes.Last();
                 }
                 string[] Dd = Up.CallbackQuery.Data.Split(':');
                 if (Dd[1] == "like")
@@ -106,19 +120,19 @@ namespace Pes7BotCrator.Commands
                     else
                         ll.DisLikeId.Remove(ld);
                 }
-                if (ll.DisLikeId.Count >= Parent.LikeDislikeQuata[1])
+                if (ll.DisLikeId.Count >= LikeDislikeQuata[1])
                 {
                     Thread sd = new Thread(async () =>
                     {
-                        await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                        await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                     });
                     sd.Start();
                     return;
                 }
 
                 InlineKeyboardMarkup keyboard = null;
-                if (Dd.Length>6)
-                    keyboard = getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count,Dd[7]);
+                if (Dd.Length > 6)
+                    keyboard = getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count, Dd[7]);
                 else
                     keyboard = getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count);
                 Thread th = new Thread(async () =>
@@ -147,21 +161,19 @@ namespace Pes7BotCrator.Commands
 
                 InlineKeyboardMarkup keyboard = null;
                 if (query.Length > 6)
-                    keyboard = getKeyBoard(l,d, query[7]);
+                    keyboard = getKeyBoard(l, d, query[7]);
                 else
-                    keyboard = getKeyBoard(l,d);
+                    keyboard = getKeyBoard(l, d);
                 Thread th = new Thread(async () =>
                 {
                     try
                     {
-                        await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId,keyboard);
+                        await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
                     }
                     catch { };
                 });
                 th.Start();
             }
         }
-
-        public LikeDislikeComponent() : base(Act, new List<string> {"like", "dislike" }) { }
     }
 }

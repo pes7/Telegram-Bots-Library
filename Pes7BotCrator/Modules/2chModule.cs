@@ -20,7 +20,7 @@ namespace Pes7BotCrator.Modules
 
         public static List<dynamic> WebmsSent = new List<dynamic>();
 
-        private List<ThBoard> Get2chBoards(Bot Parent, string address)
+        private List<ThBoard> Get2chBoards(BotInteface Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
             dynamic s = ThBoard.GetJson(address);
@@ -41,12 +41,12 @@ namespace Pes7BotCrator.Modules
             return Th;
         }
 
-        public void ParseWebmsFromDvach(Bot Parent)
+        public void ParseWebmsFromDvach(BotInteface Parent)
         {
             DvochSynkAsync(Get2chBoards(Parent, "http://2ch.hk/b/catalog_num.json"),Parent);
         }
 
-        public async Task DvochSynkAsync(List<ThBoard> th, Bot Parent)
+        public async Task DvochSynkAsync(List<ThBoard> th, BotInteface Parent)
         {
             foreach (ThBoard t in th)
             {
@@ -96,7 +96,7 @@ namespace Pes7BotCrator.Modules
             return iser;
         }
 
-        private List<dynamic> getWebms(Bot Parent, string address)
+        private List<dynamic> getWebms(BotInteface Parent, string address)
         {
             List<dynamic> Dy = new List<dynamic>();
             List<ThBoard> Th = Get2chBoards(Parent, address);
@@ -140,7 +140,7 @@ namespace Pes7BotCrator.Modules
         public static int WebmCountA = 0;
         public List<dynamic> WebmsW = null;
         public List<dynamic> WebmsA = null;
-        public void Ragenerated(Message ms, Bot Parent)
+        public void Ragenerated(Message ms, BotInteface Parent)
         {
             if (ms.From.Username == "nazarpes7")
             {
@@ -157,7 +157,7 @@ namespace Pes7BotCrator.Modules
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
-        public void get2chSmartRandWebm(Message ms,Bot Parent)
+        public void get2chSmartRandWebm(Message ms,BotInteface Parent)
         {
             List<dynamic> Webms;
             string[] d = ms.Text.Split('-');
@@ -169,7 +169,7 @@ namespace Pes7BotCrator.Modules
 
             if (Webms != null && Webms?.Count > 0)
             {
-                dynamic webm = Webms[Parent.rand.Next(0, Webms.Count)];
+                dynamic webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
                 SendWebm(Parent, webm, d);
             }
@@ -178,7 +178,7 @@ namespace Pes7BotCrator.Modules
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(Bot Parent, dynamic webm, string[] d = null)
+        public void SendWebm(BotInteface Parent, dynamic webm, string[] d = null)
         {
             if (webm != null)
             {

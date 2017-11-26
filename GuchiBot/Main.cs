@@ -35,16 +35,17 @@ namespace GuchiBot
             Ch = new _2chModule();
             Sv = new SaveLoadModule(60, LikePath, this);
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
-                modules : new List<ModuleInterface> {
+                modules: new List<ModuleInterface> {
                     Ch,
-                    Sv
+                    Sv,
+                    new LikeDislikeComponent()
                 }
             );
             if (File.Exists(LikePath))
             {
-                Bot.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
+                LikeDislikeComponent.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
-            Bot.Commands.Add(new LikeDislikeComponent());
+            Bot.Commands.Add(new LikeDislikeComponent().Command);
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm@guchimuchibot",
@@ -78,6 +79,10 @@ namespace GuchiBot
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetArgkSynk, new List<string>()
             {
                 "/testmemory"
+            }));
+            Bot.Commands.Add(new SynkCommand(new BotLogic().Oprosic, new List<string>()
+            {
+                "/opros"
             }));
             Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
             {
@@ -152,16 +157,16 @@ namespace GuchiBot
                 {
                     if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
                     {
-                        if (Bot.rand.Next(0, 1) == 0)
+                        if (Bot.Rand.Next(0, 1) == 0)
                         {
-                            int rd = Bot.rand.Next(0, _2chModule.WebmCountW);
+                            int rd = Bot.Rand.Next(0, _2chModule.WebmCountW);
                             Ch.SendWebm(Bot,  Ch.WebmsW[rd]);
                             Ch.WebmsW.RemoveAt(rd);
                             _2chModule.WebmCountW = Ch.WebmsW.Count;
                         }
                         else
                         {
-                            int rd = Bot.rand.Next(0, _2chModule.WebmCountA);
+                            int rd = Bot.Rand.Next(0, _2chModule.WebmCountA);
                             Ch.SendWebm(Bot, Ch.WebmsA[rd]);
                             Ch.WebmsA.RemoveAt(rd);
                             _2chModule.WebmCountA = Ch.WebmsA.Count;
@@ -197,9 +202,9 @@ namespace GuchiBot
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (Bot.LLikes.Count > 0)
+            if (LikeDislikeComponent.LLikes.Count > 0)
             {
-                SaveLoadModule.SaveLikesToFile(Bot.LLikes, LikePath);
+                SaveLoadModule.SaveLikesToFile(LikeDislikeComponent.LLikes, LikePath);
             }
             Bot.Dispose();
             base.OnFormClosed(e);

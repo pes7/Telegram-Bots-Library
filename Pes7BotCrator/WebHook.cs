@@ -15,8 +15,8 @@ namespace Pes7BotCrator
 {
     public class WebHook
     {
-        private Bot Parent { get; set; }
-        public WebHook(Bot parent)
+        private BotInteface Parent { get; set; }
+        public WebHook(BotInteface parent)
         {
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
@@ -52,7 +52,7 @@ namespace Pes7BotCrator
                                 fn => fn.Type == SynkCommand.TypeOfCommand.Standart &&
                                 fn.CommandLine.Exists(nf => nf == ms.Text)))
                             {
-                                await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 Thread the = new Thread(() =>
                                 {
                                     sy.doFunc(ms, Parent);

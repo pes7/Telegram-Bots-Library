@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
+using Pes7BotCrator.Commands;
 using Pes7BotCrator.Type;
 
 namespace Pes7BotCrator.Modules
@@ -51,9 +52,15 @@ namespace Pes7BotCrator.Modules
             {
                 if (Curtime >= InterVal)
                 {
-                    if (Parent?.Bot.LLikes.Count > 0) {
-                        List<Likes> ls = (List<Likes>)Parent.Bot.LLikes;
-                        SaveLikesToFile(ls, FileName);
+                    BotInteface bt = Parent?.Bot;
+                    if (bt != null) {
+                        if (bt.GetModule("LikeDislikeModule") != null) {
+                            if (LikeDislikeComponent.LLikes.Count > 0)
+                            {
+                                List<Likes> ls = LikeDislikeComponent.LLikes;
+                                SaveLikesToFile(ls, FileName);
+                            }
+                        }
                     }
                     Curtime = 0;
                 }
