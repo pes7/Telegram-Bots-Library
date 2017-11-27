@@ -16,11 +16,16 @@ using Pes7BotCrator.Type;
 using System.Threading;
 using Pes7BotCrator.Commands;
 using Telegram.Bot.Types.ReplyMarkups;
+using LuaAble;
 
 namespace GuchiBot
 {
     public partial class Main : Form
     {
+        /*
+         Долепить вывод инфы в ListView, туда также передать картинки юзверей что чатяться.
+             */
+        
         public Bot Bot;
         private int Ms = 20000;
         private int CurTime = 0;
@@ -29,9 +34,12 @@ namespace GuchiBot
         private string LikePath = AppDomain.CurrentDomain.BaseDirectory + "like.bot";
         //private string loc = $"{AppDomain.CurrentDomain.BaseDirectory}bot.xml";
 
+        public OLua lua; // Ради фана
+
         public Main()
         {
             InitializeComponent();
+
             Ch = new _2chModule();
             Sv = new SaveLoadModule(60, LikePath, this);
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
@@ -41,6 +49,12 @@ namespace GuchiBot
                     new LikeDislikeComponent()
                 }
             );
+
+            // Ради фана
+            lua = new OLua(Bot);
+            //lua.LoadScriptsFromDirectory();
+            //
+
             if (File.Exists(LikePath))
             {
                 LikeDislikeComponent.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
@@ -89,6 +103,24 @@ namespace GuchiBot
                 "Default"
             }));
             label1.Text = $"{Ms} ms";
+
+            /*
+            Thread th = new Thread(async () =>
+            {
+                while (true)
+                {
+                    await this.GetInf();
+                    Thread.Sleep(1000);
+                }
+            });
+            th.Start();
+            */
+        }
+
+        private async Task GetInf()
+        {
+            listBox1.Items.Clear();
+            listBox1.Items.AddRange(Bot.getInfForList());
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -219,6 +251,11 @@ namespace GuchiBot
         {
             if(Bot != null)
                 Bot.Exceptions.Clear();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            lua.Lua.DoString(textBox4.Text);
         }
     }
 }

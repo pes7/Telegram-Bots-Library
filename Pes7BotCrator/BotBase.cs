@@ -130,7 +130,7 @@ namespace Pes7BotCrator
             }
         }
 
-        private string TimeToString(int i)
+        public string TimeToString(int i)
         {
             string str;
             if (i / 60 > 1)

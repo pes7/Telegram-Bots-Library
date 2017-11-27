@@ -59,7 +59,7 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="BotInteface.cs" />
-    <Compile Include="Commands\LikeDislikeComponent.cs" />
+    <Compile Include="Modules\LikeDislikeComponent.cs" />
     <Compile Include="Modules\2chModule.cs" />
     <Compile Include="Modules\SaveLoadModule.cs" />
     <Compile Include="Modules\StatiscticOfGroup.cs" />
@@ -73,7 +73,9 @@
     <Compile Include="Type\UserM.cs" />
     <Compile Include="WebHook.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Commands\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

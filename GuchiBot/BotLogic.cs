@@ -68,7 +68,7 @@ namespace GuchiBot
 
         public async void GachiAttakSynk(Message ms, BotInteface Parent)
         {
-            await Parent.Client.SendTextMessageAsync(ms.Chat.Id,"Sorry, but it is to strong weapon for u.");
+            await Parent.Client.SendTextMessageAsync(ms.Chat.Id,$"Sorry, but it is to strong weapon for u. @{ms.From.Username}");
             return;
             if (!GachiAttakTrigger)
             {

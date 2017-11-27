@@ -23,22 +23,26 @@ namespace Pes7BotCrator.Modules
         private List<ThBoard> Get2chBoards(BotInteface Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
-            dynamic s = ThBoard.GetJson(address);
-            foreach (dynamic h in s.threads)
+            try
             {
-                if (h.num != null && h.files_count != null)
+                dynamic s = ThBoard.GetJson(address);
+                foreach (dynamic h in s.threads)
                 {
-                    string subj = null;
-                    try
+                    if (h.num != null && h.files_count != null)
                     {
-                        subj = h.subject;
+                        string subj = null;
+                        try
+                        {
+                            subj = h.subject;
+                        }
+                        catch { }
+                        ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count, subj);
+                        Th.Add(th);
                     }
-                    catch { }
-                    ThBoard th = new ThBoard((string)h.num, (string)h.comment, (string)h.date, (string)h.files_count, subj);
-                    Th.Add(th);
                 }
+                return Th;
             }
-            return Th;
+            catch (Exception ex){ Parent.Exceptions.Add(ex); return null; }
         }
 
         public void ParseWebmsFromDvach(BotInteface Parent)
@@ -52,23 +56,26 @@ namespace Pes7BotCrator.Modules
             {
                 if (t.Discription.Contains("WEBM"))
                 {
-                    dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
-                    foreach (dynamic h in s.threads)
+                    try
                     {
-                        foreach (dynamic c in h.posts)
+                        dynamic s = ThBoard.GetJson($"http://2ch.hk/b/res/{t.Id}.json");
+                        foreach (dynamic h in s.threads)
                         {
-                            foreach (dynamic f in c.files)
+                            foreach (dynamic c in h.posts)
                             {
-                                var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
-                                string format = ((string)file.path).Split('.')[2];
-                                if (format == "webm")
+                                foreach (dynamic f in c.files)
                                 {
-                                    Console.WriteLine($"{format}|{file.fullname}|{file.path}|{file.thumbnail}");
-                                    await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(file.thumbnail), file.path);
+                                    var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
+                                    string format = ((string)file.path).Split('.')[2];
+                                    if (format == "webm")
+                                    {
+                                        Console.WriteLine($"{format}|{file.fullname}|{file.path}|{file.thumbnail}");
+                                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(file.thumbnail), file.path);
+                                    }
                                 }
                             }
                         }
-                    }
+                    } catch (Exception ex) { Parent.Exceptions.Add(ex); return; }
                 }
             }
         }
@@ -109,22 +116,25 @@ namespace Pes7BotCrator.Modules
                     {
                         if (FilterThread(t))
                         {
-                            dynamic s = ThBoard.GetJson($"http://2ch.hk/{tag}/res/{t.Id}.json");
-                            foreach (dynamic h in s.threads)
+                            try
                             {
-                                foreach (dynamic c in h.posts)
+                                dynamic s = ThBoard.GetJson($"http://2ch.hk/{tag}/res/{t.Id}.json");
+                                foreach (dynamic h in s.threads)
                                 {
-                                    foreach (dynamic f in c.files)
+                                    foreach (dynamic c in h.posts)
                                     {
-                                        var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
-                                        string format = ((string)file.path).Split('.')[2];
-                                        if (format == "webm" || format == "mp4")
+                                        foreach (dynamic f in c.files)
                                         {
-                                            Dy.Add(file);
+                                            var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
+                                            string format = ((string)file.path).Split('.')[2];
+                                            if (format == "webm" || format == "mp4")
+                                            {
+                                                Dy.Add(file);
+                                            }
                                         }
                                     }
                                 }
-                            }
+                            } catch (Exception ex) { Parent.Exceptions.Add(ex); return null; }
                         }
                     }
                 }

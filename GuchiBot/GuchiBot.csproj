@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LuaAble">
+      <HintPath>..\..\..\..\..\Source\Repos\Diplom\UniversytyProjects\TestLua\bin\Debug\LuaAble.dll</HintPath>
+    </Reference>
+    <Reference Include="LuaInterface">
+      <HintPath>..\..\..\..\..\Source\Repos\Diplom\UniversytyProjects\TestLua\bin\Debug\LuaInterface.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -66,12 +72,15 @@
   <ItemGroup>
     <Compile Include="Bot.cs" />
     <Compile Include="BotLogic.cs" />
+    <Compile Include="LuaFile.cs" />
+    <Compile Include="LuaFunc.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="OLua.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebmModule.cs" />

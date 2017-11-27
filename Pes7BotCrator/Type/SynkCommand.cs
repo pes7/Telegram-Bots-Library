@@ -9,8 +9,8 @@ namespace Pes7BotCrator.Type
 {
     public class SynkCommand
     {
-        private Action<CallbackQuery, BotBase, Update> act;
-        private List<string> list;
+        //private Action<CallbackQuery, BotBase, Update> act;
+        //private List<string> list;
 
         public enum TypeOfCommand {
             Standart,

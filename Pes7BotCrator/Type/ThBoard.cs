@@ -28,18 +28,22 @@ namespace Pes7BotCrator.Type
         }
         public static dynamic GetJson(string url)
         {
-            string irl = Uri.EscapeUriString(url);
-            string doc = "";
-            using (System.Net.WebClient client = new System.Net.WebClient()) // WebClient class inherits IDisposable
+            try
             {
-                doc = client.DownloadString(irl);
-                Encoding utf8 = Encoding.GetEncoding("UTF-8");
-                Encoding win1251 = Encoding.GetEncoding("Windows-1251");
+                string irl = Uri.EscapeUriString(url);
+                string doc = "";
+                using (System.Net.WebClient client = new System.Net.WebClient()) // WebClient class inherits IDisposable
+                {
+                    doc = client.DownloadString(irl);
+                    Encoding utf8 = Encoding.GetEncoding("UTF-8");
+                    Encoding win1251 = Encoding.GetEncoding("Windows-1251");
 
-                byte[] utf8Bytes = win1251.GetBytes(doc);
-                byte[] win1251Bytes = Encoding.Convert(utf8, win1251, utf8Bytes);
-                return JObject.Parse(win1251.GetString(win1251Bytes));
+                    byte[] utf8Bytes = win1251.GetBytes(doc);
+                    byte[] win1251Bytes = Encoding.Convert(utf8, win1251, utf8Bytes);
+                    return JObject.Parse(win1251.GetString(win1251Bytes));
+                }
             }
+            catch { return null; }
         }
     }
 }

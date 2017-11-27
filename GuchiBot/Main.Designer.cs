@@ -50,6 +50,8 @@ namespace GuchiBot
             this.panel3 = new System.Windows.Forms.Panel();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -228,7 +230,7 @@ namespace GuchiBot
             this.panel3.Controls.Add(this.label2);
             this.panel3.Location = new System.Drawing.Point(321, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(200, 117);
+            this.panel3.Size = new System.Drawing.Size(200, 169);
             this.panel3.TabIndex = 9;
             // 
             // listBox1
@@ -236,7 +238,7 @@ namespace GuchiBot
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(3, 15);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(192, 95);
+            this.listBox1.Size = new System.Drawing.Size(192, 147);
             this.listBox1.TabIndex = 1;
             // 
             // label2
@@ -249,13 +251,33 @@ namespace GuchiBot
             this.label2.TabIndex = 0;
             this.label2.Text = "Inf:";
             // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(3, 126);
+            this.textBox4.Multiline = true;
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(312, 20);
+            this.textBox4.TabIndex = 10;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(240, 152);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 20);
+            this.button5.TabIndex = 11;
+            this.button5.Text = "Inject";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(524, 123);
+            this.ClientSize = new System.Drawing.Size(524, 176);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.textBox4);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
@@ -277,6 +299,7 @@ namespace GuchiBot
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -301,5 +324,7 @@ namespace GuchiBot
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.Button button5;
     }
 }

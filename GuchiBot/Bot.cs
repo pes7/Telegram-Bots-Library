@@ -75,22 +75,9 @@ namespace Pes7BotCrator
             }
         }
 
-        private string TimeToString(int i)
+        public string[] getInfForList()
         {
-            string str;
-            if (i / 60 > 1)
-            {
-                if (i / 60 / 60 > 1)
-                {
-                    if (i / 60 / 60 > 24)
-                    {
-                        str = $"{i / 60 / 60 / 24} days.";
-                    } else str = $"{i / 60 / 60} hrs.";
-                }
-                else str = $"{i / 60} min.";
-            }
-            else str = $"{i} sec.";
-            return str;
+            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {LikeDislikeComponent.LLikes.Count}".Split('|');
         }
 
         public override void ShowInf()
