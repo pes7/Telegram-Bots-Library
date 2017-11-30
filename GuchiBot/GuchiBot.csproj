@@ -72,6 +72,12 @@
   <ItemGroup>
     <Compile Include="Bot.cs" />
     <Compile Include="BotLogic.cs" />
+    <Compile Include="Interface\MessageUI.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Interface\MessageUI.Designer.cs">
+      <DependentUpon>MessageUI.cs</DependentUpon>
+    </Compile>
     <Compile Include="LuaFile.cs" />
     <Compile Include="LuaFunc.cs" />
     <Compile Include="Main.cs">
@@ -90,6 +96,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Interface\MessageUI.resx">
+      <DependentUpon>MessageUI.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>

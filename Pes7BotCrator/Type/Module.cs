@@ -12,9 +12,12 @@ namespace Pes7BotCrator.Type
         public string Name { get; set; }
         public dynamic Modulle { get; set; }
         public Thread MainThread { get; set; }
-        public Module(string name)
+        public System.Type Type { get; set; }
+        public Module(string name, System.Type type, dynamic modulle = null)
         {
             Name = name;
+            Modulle = modulle;
+            Type = type;
         }
         public void Start() { }
         public void AbortThread()

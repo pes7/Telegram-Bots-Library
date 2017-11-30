@@ -17,6 +17,11 @@ using System.Threading;
 using Pes7BotCrator.Commands;
 using Telegram.Bot.Types.ReplyMarkups;
 using LuaAble;
+using Pes7BotCrator.Systems;
+using System.Diagnostics;
+using System.Collections;
+using GuchiBot.Interface;
+using Telegram.Bot.Types;
 
 namespace GuchiBot
 {
@@ -40,6 +45,10 @@ namespace GuchiBot
         {
             InitializeComponent();
 
+            /*
+             * Нужно написать модуль автопоста, при том что туда будет попадать кастомная функция, а настройка будет производиться в интерфейсе проги. 
+             * 
+             */
             Ch = new _2chModule();
             Sv = new SaveLoadModule(60, LikePath, this);
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
@@ -55,9 +64,9 @@ namespace GuchiBot
             //lua.LoadScriptsFromDirectory();
             //
 
-            if (File.Exists(LikePath))
+            if (System.IO.File.Exists(LikePath))
             {
-                LikeDislikeComponent.LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
+                (Bot.GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
             Bot.Commands.Add(new LikeDislikeComponent().Command);
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
@@ -98,6 +107,31 @@ namespace GuchiBot
             {
                 "/opros"
             }));
+            Bot.Commands.Add(new SynkCommand(async (InlineQuery query, BotInteface Parent, Update up) => {
+                if (Parent.Modules.Exists(fn => fn.Name == "_2chModule"))
+                {
+                    _2chModule.Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
+                    if (webm != null)
+                    {
+                        var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
+                        {
+                            MessageText = $"{webm.Thumbnail}\n{webm.Path}",
+                            ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html
+                        };
+
+                        Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
+                                new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
+                                    Id = "0",
+                                    InputMessageContent = msg,
+                                    ReplyMarkup = LikeDislikeComponent.getKeyBoard(),
+                                    Title = "WEBM",
+                                    Description = "POST"
+                                }
+                        };
+                        await Parent.Client.AnswerInlineQueryAsync(query.Id, results);
+                    }
+                }
+            },new List<string>() {"_noon"}));
             Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
             {
                 "Default"
@@ -223,28 +257,69 @@ namespace GuchiBot
         {
             if (Bot != null)
             {
-                try
-                {
-                    //Bot.Client.SendTextMessageAsync(chatId: Bot.MessagesLast.Last().Chat.Id,text: "@Pro100RedBull ЛГБТ", replyMarkup: (new ForceReply() { Force = true }));
-                    //Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
-                }
-                catch (Exception ex) { Bot.Exceptions.Add(ex); }
+                Thread th = new Thread( async() => {
+                    try
+                    {
+                        await Bot.Client.SendTextMessageAsync(Bot.MessagesLast.Last().Chat.Id, "test");
+                    }
+                    catch (Telegram.Bot.Exceptions.ApiRequestException)
+                    {
+                        
+                    }
+                });
+                th.Start();
+                //Bot.Client.SendTextMessageAsync(chatId: Bot.MessagesLast.Last().Chat.Id,text: "@Pro100RedBull ЛГБТ", replyMarkup: (new ForceReply() { Force = true }));
+                //Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
             }
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (LikeDislikeComponent.LLikes.Count > 0)
+            LikeDislikeComponent LDModule = (Bot.GetModule<LikeDislikeComponent>() as LikeDislikeComponent);
+            if (LDModule.LLikes.Count > 0)
             {
-                SaveLoadModule.SaveLikesToFile(LikeDislikeComponent.LLikes, LikePath);
+                SaveLoadModule.SaveLikesToFile(LDModule.LLikes, LikePath);
             }
             Bot.Dispose();
             base.OnFormClosed(e);
         }
 
+        private void updateUI()
+        {
+
+        }
+
         private void button3_Click(object sender, EventArgs e)
         {
-            Bot.Client.SendTextMessageAsync("@Pro100RedBull", "Kek TI PIDOR");
+            List<dynamic> files = new List<dynamic>();
+            List<Thread> downloadTh = new List<Thread>();
+
+            Thread th = new Thread(async () =>
+            {
+                foreach (UserM us in Bot.ActiveUsers)
+                {
+                    await us.DownloadImageToDirectory(Bot);
+                    Image mg = Image.FromFile($"./UserPhotoes/{us.Id}.jpg");
+                    files.Add(new { id = us.Id, Image = mg });
+                }
+
+
+                foreach (Telegram.Bot.Types.Message ms in Bot.MessagesLast)
+                {
+                    InvokeUI(() =>
+                    {
+                        MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text);
+                        mu.Width = flowLayoutPanel1.Width - 25;
+                        flowLayoutPanel1.Controls.Add(mu);
+                    });
+                }
+            });
+            th.Start();
+        }
+
+        private void InvokeUI(Action a)
+        {
+            BeginInvoke(new MethodInvoker(a));
         }
 
         private void button4_Click(object sender, EventArgs e)

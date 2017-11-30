@@ -25,9 +25,10 @@ namespace Pes7BotCrator
         public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null) :
             base (key,likeDislikeQuata,modules)
         {
-            if (LikeDislikeComponent.LikeDislikeQuata == null)
-                LikeDislikeComponent.LikeDislikeQuata = new int[] { 3, 3 };
-            LikeDislikeComponent.LLikes = new List<Likes>();
+            LikeDislikeComponent LDModule = GetModule<LikeDislikeComponent>() as LikeDislikeComponent;
+            if (LDModule.LikeDislikeQuata == null)
+                LDModule.LikeDislikeQuata = new int[] { 3, 3 };
+            LDModule.LLikes = new List<Likes>();
             LastWebms = new List<dynamic>();
             WebmDir = webmdir;
             GachiImage = gachiimage;
@@ -77,14 +78,14 @@ namespace Pes7BotCrator
 
         public string[] getInfForList()
         {
-            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {LikeDislikeComponent.LLikes.Count}".Split('|');
+            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}".Split('|');
         }
 
         public override void ShowInf()
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {LikeDislikeComponent.LLikes.Count}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)

@@ -19,10 +19,12 @@ namespace Pes7BotCrator.Modules
         public int InterVal { get; set; }
         public string FileName { get; set; }
         public dynamic Parent { get; set; }
-
+        System.Type Type { get; set; }
         public string Name { get; set; }
         public dynamic Modulle { get; set; }
         public Thread MainThread { get; set; }
+
+        System.Type ModuleInterface.Type { get; set; }
 
         public void AbortThread()
         {
@@ -35,6 +37,7 @@ namespace Pes7BotCrator.Modules
             FileName = fn;
             Parent = parent;
             Name = "SaveLoadModule";
+            this.Type = typeof(SaveLoadModule);
             Modulle = this;
         }
 
@@ -54,10 +57,11 @@ namespace Pes7BotCrator.Modules
                 {
                     BotInteface bt = Parent?.Bot;
                     if (bt != null) {
-                        if (bt.GetModule("LikeDislikeModule") != null) {
-                            if (LikeDislikeComponent.LLikes.Count > 0)
+                        LikeDislikeComponent LDModule = bt.GetModule<LikeDislikeComponent>();
+                        if (LDModule != null) {
+                            if (LDModule.LLikes.Count > 0)
                             {
-                                List<Likes> ls = LikeDislikeComponent.LLikes;
+                                List<Likes> ls = LDModule.LLikes;
                                 SaveLikesToFile(ls, FileName);
                             }
                         }

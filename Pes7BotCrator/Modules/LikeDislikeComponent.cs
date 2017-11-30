@@ -16,9 +16,9 @@ namespace Pes7BotCrator.Commands
          * НУЖНО ЗАНОСИТЬ В JSON всех кто лайкнул и дизлайкнул
          */
 
-        public LikeDislikeComponent() : base("LikeDislikeModule") { Command = new LikeSynkCommand(); }
-        public static List<Likes> LLikes { get; set; } = new List<Likes>();
-        public static int[] LikeDislikeQuata { get; set; }
+        public LikeDislikeComponent() : base("LikeDislikeModule", typeof(LikeDislikeComponent)) { Command = new LikeSynkCommand(); }
+        public List<Likes> LLikes { get; set; } = new List<Likes>();
+        public int[] LikeDislikeQuata { get; set; }
         public LikeSynkCommand Command { get; set; }
 
         public class LikeSynkCommand : SynkCommand
@@ -85,11 +85,12 @@ namespace Pes7BotCrator.Commands
             Message ms = re.Message;
             if (ms != null)
             {
-                Likes ll = LLikes.Find(ff => ff.MessageId == ms.MessageId);
+                LikeDislikeComponent LDModule = Parent.GetModule<LikeDislikeComponent>();
+                Likes ll = LDModule.LLikes.Find(ff => ff.MessageId == ms.MessageId);
                 if (ll == null)
                 {
-                    LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
-                    ll = LLikes.Last();
+                    LDModule.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
+                    ll = LDModule.LLikes.Last();
                 }
                 string[] Dd = Up.CallbackQuery.Data.Split(':');
                 if (Dd[1] == "like")
@@ -120,7 +121,7 @@ namespace Pes7BotCrator.Commands
                     else
                         ll.DisLikeId.Remove(ld);
                 }
-                if (ll.DisLikeId.Count >= LikeDislikeQuata[1])
+                if (ll.DisLikeId.Count >= LDModule.LikeDislikeQuata[1])
                 {
                     Thread sd = new Thread(async () =>
                     {

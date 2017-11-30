@@ -11,8 +11,15 @@ namespace Pes7BotCrator.Modules
     class StatiscticOfGroup : ModuleInterface
     {
         public string Name { get; set; }
+        public System.Type Type { get; set; }
         public dynamic Modulle { get; set; }
         public Thread MainThread { get; set; }
+
+        public StatiscticOfGroup(dynamic modulle, System.Type type)
+        {
+            Type = type;
+            Modulle = modulle;
+        }
 
         public void AbortThread()
         {

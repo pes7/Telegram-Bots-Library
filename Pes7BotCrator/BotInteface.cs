@@ -23,8 +23,9 @@ namespace Pes7BotCrator
         List<UserM> ActiveUsers { get; set; }
         List<Exception> Exceptions { get; set; }
         List<ModuleInterface> Modules { get; set; }
-        ModuleInterface GetModule(string name);
         List<SynkCommand> Commands { get; set; }
+        T GetModule<T>() where T : ModuleInterface;
+        Action OnWebHoockUpdated { get; set; }
         int CountOfAvailableMessages { get; set; }
         int RunTime { get; set; }
     }

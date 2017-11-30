@@ -63,6 +63,7 @@
     <Compile Include="Modules\2chModule.cs" />
     <Compile Include="Modules\SaveLoadModule.cs" />
     <Compile Include="Modules\StatiscticOfGroup.cs" />
+    <Compile Include="Systems\RequestToTelegramSystem.cs" />
     <Compile Include="Type\Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\Likes.cs" />

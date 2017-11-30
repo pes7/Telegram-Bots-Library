@@ -24,10 +24,16 @@ namespace Pes7BotCrator
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
 
+        public Action OnWebHoockUpdated { get; set; } = ()=> { };
+
         public List<ModuleInterface> Modules { get; set; }
+        public T GetModule<T>() where T : ModuleInterface
+        {
+            return (T)Modules.Find(fn => fn.Type == typeof(T));
+        }
         public ModuleInterface GetModule(string name)
         {
-            return this.Modules.Find(fn => fn.Name == name);
+            return Modules.Find(fn => fn.Name == name);
         }
 
         public List<SynkCommand> Commands { get; set; }

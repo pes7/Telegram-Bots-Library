@@ -13,12 +13,12 @@ namespace Pes7BotCrator.Modules
 {
     public class _2chModule : Module
     {
-        public _2chModule() : base("_2chModule")
+        public _2chModule() : base("_2chModule",typeof(_2chModule))
         {
             Modulle = this;
         }
 
-        public static List<dynamic> WebmsSent = new List<dynamic>();
+        public List<Webm> WebmsSent = new List<Webm>();
 
         private List<ThBoard> Get2chBoards(BotInteface Parent, string address)
         {
@@ -103,9 +103,9 @@ namespace Pes7BotCrator.Modules
             return iser;
         }
 
-        private List<dynamic> getWebms(BotInteface Parent, string address)
+        private List<Webm> getWebms(BotInteface Parent, string address)
         {
-            List<dynamic> Dy = new List<dynamic>();
+            List<Webm> Dy = new List<Webm>();
             List<ThBoard> Th = Get2chBoards(Parent, address);
             string tag = address.Split('/')[3];
             if (tag != null)
@@ -125,8 +125,8 @@ namespace Pes7BotCrator.Modules
                                     {
                                         foreach (dynamic f in c.files)
                                         {
-                                            var file = new { fullname = f.fullname, path = "https://2ch.hk" + f.path, thumbnail = "https://2ch.hk" + f.thumbnail };
-                                            string format = ((string)file.path).Split('.')[2];
+                                            Webm file = new Webm($"https://2ch.hk{f.path}", $"https://2ch.hk{f.thumbnail}", $"{f.fullname}");
+                                            string format = ((string)file.Path).Split('.')[2];
                                             if (format == "webm" || format == "mp4")
                                             {
                                                 Dy.Add(file);
@@ -148,8 +148,8 @@ namespace Pes7BotCrator.Modules
 
         public static int WebmCountW = 0;
         public static int WebmCountA = 0;
-        public List<dynamic> WebmsW = null;
-        public List<dynamic> WebmsA = null;
+        public List<Webm> WebmsW = new List<Webm>();
+        public List<Webm> WebmsA = new List<Webm>();
         public void Ragenerated(Message ms, BotInteface Parent)
         {
             if (ms.From.Username == "nazarpes7")
@@ -169,7 +169,7 @@ namespace Pes7BotCrator.Modules
 
         public void get2chSmartRandWebm(Message ms,BotInteface Parent)
         {
-            List<dynamic> Webms;
+            List<Webm> Webms;
             string[] d = ms.Text.Split('-');
             if (d != null && d.Length > 1)
                 if (d[1] == "а" || d[1] == "a")
@@ -179,7 +179,7 @@ namespace Pes7BotCrator.Modules
 
             if (Webms != null && Webms?.Count > 0)
             {
-                dynamic webm = Webms[Parent.Rand.Next(0, Webms.Count)];
+                Webm webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
                 SendWebm(Parent, webm, d);
             }
@@ -188,7 +188,7 @@ namespace Pes7BotCrator.Modules
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(BotInteface Parent, dynamic webm, string[] d = null)
+        public void SendWebm(BotInteface Parent, Webm webm, string[] d = null)
         {
             if (webm != null)
             {
@@ -196,7 +196,7 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.thumbnail), webm.path, false, 0, LikeDislikeComponent.getKeyBoard(webm.path));
+                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeComponent.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)
@@ -206,6 +206,18 @@ namespace Pes7BotCrator.Modules
                     }
                 });
                 th.Start();
+            }
+        }
+
+        public class Webm {
+            public string Path { get; set; }
+            public string Thumbnail { get; set; }
+            public string FullName { get; set; }
+            public Webm(string path, string thub = null, string fullname = null)
+            {
+                Path = path;
+                Thumbnail = thub;
+                FullName = fullname;
             }
         }
     }

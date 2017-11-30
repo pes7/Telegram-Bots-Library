@@ -83,43 +83,20 @@ namespace Pes7BotCrator
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
                     var query = Up.InlineQuery;
-
+                    foreach(SynkCommand sy in Parent.Commands.Where(fn=>fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
+                    {
+                        sy.doFunc(query,Parent,Up);
+                    }
                     /* ------------------
                      * 
                      * Нужно сделать обработчик кастомных инлайнов!!!
                      * 
                      * ------------------ */
 
-                    if (Parent.Modules.Exists(fn => fn.Name == "_2chModule")) {
-                        dynamic webm = _2chModule.WebmsSent.Find(fn => fn.path == query.Query);
-                        if (webm != null) {
-                            var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
-                            {
-                                MessageText = $"{webm.thumbnail}\n{webm.path}",
-                                ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html,
-                            };
-
-                            Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
-                                new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
-                                    Id = "0",
-                                    InputMessageContent = msg,
-                                    ReplyMarkup = LikeDislikeComponent.getKeyBoard(),
-                                    Title = "WEBM",
-                                    Description = "POST"
-                                }
-                        };
-                            /*Id = "0",
-                            ReplyMarkup = LikeDislikeComponent.getKeyBoard(),
-                            InputMessageContent = msg,
-                            Title = "POST WEBM",
-                            Url = webm.thumbnail,
-                            ThumbUrl = webm.thumbnail,
-                            Description = webm.path*/
-                            await Parent.Client.AnswerInlineQueryAsync(query.Id, results);
-                        }
-                    }
+                    
                     break;
             }
+            Parent.OnWebHoockUpdated();
         }
         private void LogSystem(User us)
         {
