@@ -68,6 +68,9 @@ namespace Pes7BotCrator
                     }
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
+                    /*
+                     Нужно сохранять лайки людей с инлайна в других группах
+                     */
                     CallbackQuery qq = Up.CallbackQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(
                         fn=>fn.Type == SynkCommand.TypeOfCommand.Query 
@@ -87,13 +90,6 @@ namespace Pes7BotCrator
                     {
                         sy.doFunc(query,Parent,Up);
                     }
-                    /* ------------------
-                     * 
-                     * Нужно сделать обработчик кастомных инлайнов!!!
-                     * 
-                     * ------------------ */
-
-                    
                     break;
             }
             Parent.OnWebHoockUpdated();

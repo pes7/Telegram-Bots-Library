@@ -201,6 +201,7 @@ namespace Pes7BotCrator.Modules
                     }
                     catch (Exception ex)
                     {
+                        Parent.Exceptions.Add(ex);
                         await Parent.Client.SendTextMessageAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.");
                         return;
                     }

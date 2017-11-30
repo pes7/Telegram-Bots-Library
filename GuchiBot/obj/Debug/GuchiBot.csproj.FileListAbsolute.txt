@@ -47,3 +47,4 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\De
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\LuaInterface.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUI.resources
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUI.resources
