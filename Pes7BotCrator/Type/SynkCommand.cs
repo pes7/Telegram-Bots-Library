@@ -15,14 +15,15 @@ namespace Pes7BotCrator.Type
         public enum TypeOfCommand {
             Standart,
             Query,
-            InlineQuery
+            InlineQuery,
+            CommandWithParams
         }
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
         public dynamic doFunc { get; set; }
         public int SecondsSilents { get; set; }
         public string EndMessage { get; set; }
-        public SynkCommand(Action<Message, BotInteface> act, List<string> cm = null,int sec = 0, string endMessage = null)
+        public SynkCommand(Action<Message, BotInteface, List<ArgC>> act, List<string> cm = null,int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
@@ -30,6 +31,7 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
+        /*
         public SynkCommand(Action<Message, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
@@ -37,8 +39,9 @@ namespace Pes7BotCrator.Type
             Type = TypeOfCommand.Query;
             Incialize(act, cm);
         }
+        */
 
-        public SynkCommand(Action<InlineQuery, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<InlineQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
@@ -46,7 +49,7 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
-        public SynkCommand(Action<CallbackQuery, BotInteface, Update> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<CallbackQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;

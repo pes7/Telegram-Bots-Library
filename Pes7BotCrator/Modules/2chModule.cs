@@ -150,7 +150,7 @@ namespace Pes7BotCrator.Modules
         public static int WebmCountA = 0;
         public List<Webm> WebmsW = new List<Webm>();
         public List<Webm> WebmsA = new List<Webm>();
-        public void Ragenerated(Message ms, BotInteface Parent)
+        public void Ragenerated(Message ms, BotInteface Parent, List<ArgC> args)
         {
             if (ms.From.Username == "nazarpes7")
             {
@@ -167,28 +167,29 @@ namespace Pes7BotCrator.Modules
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
-        public void get2chSmartRandWebm(Message ms,BotInteface Parent)
+        public void get2chSmartRandWebm(Message ms,BotInteface Parent, List<ArgC> args)
         {
-            List<Webm> Webms;
-            string[] d = ms.Text.Split('-');
-            if (d != null && d.Length > 1)
-                if (d[1] == "а" || d[1] == "a")
+            List<Webm> Webms = null;
+            if (args != null)
+            {
+                if (args.Find(fn => fn.Name == "a") != null)
                     Webms = WebmsA;
                 else Webms = WebmsW;
+            }
             else Webms = WebmsW;
 
             if (Webms != null && Webms?.Count > 0)
             {
                 Webm webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                 Webms.Remove(webm);
-                SendWebm(Parent, webm, d);
+                SendWebm(Parent, webm);
             }
             else
                 Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(BotInteface Parent, Webm webm, string[] d = null)
+        public void SendWebm(BotInteface Parent, Webm webm)
         {
             if (webm != null)
             {

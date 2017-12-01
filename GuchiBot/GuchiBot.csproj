@@ -78,6 +78,12 @@
     <Compile Include="Interface\MessageUI.Designer.cs">
       <DependentUpon>MessageUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interface\MessageUIPhoto.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Interface\MessageUIPhoto.Designer.cs">
+      <DependentUpon>MessageUIPhoto.cs</DependentUpon>
+    </Compile>
     <Compile Include="LuaFile.cs" />
     <Compile Include="LuaFunc.cs" />
     <Compile Include="Main.cs">
@@ -98,6 +104,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Interface\MessageUI.resx">
       <DependentUpon>MessageUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Interface\MessageUIPhoto.resx">
+      <DependentUpon>MessageUIPhoto.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

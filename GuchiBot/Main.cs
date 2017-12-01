@@ -89,11 +89,6 @@ namespace GuchiBot
                 "/2ch@guchimuchibot",
                 "/2ch"
             }));
-            Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
-            {
-                "/2ch@guchimuchibot -a",
-                "/2ch -a"
-            }));
             Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
             {
                 "/regenerate@guchimuchibot",
@@ -103,11 +98,25 @@ namespace GuchiBot
             {
                 "/testmemory"
             }));
+            Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot, List<ArgC> args)=>
+            {
+                string message = "";
+                ArgC ag = args.Find(fs => fs.Name == "id");
+                ArgC text = args.Find(fs => fs.Name == "text");
+                if (ag != null && text != null)
+                {
+                    message = $"@{ag.Arg} {text.Arg}";
+                }
+                bot.Client.SendTextMessageAsync(ms.Chat.Id,message);
+            }, new List<string>()
+            {
+                "/testparam"
+            }));
             Bot.Commands.Add(new SynkCommand(new BotLogic().Oprosic, new List<string>()
             {
                 "/opros"
             }));
-            Bot.Commands.Add(new SynkCommand(async (InlineQuery query, BotInteface Parent, Update up) => {
+            Bot.Commands.Add(new SynkCommand(async (InlineQuery query, BotInteface Parent) => {
                 if (Parent.Modules.Exists(fn => fn.Name == "_2chModule"))
                 {
                     _2chModule.Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
@@ -303,14 +312,25 @@ namespace GuchiBot
                     files.Add(new { id = us.Id, Image = mg });
                 }
 
-
                 foreach (Telegram.Bot.Types.Message ms in Bot.MessagesLast)
                 {
+                    //var afs = await Bot.getFileFrom(ms.Photo.ToList().First().FileId);
                     InvokeUI(() =>
                     {
-                        MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text);
-                        mu.Width = flowLayoutPanel1.Width - 25;
-                        flowLayoutPanel1.Controls.Add(mu);
+                        if (ms.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
+                        {
+                            MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text);
+                            mu.Width = flowLayoutPanel1.Width - 25;
+                            flowLayoutPanel1.Controls.Add(mu);
+                        }
+                        /*
+                        else if (ms.Type == Telegram.Bot.Types.Enums.MessageType.PhotoMessage)
+                        {
+                            MessageUIPhoto mu = new MessageUIPhoto(Image.FromStream(afs));
+                            mu.Width = flowLayoutPanel1.Width - 25;
+                            flowLayoutPanel1.Controls.Add(mu);
+                        }
+                        */
                     });
                 }
             });

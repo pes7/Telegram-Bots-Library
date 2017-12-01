@@ -10,6 +10,8 @@ using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
+using System.Diagnostics;
+using System.Collections;
 
 namespace Pes7BotCrator
 {
@@ -30,12 +32,12 @@ namespace Pes7BotCrator
                 foreach (var up in update)
                 {
                     offset = up.Id + 1;
-                    new Thread(()=> { MessageSynk(up); }).Start();
+                    new Thread(() => { MessageSynk(up); }).Start();
                 }
             }
         }
 
-        private async void MessageSynk(Update Up){
+        private async void MessageSynk(Update Up) {
             Message ms;
             switch (Up.Type)
             {
@@ -43,24 +45,25 @@ namespace Pes7BotCrator
                     ms = Up.Message;
                     switch (Up.Message.Type) {
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
-
+                            Parent.MessagesLast.Add(ms);
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.TextMessage:
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);
                             foreach (SynkCommand sy in Parent.Commands.Where(
                                 fn => fn.Type == SynkCommand.TypeOfCommand.Standart &&
-                                fn.CommandLine.Exists(nf => nf == ms.Text)))
+                                fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()))
+                                ))
                             {
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 Thread the = new Thread(() =>
                                 {
-                                    sy.doFunc(ms, Parent);
+                                    sy.doFunc(ms, Parent, getArgs(ms.Text));
                                 });
                                 the.Start();
                                 break;
                             }
-                            Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc(ms,Parent);
+                            Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc(ms, Parent, getArgs(ms.Text));
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 
@@ -73,12 +76,12 @@ namespace Pes7BotCrator
                      */
                     CallbackQuery qq = Up.CallbackQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(
-                        fn=>fn.Type == SynkCommand.TypeOfCommand.Query 
+                        fn => fn.Type == SynkCommand.TypeOfCommand.Query
                         && fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
                     {
                         Thread the = new Thread(() =>
                         {
-                            sy.doFunc(qq, Parent, Up);
+                            sy.doFunc(qq, Parent);
                         });
                         the.Start();
                         break;
@@ -86,9 +89,9 @@ namespace Pes7BotCrator
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
                     var query = Up.InlineQuery;
-                    foreach(SynkCommand sy in Parent.Commands.Where(fn=>fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
+                    foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
                     {
-                        sy.doFunc(query,Parent,Up);
+                        sy.doFunc(query, Parent, getArgs(Up.Message.Text));
                     }
                     break;
             }
@@ -99,11 +102,44 @@ namespace Pes7BotCrator
             UserM mu = Parent.ActiveUsers.Find(f => f.Id == us.Id && UserM.usernameGet(f) == UserM.usernameGet(us));
             if (mu == null)
             {
-                Parent.ActiveUsers.Add(new UserM(us,1));
-            }else
+                Parent.ActiveUsers.Add(new UserM(us, 1));
+            } else
             {
                 mu.MessageCount++;
             }
+        }
+        private List<ArgC> getArgs(string message)
+        {
+            List<ArgC> Args = new List<ArgC>();
+            string[] args_parse = null;
+            try
+            {
+                args_parse = message.Split('-');
+            }
+            catch { return null; }
+            if (args_parse.Length > 1)
+            {
+                for (int i = 0; i < args_parse.Length; i++)
+                {
+                    var sf = new ArgC();
+                    try
+                    {
+                        string[] ssf = args_parse[i].Split(':');
+                        if(ssf.Length > 1)
+                        {
+                            sf.Name = ssf[0];
+                            sf.Arg = ssf[1];
+                        }else
+                        {
+                            sf.Name = ssf[0];
+                        }
+                    }
+                    catch { sf.Name = args_parse[i]; }
+                    Args.Add(sf);
+                }
+                return Args;
+            }
+            else return null;
         }
 
     }

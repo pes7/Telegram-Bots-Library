@@ -80,7 +80,7 @@ namespace Pes7BotCrator.Commands
             return keyboard;
         }
 
-        public static void Act(CallbackQuery re, BotInteface Parent, Update Up)
+        public static void Act(CallbackQuery re, BotInteface Parent)
         {
             Message ms = re.Message;
             if (ms != null)
@@ -92,13 +92,13 @@ namespace Pes7BotCrator.Commands
                     LDModule.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
                     ll = LDModule.LLikes.Last();
                 }
-                string[] Dd = Up.CallbackQuery.Data.Split(':');
+                string[] Dd = re.Data.Split(':');
                 if (Dd[1] == "like")
                 {
-                    long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                    long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    long li = ll.LikeId.Find(dd => dd == re.From.Id);
+                    long ld = ll.DisLikeId.Find(dd => dd == re.From.Id);
                     if (li == 0 && ld == 0)
-                        ll.LikeId.Add(Up.CallbackQuery.From.Id);
+                        ll.LikeId.Add(re.From.Id);
                     else if (li == 0 && ld != 0)
                     {
                         ll.LikeId.Add(ld);
@@ -109,10 +109,10 @@ namespace Pes7BotCrator.Commands
                 }
                 else if (Dd[1] == "dislike")
                 {
-                    long li = ll.LikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
-                    long ld = ll.DisLikeId.Find(dd => dd == Up.CallbackQuery.From.Id);
+                    long li = ll.LikeId.Find(dd => dd == re.From.Id);
+                    long ld = ll.DisLikeId.Find(dd => dd == re.From.Id);
                     if (li == 0 && ld == 0)
-                        ll.DisLikeId.Add(Up.CallbackQuery.From.Id);
+                        ll.DisLikeId.Add(re.From.Id);
                     else if (li != 0 && ld == 0)
                     {
                         ll.DisLikeId.Add(li);

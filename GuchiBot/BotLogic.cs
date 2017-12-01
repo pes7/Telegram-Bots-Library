@@ -15,7 +15,7 @@ namespace GuchiBot
     class BotLogic
     {
         delegate void Error(Bot parent);
-        public async void GetGachiImageLogic(Message ms, BotInteface Parent)
+        public async void GetGachiImageLogic(Message ms, BotInteface Parent, List<ArgC> args)
         {
             Bot PBot = Parent as Bot;
             Error error = async delegate (Bot parent) { await parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have Gachi Photoes."); };
@@ -35,7 +35,7 @@ namespace GuchiBot
             else error(PBot);
         }
 
-        public void Oprosic(Message ms, BotInteface Parent)
+        public void Oprosic(Message ms, BotInteface Parent, List<ArgC> args)
         {
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             Parent.Client.SendTextMessageAsync(ms.Chat.Id, "What yor opros about?");
@@ -66,7 +66,7 @@ namespace GuchiBot
             GachiAttakTrigger = false;
         }
 
-        public async void GachiAttakSynk(Message ms, BotInteface Parent)
+        public async void GachiAttakSynk(Message ms, BotInteface Parent, List<ArgC> args)
         {
             await Parent.Client.SendTextMessageAsync(ms.Chat.Id,$"Sorry, but it is to strong weapon for u. @{ms.From.Username}");
             return;
@@ -82,13 +82,13 @@ namespace GuchiBot
             }
         }
 
-        public async void GetArgkSynk(Message ms, BotInteface Parent)
+        public async void GetArgkSynk(Message ms, BotInteface Parent, List<ArgC> args)
         {
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Say somethink");
         }
 
-        public void DefaultSynk(Message ms, BotInteface Parent)
+        public void DefaultSynk(Message ms, BotInteface Parent, List<ArgC> args)
         {
             CommandAdd(ms, Parent);
             CommandSynk(Parent);

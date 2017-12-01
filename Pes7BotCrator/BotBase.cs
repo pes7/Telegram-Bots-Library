@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
+using System.IO;
 
 namespace Pes7BotCrator
 {
@@ -105,7 +106,28 @@ namespace Pes7BotCrator
                 }
             }
         }
-
+        /*Нужна Сильная доработка*/
+        public async Task<FileStream> getFileFrom(string id, string name = null)
+        {
+            if (name != null)
+            {
+                if (System.IO.File.Exists($"./DownloadFiles/{name}"))
+                {
+                    string filePath = $"./DownloadFiles/{name}";
+                    return new FileStream(filePath,FileMode.Open);
+                }
+            }
+            var photo = Client.GetFileAsync(id).Result;
+            string filename = photo.FilePath.Split('/')[1];
+            if (!Directory.Exists("./DownloadFiles"))
+                Directory.CreateDirectory("./DownloadFiles");
+            if (System.IO.File.Exists($"./DownloadFiles{filename}"))
+                return new FileStream($"./DownloadFiles/{filename}",FileMode.Open);
+            var file = new FileStream($"./DownloadFiles/{filename}",FileMode.Create);
+            var down = Client.GetFileAsync(id);
+            await down.Result.FileStream.CopyToAsync(file);
+            return file;
+        }
         public virtual void Dispose()
         {
             WebThread.Abort();
