@@ -3,6 +3,9 @@ This Bot Creating Library created with aim of doing creating Telegram Bot proces
 It gives you abillity to easy add your commands and etc. to Bot and don't thinking about how it works)<br>
 If you want to controll all aspects of bot you can inherit <b>BotBase</b> or <b>BotInterface</b> and use all pleasure of my realisations and add you own changes to it.<br>
 In Addition, in project you can find GuchiBot - this is bot that have all examples of creating your own bot in my Bot Creating Library.
+# Structure
+### Pes7BotCrator - main Library
+### GuchiBot - example
 # Creating a Bot
 ## Creating 
 ``` c#
