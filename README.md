@@ -36,5 +36,7 @@ Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot
     "/testparam"
 }));
 ```
+# Built With:
+<a href = "https://github.com/TelegramBots/telegram.bot">.NET Client for Telegram Bot API</a>
 # Creator:
 Nazar Ukolov - pes7
