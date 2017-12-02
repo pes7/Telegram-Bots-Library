@@ -1,3 +1,4 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pes7/TelegramBots/blob/master/LICENSE)
 # TelegramBots
 This Bot Creating Library created with aim of doing creating Telegram Bot process more easely.<br>
 It gives you abillity to easy add your commands and etc. to Bot and don't thinking about how it works)<br>
