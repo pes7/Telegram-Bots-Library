@@ -13,6 +13,7 @@ namespace Pes7BotCrator
     public abstract class BotBase : BotInteface
     {
         public string Key { get; set; }
+        public string Name { get; set; }
         public Random Rand { get; set; } = new Random();
         public Telegram.Bot.TelegramBotClient Client { get; set; }
         public Thread WebThread { get; set; }
@@ -41,9 +42,10 @@ namespace Pes7BotCrator
         public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
         public int RunTime { get; set; } = 0;
 
-        public BotBase(string key, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null)
+        public BotBase(string key, string name, List<ModuleInterface> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
+            Name = name;
             Modules = modules;
             CommandsSynk = new List<Command>();
             MessagesLast = new List<Message>();
@@ -181,7 +183,7 @@ namespace Pes7BotCrator
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)

@@ -51,7 +51,7 @@ namespace GuchiBot
              */
             Ch = new _2chModule();
             Sv = new SaveLoadModule(60, LikePath, this);
-            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
+            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "guchimuchibot", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
                 modules: new List<ModuleInterface> {
                     Ch,
                     Sv,
@@ -69,53 +69,53 @@ namespace GuchiBot
                 (Bot.GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
             Bot.Commands.Add(new LikeDislikeComponent().Command);
+            Bot.Commands.Add(new Pes7BotCrator.Commands.Help(Bot));
+            Bot.Commands.Add(new Statistic(Bot));
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
-                "/sendrandwebm@guchimuchibot",
                 "/sendrandwebm"
-            }));
+            },descr:"Webm с личной колекции."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GachiAttakSynk, new List<string>()
             {
-                "/gachiattak@guchimuchibot",
                 "/gachiattak"
-            }));
+            },descr:"Секретное оружие."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetGachiImageLogic, new List<string>()
             {
-                "/sendrandimg@guchimuchibot",
                 "/sendrandimg"
-            }));
+            },descr:"Пикча с личной колекции"));
             Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
             {
-                "/2ch@guchimuchibot",
                 "/2ch"
-            }));
+            },descr:"Пост webm в тред, Argc: `-a` если хотите аниме."));
             Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
             {
-                "/regenerate@guchimuchibot",
                 "/regenerate"
-            }));
+            },descr:"Перепарсить двач."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetArgkSynk, new List<string>()
             {
                 "/testmemory"
-            }));
+            },descr: "Бот повторит за вами."));
             Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot, List<ArgC> args)=>
             {
                 string message = "";
-                ArgC ag = args.Find(fs => fs.Name == "id");
-                ArgC text = args.Find(fs => fs.Name == "text");
-                if (ag != null && text != null)
+                if (args != null)
                 {
-                    message = $"@{ag.Arg} {text.Arg}";
+                    ArgC ag = args.Find(fs => fs.Name == "id");
+                    ArgC text = args.Find(fs => fs.Name == "text");
+                    if (ag != null && text != null)
+                    {
+                        message = $"@{ag.Arg} {text.Arg}";
+                    }
+                    bot.Client.SendTextMessageAsync(ms.Chat.Id, message);
                 }
-                bot.Client.SendTextMessageAsync(ms.Chat.Id,message);
             }, new List<string>()
             {
                 "/testparam"
-            }));
+            },descr:"Новейшая разработка Нэвельного."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().Oprosic, new List<string>()
             {
                 "/opros"
-            }));
+            },descr:"Создаёт мини опрос"));
             Bot.Commands.Add(new SynkCommand(async (InlineQuery query, BotInteface Parent) => {
                 if (Parent.Modules.Exists(fn => fn.Name == "_2chModule"))
                 {

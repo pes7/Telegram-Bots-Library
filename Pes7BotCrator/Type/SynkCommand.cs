@@ -15,18 +15,19 @@ namespace Pes7BotCrator.Type
         public enum TypeOfCommand {
             Standart,
             Query,
-            InlineQuery,
-            CommandWithParams
+            InlineQuery
         }
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
         public dynamic doFunc { get; set; }
         public int SecondsSilents { get; set; }
         public string EndMessage { get; set; }
-        public SynkCommand(Action<Message, BotInteface, List<ArgC>> act, List<string> cm = null,int sec = 0, string endMessage = null)
+        public string Description { get; set; }
+        public SynkCommand(Action<Message, BotInteface, List<ArgC>> act, List<string> cm = null,int sec = 0, string endMessage = null, string descr = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
+            Description = descr;
             Type = TypeOfCommand.Standart;
             Incialize(act, cm);
         }
@@ -41,18 +42,20 @@ namespace Pes7BotCrator.Type
         }
         */
 
-        public SynkCommand(Action<InlineQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<InlineQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null, string descr = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
+            Description = descr;
             Type = TypeOfCommand.InlineQuery;
             Incialize(act, cm);
         }
 
-        public SynkCommand(Action<CallbackQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null)
+        public SynkCommand(Action<CallbackQuery, BotInteface> act, List<string> cm = null, int sec = 0, string endMessage = null, string descr = null)
         {
             SecondsSilents = sec;
             EndMessage = endMessage;
+            Description = descr;
             Type = TypeOfCommand.Query;
             Incialize(act, cm);
         }

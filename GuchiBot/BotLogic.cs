@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator;
-using Pes7BotCrator.Commands;
+using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
@@ -37,6 +37,9 @@ namespace GuchiBot
 
         public void Oprosic(Message ms, BotInteface Parent, List<ArgC> args)
         {
+            string te = ms.Text.Split('@')?.First();
+            if (te != null)
+                ms.Text = te;
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             Parent.Client.SendTextMessageAsync(ms.Chat.Id, "What yor opros about?");
         }
@@ -84,6 +87,9 @@ namespace GuchiBot
 
         public async void GetArgkSynk(Message ms, BotInteface Parent, List<ArgC> args)
         {
+            string te = ms.Text.Split('@')?.First();
+            if (te != null)
+                ms.Text = te;
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Say somethink");
         }
@@ -105,7 +111,7 @@ namespace GuchiBot
         }
         private void CommandSynk(BotInteface Parent)
         {
-            Command[] arg = Parent.CommandsSynk.Where(fn => fn.cArgs.Count > 0).ToArray<Command>();
+            Command[] arg = Parent.CommandsSynk.Where(fn => fn.cArgs.Count > 0).ToArray();
             for (int i = 0; i < arg.Length; i++)
             {
                 switch (arg[i].cCommand)

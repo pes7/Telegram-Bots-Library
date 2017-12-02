@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Pes7BotCrator.Commands
+namespace Pes7BotCrator.Modules
 {
     public class LikeDislikeComponent : Module
     {

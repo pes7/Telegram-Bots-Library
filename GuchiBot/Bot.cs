@@ -22,8 +22,8 @@ namespace Pes7BotCrator
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
 
-        public Bot(string key, string webmdir = null, string gachiimage = null, string preViewDir = null, int[] likeDislikeQuata = null, List<ModuleInterface> modules = null) :
-            base (key,likeDislikeQuata,modules)
+        public Bot(string key,string Name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<ModuleInterface> modules = null) :
+            base (key, Name, modules)
         {
             LikeDislikeComponent LDModule = GetModule<LikeDislikeComponent>() as LikeDislikeComponent;
             if (LDModule.LikeDislikeQuata == null)
@@ -85,7 +85,7 @@ namespace Pes7BotCrator
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    Available messages: {CountOfAvailableMessages}\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)

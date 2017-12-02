@@ -12,6 +12,7 @@ namespace Pes7BotCrator
     public interface BotInteface
     {
         string Key { get; set; }
+        string Name { get; set; }
         Random Rand { get; set; }
         Telegram.Bot.TelegramBotClient Client { get; set; }
         Thread TMessageQueueSynk { get; set; }
@@ -28,5 +29,6 @@ namespace Pes7BotCrator
         Action OnWebHoockUpdated { get; set; }
         int CountOfAvailableMessages { get; set; }
         int RunTime { get; set; }
+        string TimeToString(int i);
     }
 }
