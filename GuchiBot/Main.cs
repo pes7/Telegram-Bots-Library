@@ -86,7 +86,7 @@ namespace GuchiBot
             Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
             {
                 "/2ch"
-            },descr:"Пост webm в тред, Argc: `-a` если хотите аниме."));
+            },descr:"Пост webm в тред, Argc: `-a` если хотите аниме. `-c:` количество"));
             Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
             {
                 "/regenerate"

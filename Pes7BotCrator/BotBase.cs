@@ -82,10 +82,7 @@ namespace Pes7BotCrator
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
             }
-            catch (Exception ex)
-            {
-                Parent.Exceptions.Add(ex);
-            }
+            catch { }
         }
         public virtual void SendMessage(long ChatId, string text, UserM user = null)
         {

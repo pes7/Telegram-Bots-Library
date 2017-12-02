@@ -180,9 +180,27 @@ namespace Pes7BotCrator.Modules
 
             if (Webms != null && Webms?.Count > 0)
             {
-                Webm webm = Webms[Parent.Rand.Next(0, Webms.Count)];
-                Webms.Remove(webm);
-                SendWebm(Parent, webm);
+                Webm webm;
+                ArgC Count = args.Find(sn => sn.Name == "c");
+                if (Count != null)
+                {
+                    try
+                    {
+                        for (int i = 0; i < int.Parse(Count.Arg); i++)
+                        {
+                            webm = Webms[Parent.Rand.Next(0, Webms.Count)];
+                            Webms.Remove(webm);
+                            SendWebm(Parent, webm);
+                        }
+                    }
+                    catch {}
+                }
+                else
+                {
+                    webm = Webms[Parent.Rand.Next(0, Webms.Count)];
+                    Webms.Remove(webm);
+                    SendWebm(Parent, webm);
+                }
             }
             else
                 Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
