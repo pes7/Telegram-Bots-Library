@@ -10,7 +10,7 @@ In Addition, in project you can find GuchiBot - this is bot that have all exampl
 # Creating a Bot
 ## Creating 
 ``` c#
-BotBase Bot = new BotBase("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw",
+BotBase Bot = new BotBase("YOUR KEY",
     modules: new List<ModuleInterface> {
         new SaveLoadModule(60, LikePath, this)
         new LikeDislikeComponent()
