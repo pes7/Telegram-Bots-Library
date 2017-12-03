@@ -17,8 +17,8 @@ namespace Pes7BotCrator
 {
     public class WebHook
     {
-        private BotInteface Parent { get; set; }
-        public WebHook(BotInteface parent)
+        private IBotBase Parent { get; set; }
+        public WebHook(IBotBase parent)
         {
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
@@ -92,7 +92,7 @@ namespace Pes7BotCrator
                     var query = Up.InlineQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
                     {
-                        sy.doFunc(query, Parent, getArgs(Up.Message.Text));
+                        sy.doFunc(query, Parent);
                     }
                     break;
             }

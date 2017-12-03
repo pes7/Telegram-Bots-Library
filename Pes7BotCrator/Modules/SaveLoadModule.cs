@@ -14,7 +14,7 @@ using Pes7BotCrator.Type;
 
 namespace Pes7BotCrator.Modules
 {
-    public class SaveLoadModule : ModuleInterface
+    public class SaveLoadModule : IModule
     {
         public int InterVal { get; set; }
         public string FileName { get; set; }
@@ -24,7 +24,7 @@ namespace Pes7BotCrator.Modules
         public dynamic Modulle { get; set; }
         public Thread MainThread { get; set; }
 
-        System.Type ModuleInterface.Type { get; set; }
+        System.Type IModule.Type { get; set; }
 
         public void AbortThread()
         {
@@ -55,9 +55,9 @@ namespace Pes7BotCrator.Modules
             {
                 if (Curtime >= InterVal)
                 {
-                    BotInteface bt = Parent?.Bot;
+                    IBotBase bt = Parent?.Bot;
                     if (bt != null) {
-                        LikeDislikeComponent LDModule = bt.GetModule<LikeDislikeComponent>();
+                        LikeDislikeModule LDModule = bt.GetModule<LikeDislikeModule>();
                         if (LDModule != null) {
                             if (LDModule.LLikes.Count > 0)
                             {

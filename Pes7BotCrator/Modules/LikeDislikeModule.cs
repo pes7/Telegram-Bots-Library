@@ -10,13 +10,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pes7BotCrator.Modules
 {
-    public class LikeDislikeComponent : Module
+    public class LikeDislikeModule : Module
     {
         /*
          * НУЖНО ЗАНОСИТЬ В JSON всех кто лайкнул и дизлайкнул
          */
 
-        public LikeDislikeComponent() : base("LikeDislikeModule", typeof(LikeDislikeComponent)) { Command = new LikeSynkCommand(); }
+        public LikeDislikeModule() : base("LikeDislikeModule", typeof(LikeDislikeModule)) { Command = new LikeSynkCommand(); }
         public List<Likes> LLikes { get; set; } = new List<Likes>();
         public int[] LikeDislikeQuata { get; set; }
         public LikeSynkCommand Command { get; set; }
@@ -80,12 +80,12 @@ namespace Pes7BotCrator.Modules
             return keyboard;
         }
 
-        public static void Act(CallbackQuery re, BotInteface Parent)
+        public static void Act(CallbackQuery re, IBotBase Parent)
         {
             Message ms = re.Message;
             if (ms != null)
             {
-                LikeDislikeComponent LDModule = Parent.GetModule<LikeDislikeComponent>();
+                LikeDislikeModule LDModule = Parent.GetModule<LikeDislikeModule>();
                 Likes ll = LDModule.LLikes.Find(ff => ff.MessageId == ms.MessageId);
                 if (ll == null)
                 {

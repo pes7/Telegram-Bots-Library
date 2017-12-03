@@ -9,7 +9,7 @@ using Telegram.Bot.Types;
 
 namespace Pes7BotCrator
 {
-    public interface BotInteface
+    public interface IBotBase
     {
         string Key { get; set; }
         string Name { get; set; }
@@ -23,9 +23,9 @@ namespace Pes7BotCrator
         List<Command> CommandsSynk { get; set; }
         List<UserM> ActiveUsers { get; set; }
         List<Exception> Exceptions { get; set; }
-        List<ModuleInterface> Modules { get; set; }
+        List<IModule> Modules { get; set; }
         List<SynkCommand> Commands { get; set; }
-        T GetModule<T>() where T : ModuleInterface;
+        T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
         int CountOfAvailableMessages { get; set; }
         int RunTime { get; set; }

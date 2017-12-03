@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Pes7BotCrator
 {
-    public abstract class BotBase : BotInteface
+    public abstract class BotBase : IBotBase
     {
         public string Key { get; set; }
         public string Name { get; set; }
@@ -28,12 +28,12 @@ namespace Pes7BotCrator
 
         public Action OnWebHoockUpdated { get; set; } = ()=> { };
 
-        public List<ModuleInterface> Modules { get; set; }
-        public T GetModule<T>() where T : ModuleInterface
+        public List<IModule> Modules { get; set; }
+        public T GetModule<T>() where T : IModule
         {
             return (T)Modules.Find(fn => fn.Type == typeof(T));
         }
-        public ModuleInterface GetModule(string name)
+        public IModule GetModule(string name)
         {
             return Modules.Find(fn => fn.Name == name);
         }
@@ -42,7 +42,7 @@ namespace Pes7BotCrator
         public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
         public int RunTime { get; set; } = 0;
 
-        public BotBase(string key, string name, List<ModuleInterface> modules = null)
+        public BotBase(string key, string name, List<IModule> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             Name = name;
@@ -71,12 +71,12 @@ namespace Pes7BotCrator
 
         private void SynkModules()
         {
-            foreach (ModuleInterface nd in Modules)
+            foreach (IModule nd in Modules)
             {
                 nd.Start();
             }
         }
-        public static async Task ClearCommandAsync(long id, int msgid, BotInteface Parent)
+        public static async Task ClearCommandAsync(long id, int msgid, IBotBase Parent)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace Pes7BotCrator
             WebThread.Abort();
             TMessageQueueSynk.Abort();
             TimeSynk.Abort();
-            foreach (ModuleInterface md in Modules)
+            foreach (IModule md in Modules)
             {
                 md.AbortThread();
             }

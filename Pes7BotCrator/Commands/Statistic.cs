@@ -12,7 +12,7 @@ namespace Pes7BotCrator.Commands
     {
         public BotBase Parent { get; set; }
         public Statistic(BotBase bot) : base(Act, new List<string>() { "/stat" },descr:"Статистика чата.") { Parent = bot; }
-        public static void Act(Message re, BotInteface Parent, List<ArgC> args)
+        public static void Act(Message re, IBotBase Parent, List<ArgC> args)
         {
             string add = "";
             if (Parent.ActiveUsers.Count > 0)

@@ -21,11 +21,13 @@ namespace Pes7BotCrator
         public string WebmDir { get; set; }
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
+        public List<Opros> Opros { get; set; }
 
-        public Bot(string key,string Name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<ModuleInterface> modules = null) :
-            base (key, Name, modules)
+        public Bot(string key, string Name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<IModule> modules = null) :
+            base(key, Name, modules)
         {
-            LikeDislikeComponent LDModule = GetModule<LikeDislikeComponent>() as LikeDislikeComponent;
+            LikeDislikeModule LDModule = GetModule<LikeDislikeModule>() as LikeDislikeModule;
+            Opros = new List<Pes7BotCrator.Opros>();
             if (LDModule.LikeDislikeQuata == null)
                 LDModule.LikeDislikeQuata = new int[] { 3, 3 };
             LDModule.LLikes = new List<Likes>();
@@ -38,7 +40,7 @@ namespace Pes7BotCrator
 
         private void SynkModules()
         {
-            foreach (ModuleInterface nd in Modules)
+            foreach (IModule nd in Modules)
             {
                 nd.Start();
             }
@@ -54,12 +56,12 @@ namespace Pes7BotCrator
                 }
             }
         }
-        public static async Task ClearCommandAsync(long id, int msgid, BotInteface Parent)
+        public static async Task ClearCommandAsync(long id, int msgid, IBotBase Parent)
         {
             try
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
                 Parent.Exceptions.Add(ex);
             }
@@ -78,14 +80,14 @@ namespace Pes7BotCrator
 
         public string[] getInfForList()
         {
-            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}".Split('|');
+            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {(GetModule<LikeDislikeModule>() as LikeDislikeModule).LLikes.Count}".Split('|');
         }
 
         public override void ShowInf()
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes.Count}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeModule>() as LikeDislikeModule).LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)
@@ -99,7 +101,11 @@ namespace Pes7BotCrator
                 {
 
                     Message ms = MessagesLast[i];
-                    Console.WriteLine($"    {UserM.usernameGet(ms.From)}: {ms.Text}");
+                    try
+                    {
+                        Console.WriteLine($"    {UserM.usernameGet(ms.From)}: {ms.Text}");
+                    }
+                    catch (Exception ex) { Exceptions.Add(ex); }
                 }
             }
             else
@@ -126,6 +132,21 @@ namespace Pes7BotCrator
                 }
             }
             Console.WriteLine("}");
+        }
+    }
+    public class Opros {
+        public string About { get; set; }
+        //string First { get; set; }
+        //string Second { get; set; }
+        public int Id { get; set; }
+        public Message oprosThis { get; set; }
+        public Opros(string ab, int id, Message it)
+        {
+            About = ab;
+            //First = fr;
+            //Second = se;
+            Id = id;
+            oprosThis = it;
         }
     }
 }

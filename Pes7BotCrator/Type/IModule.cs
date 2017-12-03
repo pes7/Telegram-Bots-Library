@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pes7BotCrator.Type
 {
-    public interface ModuleInterface
+    public interface IModule
     {
         string Name { get; set; }
         dynamic Modulle { get; set; }
