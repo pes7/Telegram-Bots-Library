@@ -12,19 +12,19 @@ In Addition, in project you can find GuchiBot - this is bot that have all exampl
 ``` c#
 BotBase Bot = new BotBase("YOUR KEY",
     modules: new List<ModuleInterface> {
-        new SaveLoadModule(60, LikePath, this)
-        new LikeDislikeComponent()
+        new _2chModule(),
+        new SaveLoadModule(60, LikePath, this),
+        new LikeDislikeModule()
     }
 );
 ```
 ## Add some Commands in different ways
 ``` c#
-Bot.Commands.Add(new LikeDislikeComponent().Command);
+Bot.Commands.Add(Bot.GetModule<LikeDislikeModule>().Command);
 Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
 {
-    "/sendrandwebm@guchimuchibot",
     "/sendrandwebm"
-}));
+},descr:"Webm с личной колекции."));
 Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot, List<ArgC> args)=>
 {
     string message = "";
@@ -38,9 +38,10 @@ Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot
 }, new List<string>()
 {
     "/testparam"
-}));
+},descr:"Новейшая разработка Нэвельного."));
 ```
 # Built With:
 <a href = "https://github.com/TelegramBots/telegram.bot">.NET Client for Telegram Bot API</a>
+<a href = "https://github.com/zzzprojects/html-agility-pack">Html Agility Pack</a>
 # Creator:
 Nazar Ukolov - pes7
