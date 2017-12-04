@@ -171,18 +171,6 @@ namespace GuchiBot
                 "Default"
             }));
             label1.Text = $"{Ms} ms";
-
-            /*
-            Thread th = new Thread(async () =>
-            {
-                while (true)
-                {
-                    await this.GetInf();
-                    Thread.Sleep(1000);
-                }
-            });
-            th.Start();
-            */
         }
 
         private async Task GetInf()

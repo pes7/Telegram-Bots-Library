@@ -14,6 +14,7 @@ namespace Pes7BotCrator.Modules
     {
         /*
          * НУЖНО ЗАНОСИТЬ В JSON всех кто лайкнул и дизлайкнул
+         * сделал, частично, но лайкнуть может только один опридилённый человек, нужно проверить добавление лайка
          */
 
         public LikeDislikeModule() : base("LikeDislikeModule", typeof(LikeDislikeModule)) { Command = new LikeSynkCommand(); }
@@ -82,14 +83,22 @@ namespace Pes7BotCrator.Modules
 
         public static void Act(CallbackQuery re, IBotBase Parent)
         {
-            Message ms = re.Message;
-            if (ms != null)
+            Message ms = re?.Message;
+            long id;
+            if (re.Message != null)
+                id = re.Message.MessageId;
+            else
+                id = long.Parse(re.Id);
+            if (true)
             {
                 LikeDislikeModule LDModule = Parent.GetModule<LikeDislikeModule>();
-                Likes ll = LDModule.LLikes.Find(ff => ff.MessageId == ms.MessageId);
+                Likes ll = LDModule.LLikes.Find(ff => ff.MessageId == id.ToString());
                 if (ll == null)
                 {
-                    LDModule.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
+                    if (ms != null)
+                        LDModule.LLikes.Add(new Likes(ms.MessageId, ms.Chat.Id));
+                    else
+                        LDModule.LLikes.Add(new Likes(re.InlineMessageId,id));
                     ll = LDModule.LLikes.Last();
                 }
                 string[] Dd = re.Data.Split(':');
@@ -140,7 +149,10 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                        if(ll.Type == Likes.TypeOfLike.Common)
+                            await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
+                        else
+                            await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
                     }
                     catch { };
                 });
