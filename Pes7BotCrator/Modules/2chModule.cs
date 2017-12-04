@@ -20,7 +20,7 @@ namespace Pes7BotCrator.Modules
 
         public List<Webm> WebmsSent = new List<Webm>();
 
-        private List<ThBoard> Get2chBoards(BotInteface Parent, string address)
+        private List<ThBoard> Get2chBoards(IBotBase Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
             try
@@ -45,12 +45,12 @@ namespace Pes7BotCrator.Modules
             catch (Exception ex){ Parent.Exceptions.Add(ex); return null; }
         }
 
-        public void ParseWebmsFromDvach(BotInteface Parent)
+        public void ParseWebmsFromDvach(IBotBase Parent)
         {
             DvochSynkAsync(Get2chBoards(Parent, "http://2ch.hk/b/catalog_num.json"),Parent);
         }
 
-        public async Task DvochSynkAsync(List<ThBoard> th, BotInteface Parent)
+        public async Task DvochSynkAsync(List<ThBoard> th, IBotBase Parent)
         {
             foreach (ThBoard t in th)
             {
@@ -103,7 +103,7 @@ namespace Pes7BotCrator.Modules
             return iser;
         }
 
-        private List<Webm> getWebms(BotInteface Parent, string address)
+        private List<Webm> getWebms(IBotBase Parent, string address)
         {
             List<Webm> Dy = new List<Webm>();
             List<ThBoard> Th = Get2chBoards(Parent, address);
@@ -150,7 +150,7 @@ namespace Pes7BotCrator.Modules
         public static int WebmCountA = 0;
         public List<Webm> WebmsW = new List<Webm>();
         public List<Webm> WebmsA = new List<Webm>();
-        public void Ragenerated(Message ms, BotInteface Parent, List<ArgC> args)
+        public void Ragenerated(Message ms, IBotBase Parent, List<ArgC> args)
         {
             if (ms.From.Username == "nazarpes7")
             {
@@ -167,7 +167,7 @@ namespace Pes7BotCrator.Modules
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
-        public void get2chSmartRandWebm(Message ms,BotInteface Parent, List<ArgC> args)
+        public void get2chSmartRandWebm(Message ms,IBotBase Parent, List<ArgC> args)
         {
             List<Webm> Webms = null;
             if (args != null)
@@ -180,16 +180,34 @@ namespace Pes7BotCrator.Modules
 
             if (Webms != null && Webms?.Count > 0)
             {
-                Webm webm = Webms[Parent.Rand.Next(0, Webms.Count)];
-                Webms.Remove(webm);
-                SendWebm(Parent, webm);
+                Webm webm;
+                ArgC Count = args?.Find(sn => sn.Name == "c");
+                if (Count != null)
+                {
+                    try
+                    {
+                        for (int i = 0; i < int.Parse(Count.Arg); i++)
+                        {
+                            webm = Webms[Parent.Rand.Next(0, Webms.Count)];
+                            Webms.Remove(webm);
+                            SendWebm(Parent, webm);
+                        }
+                    }
+                    catch {}
+                }
+                else
+                {
+                    webm = Webms[Parent.Rand.Next(0, Webms.Count)];
+                    Webms.Remove(webm);
+                    SendWebm(Parent, webm);
+                }
             }
             else
                 Parent.Exceptions.Add(new Exception("No Webms There. User regenerate func."));
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(BotInteface Parent, Webm webm)
+        public void SendWebm(IBotBase Parent, Webm webm)
         {
             if (webm != null)
             {
@@ -197,7 +215,7 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeComponent.getKeyBoard(webm.Path));
+                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)

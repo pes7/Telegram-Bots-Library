@@ -49,6 +49,13 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debu
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUI.resources
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUI.resources
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUIPhoto.resources
+<<<<<<< HEAD
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\GuchiBot\bin\Debug\GuchiBot.exe.config
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.exe
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
+=======
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Interface.MessageUIPhoto.resources
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.dll
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
+>>>>>>> master

@@ -17,8 +17,8 @@ namespace Pes7BotCrator
 {
     public class WebHook
     {
-        private BotInteface Parent { get; set; }
-        public WebHook(BotInteface parent)
+        private IBotBase Parent { get; set; }
+        public WebHook(IBotBase parent)
         {
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
@@ -52,7 +52,8 @@ namespace Pes7BotCrator
                             LogSystem(ms.From);
                             foreach (SynkCommand sy in Parent.Commands.Where(
                                 fn => fn.Type == SynkCommand.TypeOfCommand.Standart &&
-                                fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()))
+                                fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()) ||
+                                                           (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
                             {
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
@@ -91,7 +92,7 @@ namespace Pes7BotCrator
                     var query = Up.InlineQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
                     {
-                        sy.doFunc(query, Parent, getArgs(Up.Message.Text));
+                        sy.doFunc(query, Parent);
                     }
                     break;
             }
@@ -141,6 +142,13 @@ namespace Pes7BotCrator
             }
             else return null;
         }
-
+        private string tryToParseNameBotCommand(string s)
+        {
+            try
+            {
+                return s.Split('@').First();
+            }
+            catch { return null; }
+        }
     }
 }

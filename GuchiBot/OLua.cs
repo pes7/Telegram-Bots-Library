@@ -14,9 +14,9 @@ namespace LuaAble
     {
         public List<LuaFile> LuaScripts = new List<LuaFile>();
         public Lua Lua { get; set; }
-        public BotInteface Bot { get; set; }
+        public IBotBase Bot { get; set; }
 
-        public OLua(BotInteface bot)
+        public OLua(IBotBase bot)
         {
             Bot = bot;
             Lua = new Lua();

@@ -38,7 +38,7 @@ namespace Pes7BotCrator
             ffMpeg.GetVideoThumbnail(videopath, $"{Parent.PreViewDir}{Path.GetFileName(videopath)}.jpg", 5);
         }
 
-        public async void WebmFuncForBot(Message ms, BotInteface Parent, List<ArgC> args)
+        public async void WebmFuncForBot(Message ms, IBotBase Parent, List<ArgC> args)
         {
             Bot PBot = Parent as Bot;
             Error error = async delegate (Bot parent) { await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have any webm."); };

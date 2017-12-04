@@ -34,8 +34,6 @@ namespace GuchiBot
         public Bot Bot;
         private int Ms = 20000;
         private int CurTime = 0;
-        private static _2chModule Ch = null;
-        private static SaveLoadModule Sv = null;
         private string LikePath = AppDomain.CurrentDomain.BaseDirectory + "like.bot";
         //private string loc = $"{AppDomain.CurrentDomain.BaseDirectory}bot.xml";
 
@@ -49,13 +47,12 @@ namespace GuchiBot
              * Нужно написать модуль автопоста, при том что туда будет попадать кастомная функция, а настройка будет производиться в интерфейсе проги. 
              * 
              */
-            Ch = new _2chModule();
-            Sv = new SaveLoadModule(60, LikePath, this);
-            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
-                modules: new List<ModuleInterface> {
-                    Ch,
-                    Sv,
-                    new LikeDislikeComponent()
+            Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "guchimuchibot", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
+                modules: new List<IModule> {
+                    new _2chModule(),
+                    new SaveLoadModule(60, LikePath, this),
+                    new LikeDislikeModule(),
+                    new AnistarModule()
                 }
             );
 
@@ -66,58 +63,58 @@ namespace GuchiBot
 
             if (System.IO.File.Exists(LikePath))
             {
-                (Bot.GetModule<LikeDislikeComponent>() as LikeDislikeComponent).LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
+                (Bot.GetModule<LikeDislikeModule>() as LikeDislikeModule).LLikes = SaveLoadModule.LoadLikesFromFile(LikePath);
             }
-            Bot.Commands.Add(new LikeDislikeComponent().Command);
+            Bot.Commands.Add(Bot.GetModule<LikeDislikeModule>().Command);
+            Bot.Commands.Add(new Pes7BotCrator.Commands.Help(Bot));
+            Bot.Commands.Add(new Statistic(Bot));
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
-                "/sendrandwebm@guchimuchibot",
                 "/sendrandwebm"
-            }));
+            },descr:"Webm с личной колекции."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GachiAttakSynk, new List<string>()
             {
-                "/gachiattak@guchimuchibot",
                 "/gachiattak"
-            }));
+            },descr:"Секретное оружие."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetGachiImageLogic, new List<string>()
             {
-                "/sendrandimg@guchimuchibot",
                 "/sendrandimg"
-            }));
-            Bot.Commands.Add(new SynkCommand(Ch.get2chSmartRandWebm, new List<string>()
+            },descr:"Пикча с личной колекции"));
+            Bot.Commands.Add(new SynkCommand(Bot.GetModule<_2chModule>().get2chSmartRandWebm, new List<string>()
             {
-                "/2ch@guchimuchibot",
                 "/2ch"
-            }));
-            Bot.Commands.Add(new SynkCommand(Ch.Ragenerated, new List<string>()
+            },descr:"Пост webm в тред, Argc: `-a` если хотите аниме. `-c:` количество"));
+            Bot.Commands.Add(new SynkCommand(Bot.GetModule<_2chModule>().Ragenerated, new List<string>()
             {
-                "/regenerate@guchimuchibot",
                 "/regenerate"
-            }));
+            },descr:"Перепарсить двач."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().GetArgkSynk, new List<string>()
             {
                 "/testmemory"
-            }));
-            Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, BotInteface bot, List<ArgC> args)=>
+            },descr: "Бот повторит за вами."));
+            Bot.Commands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, IBotBase bot, List<ArgC> args)=>
             {
                 string message = "";
-                ArgC ag = args.Find(fs => fs.Name == "id");
-                ArgC text = args.Find(fs => fs.Name == "text");
-                if (ag != null && text != null)
+                if (args != null)
                 {
-                    message = $"@{ag.Arg} {text.Arg}";
+                    ArgC ag = args.Find(fs => fs.Name == "id");
+                    ArgC text = args.Find(fs => fs.Name == "text");
+                    if (ag != null && text != null)
+                    {
+                        message = $"@{ag.Arg} {text.Arg}";
+                    }
+                    bot.Client.SendTextMessageAsync(ms.Chat.Id, message);
                 }
-                bot.Client.SendTextMessageAsync(ms.Chat.Id,message);
             }, new List<string>()
             {
                 "/testparam"
-            }));
+            },descr:"Новейшая разработка Нэвельного."));
             Bot.Commands.Add(new SynkCommand(new BotLogic().Oprosic, new List<string>()
             {
                 "/opros"
-            }));
-            Bot.Commands.Add(new SynkCommand(async (InlineQuery query, BotInteface Parent) => {
-                if (Parent.Modules.Exists(fn => fn.Name == "_2chModule"))
+            },descr:"Создаёт мини опрос"));
+            Bot.Commands.Add(new SynkCommand(async (InlineQuery query, IBotBase Parent) => {
+                if (Parent.Modules.Exists(fn => fn.Name == "_2chModule") && query.Query.Contains("2ch"))
                 {
                     _2chModule.Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
                     if (webm != null)
@@ -132,15 +129,43 @@ namespace GuchiBot
                                 new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
                                     Id = "0",
                                     InputMessageContent = msg,
-                                    ReplyMarkup = LikeDislikeComponent.getKeyBoard(),
+                                    ReplyMarkup = LikeDislikeModule.getKeyBoard(),
                                     Title = "WEBM",
                                     Description = "POST"
                                 }
                         };
                         await Parent.Client.AnswerInlineQueryAsync(query.Id, results);
                     }
+                }else if (query.Query.Contains("opros"))
+                {
+                    string id = query.Query.Split('-').Last();
+                    try
+                    {
+                        var i = Bot.Opros.Find(fn => fn.Id == int.Parse(id));
+                        if (i != null)
+                        {
+                            var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
+                            {
+                                MessageText = $"{i.About}",
+                                ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html
+                            };
+
+                            Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
+                                new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
+                                    Id = "0",
+                                    InputMessageContent = msg,
+                                    ReplyMarkup = LikeDislikeModule.getKeyBoard(),
+                                    Title = "Opros",
+                                    Description = "POST"
+                                }
+                        };
+                            await Parent.Client.AnswerInlineQueryAsync(query.Id, results);
+                        }
+                    }
+                    catch { }
                 }
             },new List<string>() {"_noon"}));
+            Bot.Commands.Add(Bot.GetModule<AnistarModule>().Command);
             Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
             {
                 "Default"
@@ -232,6 +257,7 @@ namespace GuchiBot
                 {
                     if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
                     {
+                        _2chModule Ch = Bot.GetModule<_2chModule>();
                         if (Bot.Rand.Next(0, 1) == 0)
                         {
                             int rd = Bot.Rand.Next(0, _2chModule.WebmCountW);
@@ -259,11 +285,12 @@ namespace GuchiBot
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Ch.ParseWebmsFromDvach(Bot);
+            Bot.GetModule<_2chModule>().ParseWebmsFromDvach(Bot);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            /*
             if (Bot != null)
             {
                 Thread th = new Thread( async() => {
@@ -280,11 +307,12 @@ namespace GuchiBot
                 //Bot.Client.SendTextMessageAsync(chatId: Bot.MessagesLast.Last().Chat.Id,text: "@Pro100RedBull ЛГБТ", replyMarkup: (new ForceReply() { Force = true }));
                 //Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
             }
+            */
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            LikeDislikeComponent LDModule = (Bot.GetModule<LikeDislikeComponent>() as LikeDislikeComponent);
+            LikeDislikeModule LDModule = (Bot.GetModule<LikeDislikeModule>() as LikeDislikeModule);
             if (LDModule.LLikes.Count > 0)
             {
                 SaveLoadModule.SaveLikesToFile(LDModule.LLikes, LikePath);

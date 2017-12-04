@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator;
-using Pes7BotCrator.Commands;
+using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
@@ -15,13 +15,12 @@ namespace GuchiBot
     class BotLogic
     {
         delegate void Error(Bot parent);
-        public async void GetGachiImageLogic(Message ms, BotInteface Parent, List<ArgC> args)
+        public async void GetGachiImageLogic(Message ms, IBotBase Parent, List<ArgC> args)
         {
             Bot PBot = Parent as Bot;
             Error error = async delegate (Bot parent) { await parent.Client.SendTextMessageAsync(ms.Chat.Id, "Sorry, but my creator dont have Gachi Photoes."); };
             if (PBot.GachiImage != null)
             {
-                //await ClearCommandAsync(ms.Chat.Id, ms.MessageId);
                 try
                 {
                     GetLocalGachi(ms.Chat.Id, PBot);
@@ -35,8 +34,11 @@ namespace GuchiBot
             else error(PBot);
         }
 
-        public void Oprosic(Message ms, BotInteface Parent, List<ArgC> args)
+        public void Oprosic(Message ms, IBotBase Parent, List<ArgC> args)
         {
+            string te = ms.Text.Split('@')?.First();
+            if (te != null)
+                ms.Text = te;
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             Parent.Client.SendTextMessageAsync(ms.Chat.Id, "What yor opros about?");
         }
@@ -66,7 +68,7 @@ namespace GuchiBot
             GachiAttakTrigger = false;
         }
 
-        public async void GachiAttakSynk(Message ms, BotInteface Parent, List<ArgC> args)
+        public async void GachiAttakSynk(Message ms, IBotBase Parent, List<ArgC> args)
         {
             await Parent.Client.SendTextMessageAsync(ms.Chat.Id,$"Sorry, but it is to strong weapon for u. @{ms.From.Username}");
             return;
@@ -82,19 +84,22 @@ namespace GuchiBot
             }
         }
 
-        public async void GetArgkSynk(Message ms, BotInteface Parent, List<ArgC> args)
+        public async void GetArgkSynk(Message ms, IBotBase Parent, List<ArgC> args)
         {
+            string te = ms.Text.Split('@')?.First();
+            if (te != null)
+                ms.Text = te;
             Parent.CommandsSynk.Add(new Command(ms.Text, ms.From.Id, ms.Chat.Id));
             await Parent.Client.SendTextMessageAsync(ms.Chat.Id, "Say somethink");
         }
 
-        public void DefaultSynk(Message ms, BotInteface Parent, List<ArgC> args)
+        public void DefaultSynk(Message ms, IBotBase Parent, List<ArgC> args)
         {
             CommandAdd(ms, Parent);
             CommandSynk(Parent);
         }
 
-        private async void CommandAdd(Message ms, BotInteface Parent)
+        private async void CommandAdd(Message ms, IBotBase Parent)
         {
             Command cm = Parent.CommandsSynk.Find(fn => fn.ChatId == ms.Chat.Id && fn.UserId == ms.From.Id);
             if (cm != null)
@@ -103,9 +108,9 @@ namespace GuchiBot
                 await Bot.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
             }
         }
-        private void CommandSynk(BotInteface Parent)
+        private void CommandSynk(IBotBase Parent)
         {
-            Command[] arg = Parent.CommandsSynk.Where(fn => fn.cArgs.Count > 0).ToArray<Command>();
+            Command[] arg = Parent.CommandsSynk.Where(fn => fn.cArgs.Count > 0).ToArray();
             for (int i = 0; i < arg.Length; i++)
             {
                 switch (arg[i].cCommand)
@@ -116,8 +121,9 @@ namespace GuchiBot
                         break;
                     case "/opros":
                         //Нужно контролировать все исходящие сообщения. Для этого надо добавить колекшен их в Основной БОт
-                        Parent.Client.SendTextMessageAsync(arg[i].ChatId, $"{arg[i].cArgs[0]}", replyMarkup: LikeDislikeComponent.getKeyBoard($"opros{Parent.Rand.Next(0,99999)}"));
+                        var it = Parent.Client.SendTextMessageAsync(arg[i].ChatId, $"{arg[i].cArgs[0]}", replyMarkup: LikeDislikeModule.getKeyBoard($"opros-{(Parent as Bot).Opros.Count}"));
                         Parent.CommandsSynk.Remove(arg[i]);
+                        (Parent as Bot).Opros.Add(new Opros(arg[i].cArgs[0], (Parent as Bot).Opros.Count,it.Result));
                         break;
                 }
             }

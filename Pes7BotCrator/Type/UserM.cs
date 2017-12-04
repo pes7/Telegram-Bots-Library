@@ -22,7 +22,7 @@ namespace Pes7BotCrator.Type
             this.FirstName = us.FirstName;
             MessageCount = i;
         }
-        public async Task<bool> DownloadImageToDirectory(BotInteface Parent, bool isOverride = false)
+        public async Task<bool> DownloadImageToDirectory(IBotBase Parent, bool isOverride = false)
         {
             if (!isOverride)
             {
