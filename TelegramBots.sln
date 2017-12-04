@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuchiBot", "GuchiBot\GuchiB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pes7BotCrator", "Pes7BotCrator\Pes7BotCrator.csproj", "{6E631153-5C32-4327-987D-8085330157F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pic_finder", "Pic_finder\Pic_finder.csproj", "{0A780073-F935-4FF8-84CD-32964EF5803E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,13 +16,16 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{19FE0E9A-58B1-4ADD-A98F-D06262D05737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19FE0E9A-58B1-4ADD-A98F-D06262D05737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19FE0E9A-58B1-4ADD-A98F-D06262D05737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19FE0E9A-58B1-4ADD-A98F-D06262D05737}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6E631153-5C32-4327-987D-8085330157F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6E631153-5C32-4327-987D-8085330157F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E631153-5C32-4327-987D-8085330157F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E631153-5C32-4327-987D-8085330157F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A780073-F935-4FF8-84CD-32964EF5803E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A780073-F935-4FF8-84CD-32964EF5803E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A780073-F935-4FF8-84CD-32964EF5803E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A780073-F935-4FF8-84CD-32964EF5803E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

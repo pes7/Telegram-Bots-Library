@@ -20,3 +20,9 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\o
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.pdb
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojResolveAssemblyReference.cache
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojResolveAssemblyReference.cache
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Pes7BotCrator.pdb
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Telegram.Bot.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojResolveAssemblyReference.cache
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.pdb

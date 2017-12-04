@@ -1,0 +1,10 @@
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Pic_finder.exe.config
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Pic_finder.exe
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Pic_finder.pdb
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Newtonsoft.Json.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Pes7BotCrator.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Telegram.Bot.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\Pes7BotCrator.pdb
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.csprojResolveAssemblyReference.cache
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.exe
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.pdb
