@@ -70,8 +70,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot.cs" />
-    <Compile Include="BotLogic.cs" />
+    <Compile Include="Bot\Bot.cs" />
+    <Compile Include="Bot\Logic\BotLogic.cs" />
     <Compile Include="Interface\MessageUI.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -84,22 +84,22 @@
     <Compile Include="Interface\MessageUIPhoto.Designer.cs">
       <DependentUpon>MessageUIPhoto.cs</DependentUpon>
     </Compile>
-    <Compile Include="LuaFile.cs" />
-    <Compile Include="LuaFunc.cs" />
-    <Compile Include="Main.cs">
+    <Compile Include="Lua\LuaFile.cs" />
+    <Compile Include="Lua\LuaFunc.cs" />
+    <Compile Include="Forms\Main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.cs">
+    <Compile Include="Forms\Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
-    <Compile Include="OLua.cs" />
+    <Compile Include="Lua\OLua.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebmModule.cs" />
+    <Compile Include="Bot\Logic\WebmModule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="Config\App.config" />
+    <None Include="Config\packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Interface\MessageUI.resx">
@@ -108,7 +108,7 @@
     <EmbeddedResource Include="Interface\MessageUIPhoto.resx">
       <DependentUpon>MessageUIPhoto.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
+    <EmbeddedResource Include="Forms\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -117,6 +117,9 @@
       <Project>{6e631153-5c32-4327-987d-8085330157f7}</Project>
       <Name>Pes7BotCrator</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Bot\Types\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

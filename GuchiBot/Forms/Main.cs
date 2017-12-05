@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Collections;
 using GuchiBot.Interface;
 using Telegram.Bot.Types;
+using Pes7BotCrator.Modules.Types;
 
 namespace GuchiBot
 {
@@ -57,6 +58,7 @@ namespace GuchiBot
             );
 
             // Ради фана
+            BotBase ds = new BotBase("sf","sf");
             lua = new OLua(Bot);
             //lua.LoadScriptsFromDirectory();
             //
@@ -116,7 +118,7 @@ namespace GuchiBot
             Bot.Commands.Add(new SynkCommand(async (InlineQuery query, IBotBase Parent) => {
                 if (Parent.Modules.Exists(fn => fn.Name == "_2chModule") && query.Query.Contains("2ch"))
                 {
-                    _2chModule.Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
+                    Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
                     if (webm != null)
                     {
                         var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent

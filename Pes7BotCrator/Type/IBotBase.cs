@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
-namespace Pes7BotCrator
+namespace Pes7BotCrator.Type
 {
     public interface IBotBase
     {

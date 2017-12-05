@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Pes7BotCrator
 {
-    public abstract class BotBase : IBotBase
+    public class BotBase : IBotBase
     {
         public string Key { get; set; }
         public string Name { get; set; }
