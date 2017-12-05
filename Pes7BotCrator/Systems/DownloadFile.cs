@@ -9,6 +9,7 @@ namespace Pes7BotCrator.Systems
 {
     public class DownloadFile
     {
+        /*
         public async Action<bool> DownloadFromTelegramTo(File file, string path)
         {
             return true;
@@ -25,5 +26,6 @@ namespace Pes7BotCrator.Systems
         {
             return true;
         }
+        */
     }
 }
