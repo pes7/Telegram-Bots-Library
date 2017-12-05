@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pes7BotCrator.Type
+namespace Pes7BotCrator.Modules.Types
 {
     public class ThBoard
     {

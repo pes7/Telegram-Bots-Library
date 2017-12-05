@@ -61,27 +61,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotBase.cs" />
-    <Compile Include="IBotBase.cs" />
+    <Compile Include="Systems\DownloadFile.cs" />
+    <Compile Include="Type\IBotBase.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Commands\Statistic.cs" />
+    <Compile Include="Modules\2chModule\Types\Webm.cs" />
     <Compile Include="Modules\AnistarModule.cs" />
     <Compile Include="Modules\LikeDislikeModule.cs" />
-    <Compile Include="Modules\2chModule.cs" />
+    <Compile Include="Modules\2chModule\2chModule.cs" />
     <Compile Include="Modules\SaveLoadModule.cs" />
-    <Compile Include="Systems\RequestToTelegramSystem.cs" />
     <Compile Include="Type\ArgC.cs" />
     <Compile Include="Type\Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Type\ISynkCommand.cs" />
     <Compile Include="Type\Likes.cs" />
     <Compile Include="Type\Module.cs" />
     <Compile Include="Type\IModule.cs" />
     <Compile Include="Type\SynkCommand.cs" />
-    <Compile Include="Type\ThBoard.cs" />
+    <Compile Include="Modules\2chModule\Types\ThBoard.cs" />
+    <Compile Include="Type\TimedSynkCommand.cs" />
     <Compile Include="Type\UserM.cs" />
     <Compile Include="WebHook.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="Properties\packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
