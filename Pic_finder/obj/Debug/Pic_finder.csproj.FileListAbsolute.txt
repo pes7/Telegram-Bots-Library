@@ -8,3 +8,6 @@ C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\De
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.csprojResolveAssemblyReference.cache
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.exe
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\obj\Debug\Pic_finder.pdb
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\HtmlAgilityPack.dll
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pic_finder\bin\Debug\HtmlAgilityPack.xml

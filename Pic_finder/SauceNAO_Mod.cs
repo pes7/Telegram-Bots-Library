@@ -65,7 +65,7 @@ namespace Pic_finder
             return resp.StatusCode.ToString().Contains("429");
         }
 
-        private async void PrintRes(System.IO.Stream proc, BotInteface serv, ChatId ch_id, int rep = 0)
+        private async void PrintRes(System.IO.Stream proc, IBotBase serv, ChatId ch_id, int rep = 0)
         {
             HttpResponseMessage th;
             UInt16 i = 0;
@@ -84,7 +84,7 @@ namespace Pic_finder
             else await serv.Client.SendTextMessageAsync(ch_id, await th.Content.ReadAsStringAsync(), replyToMessageId: rep);
         }
 
-        public async void SearchPic(Message msg, BotInteface serving, List<ArgC> args)
+        public async void SearchPic(Message msg, IBotBase serving, List<ArgC> args)
         {
             foreach(var ph in msg.Photo)
             {
