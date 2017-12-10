@@ -36,7 +36,7 @@ namespace Pic_finder
             {
                 foreach (ArgC p in param)
                 {
-                    if (p.Name != "file" || p.Name != "photo")
+                    if (p.Name != "file")
                     {
                         if (p.Name != "tag") Post.Add(p.Name, p.Arg);
                         else Tags.Add(p.Arg);
@@ -82,23 +82,17 @@ namespace Pic_finder
                 return;
             }
             dynamic ress = JsonConvert.DeserializeObject(await th.Content.ReadAsStringAsync());
-            bool is_res = false;
+            bool is_res = false, sd_fl = false;
+            if (args != null)
+            {
+                if (args.Find(fg => fg.Name == "file") != null) sd_fl = true;
+            }
             foreach (var post in ress)
             {
                 System.String fn = post.file_url;
-                HttpResponseMessage get_pic = await Client.GetAsync(fn);
-                bool sd_fl = false, sd_ph = true;
-                if (args != null)
-                {
-                    if (args.Find(fg => fg.Name == "file") != null)
-                    {
-                        sd_fl = true;
-                        sd_ph = false;
-                    }
-                    if (args.Find(fg => fg.Name == "photo") != null) sd_ph = true;
-                }
-                if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), await get_pic.Content.ReadAsStreamAsync()), replyToMessageId: msg.MessageId);
-                if (sd_ph) await serving.Client.SendPhotoAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), await get_pic.Content.ReadAsStreamAsync()), replyToMessageId: msg.MessageId);
+                System.IO.Stream get_pic = await Client.GetStreamAsync(fn);
+                if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), replyToMessageId: msg.MessageId);
+                else await serving.Client.SendPhotoAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), replyToMessageId: msg.MessageId);
                 is_res = true;
             }
             if (!is_res) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunately we have no result\'s.");
