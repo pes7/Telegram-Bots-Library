@@ -61,10 +61,10 @@ namespace Pic_finder
 
         public async void GetFromYandereAsync(Message msg, IBotBase serving, List<ArgC> args)
         {
-            System.String url = null;
+            HttpResponseMessage th = null;
             try
             {
-                url = this.GenerateURL(args);
+                th = await Client.GetAsync(this.GenerateURL(args));
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -73,9 +73,10 @@ namespace Pic_finder
             }
             catch (Exception ex)
             {
+                serving.Exceptions.Add(ex);
                 await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message, replyToMessageId: msg.MessageId);
+                return;
             }
-            HttpResponseMessage th = await Client.GetAsync(url);
             if (!th.IsSuccessStatusCode)
             {
                 await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunately we had error.", replyToMessageId: msg.MessageId);
@@ -89,11 +90,37 @@ namespace Pic_finder
             }
             foreach (var post in ress)
             {
-                System.String fn = post.file_url;
-                System.IO.Stream get_pic = await Client.GetStreamAsync(fn);
-                if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), replyToMessageId: msg.MessageId);
-                else await serving.Client.SendPhotoAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), replyToMessageId: msg.MessageId);
-                is_res = true;
+                bool succ = true;
+                System.String exc = System.String.Empty;
+                do
+                {
+                    try
+                    {
+                        System.String fn = post.file_url;
+                        System.IO.Stream get_pic = await Client.GetStreamAsync(fn);
+                        if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), succ?System.String.Empty:exc, replyToMessageId: msg.MessageId);
+                        else await serving.Client.SendPhotoAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), replyToMessageId: msg.MessageId);
+                        is_res = true;
+                        //Bad Request: PHOTO_SAVE_FILE_INVALID
+                        if (!succ)
+                        {
+                            if (args != null)
+                            {
+                                if (args.Find(fg => fg.Name == "file") != null) sd_fl = true;
+                                else sd_fl = false;
+                            }
+                            succ = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        serving.Exceptions.Add(ex);
+                        exc = ex.Message;
+                        sd_fl = true;
+                        succ = false;
+                    }
+                }
+                while (!succ);
             }
             if (!is_res) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunately we have no result\'s.");
         }

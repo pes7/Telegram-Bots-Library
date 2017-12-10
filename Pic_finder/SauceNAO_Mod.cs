@@ -86,17 +86,19 @@ namespace Pic_finder
 
         public async void SearchPic(Message msg, IBotBase serving, List<ArgC> args)
         {
-            foreach(var ph in msg.Photo)
+            try
             {
-                try
+                if (msg.Photo == null)
                 {
-                    PrintRes(ph.FileStream, serving, msg.Chat.Id, msg.MessageId);
+                    foreach (var ph in msg.Photo) PrintRes(ph.FileStream, serving, msg.Chat.Id, msg.MessageId);
                 }
-                catch(Exception ex)
-                {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message, replyToMessageId: msg.MessageId);
-                    break;
-                }
+                if (msg.Document.FileStream != null) PrintRes(msg.Document.FileStream, serving, msg.Chat.Id);
+                else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Please paste a file and type with it a command.", replyToMessageId: msg.MessageId);
+            }
+            catch (Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message, replyToMessageId: msg.MessageId);
             }
         }
     }
