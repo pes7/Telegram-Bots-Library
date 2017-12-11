@@ -51,7 +51,7 @@ namespace Pes7BotCrator
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);
                             foreach (SynkCommand sy in Parent.Commands.Where(
-                                fn => fn.Type == SynkCommand.TypeOfCommand.Standart &&
+                                fn => fn.Type == TypeOfCommand.Standart &&
                                 fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()) ||
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
@@ -77,7 +77,7 @@ namespace Pes7BotCrator
                      */
                     CallbackQuery qq = Up.CallbackQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(
-                        fn => fn.Type == SynkCommand.TypeOfCommand.Query
+                        fn => fn.Type == TypeOfCommand.Query
                         && fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
                     {
                         Thread the = new Thread(() =>
@@ -90,7 +90,7 @@ namespace Pes7BotCrator
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
                     var query = Up.InlineQuery;
-                    foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == SynkCommand.TypeOfCommand.InlineQuery))
+                    foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == TypeOfCommand.InlineQuery))
                     {
                         sy.doFunc(query, Parent);
                     }

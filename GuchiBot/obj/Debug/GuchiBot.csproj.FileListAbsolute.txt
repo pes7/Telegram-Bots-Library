@@ -58,4 +58,10 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\De
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.dll
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
+<<<<<<< HEAD
+>>>>>>> master
+=======
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.dll
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
 >>>>>>> master

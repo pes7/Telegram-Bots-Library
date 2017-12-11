@@ -27,7 +27,7 @@ namespace Pes7BotCrator
             base(key, Name, modules)
         {
             LikeDislikeModule LDModule = GetModule<LikeDislikeModule>() as LikeDislikeModule;
-            Opros = new List<Pes7BotCrator.Opros>();
+            Opros = new List<Opros>();
             if (LDModule.LikeDislikeQuata == null)
                 LDModule.LikeDislikeQuata = new int[] { 3, 3 };
             LDModule.LLikes = new List<Likes>();

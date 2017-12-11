@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Collections;
 using GuchiBot.Interface;
 using Telegram.Bot.Types;
+using Pes7BotCrator.Modules.Types;
 
 namespace GuchiBot
 {
@@ -45,7 +46,7 @@ namespace GuchiBot
 
             /*
              * Нужно написать модуль автопоста, при том что туда будет попадать кастомная функция, а настройка будет производиться в интерфейсе проги. 
-             * 
+             * В опрос надо добавить параметрический ввод своего текста кнопок. Так же сделать не анонимное голосование.
              */
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "guchimuchibot", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
@@ -116,13 +117,13 @@ namespace GuchiBot
             Bot.Commands.Add(new SynkCommand(async (InlineQuery query, IBotBase Parent) => {
                 if (Parent.Modules.Exists(fn => fn.Name == "_2chModule") && query.Query.Contains("2ch"))
                 {
-                    _2chModule.Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
+                    Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
                     if (webm != null)
                     {
                         var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
                         {
-                            MessageText = $"{webm.Thumbnail}\n{webm.Path}",
-                            ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html
+                            MessageText = $"<a href=\"{ webm.Thumbnail }\">&#8204;</a>{webm.Path}",
+                            ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html,
                         };
 
                         Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
@@ -171,18 +172,6 @@ namespace GuchiBot
                 "Default"
             }));
             label1.Text = $"{Ms} ms";
-
-            /*
-            Thread th = new Thread(async () =>
-            {
-                while (true)
-                {
-                    await this.GetInf();
-                    Thread.Sleep(1000);
-                }
-            });
-            th.Start();
-            */
         }
 
         private async Task GetInf()
@@ -347,8 +336,10 @@ namespace GuchiBot
                     {
                         if (ms.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
                         {
-                            MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text);
-                            mu.Width = flowLayoutPanel1.Width - 25;
+                            MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text)
+                            {
+                                Width = flowLayoutPanel1.Width - 25
+                            };
                             flowLayoutPanel1.Controls.Add(mu);
                         }
                         /*

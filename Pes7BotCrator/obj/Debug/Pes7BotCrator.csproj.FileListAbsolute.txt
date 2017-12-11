@@ -31,7 +31,13 @@ C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\obj
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.dll
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.xml
+<<<<<<< HEAD
 >>>>>>> master
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.dll
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\hoodi\OneDrive\Документи\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.xml
+=======
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.dll
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.xml
+>>>>>>> master

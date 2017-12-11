@@ -9,26 +9,26 @@ namespace Pes7BotCrator.Type
     [Serializable]
     public class Likes
     {
-        public int MessageId { get; set; }
-        public int InstantId { get; set; }
-        public int ChatInstanceId { get; set; }
+        public string MessageId { get; set; }
+        //public int InstantId { get; set; }
+        //public int ChatInstanceId { get; set; }
         public long ChatId { get; set; }
         public List<long> LikeId { get; set; }
         public List<long> DisLikeId { get; set; }
         public enum TypeOfLike { Common, Instant };
         public TypeOfLike Type { get; set; }
-        public Likes(int messageid, long chatid)
+        public Likes(long messageid, long chatid)
         {
             ChatId = chatid;
-            MessageId = messageid;
+            MessageId = messageid.ToString();
             Type = TypeOfLike.Common;
             LikeId = new List<long>();
             DisLikeId = new List<long>();
         }
-        public Likes(int instid, int chatinstantid)
+        public Likes(string chatinstantid, long instid)
         {
-            InstantId = instid;
-            ChatInstanceId = chatinstantid;
+            ChatId = instid;
+            MessageId = chatinstantid;
             Type = TypeOfLike.Instant;
             LikeId = new List<long>();
             DisLikeId = new List<long>();
