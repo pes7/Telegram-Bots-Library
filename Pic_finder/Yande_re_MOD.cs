@@ -36,7 +36,7 @@ namespace Pic_finder
             {
                 foreach (ArgC p in param)
                 {
-                    if (p.Name != "file")
+                    if (p.Name != "file" || p.Name != "show_any")
                     {
                         if (p.Name != "tag") Post.Add(p.Name, p.Arg);
                         else Tags.Add(p.Arg);
@@ -83,10 +83,11 @@ namespace Pic_finder
                 return;
             }
             dynamic ress = JsonConvert.DeserializeObject(await th.Content.ReadAsStringAsync());
-            bool is_res = false, sd_fl = false;
+            bool is_res = false, sd_fl = false, shw_a = false;
             if (args != null)
             {
                 if (args.Find(fg => fg.Name == "file") != null) sd_fl = true;
+                if ( args.Find(fg => fg.Name == "show_any") != null) shw_a = true;
             }
             foreach (var post in ress)
             {
@@ -96,6 +97,7 @@ namespace Pic_finder
                 {
                     try
                     {
+                        if (succ && post.rating != "s" && !shw_a) throw new Exception("This post is \"unsafe\" or has an \"questionable\" rating.\nPlease be careful before open it!");
                         System.String fn = post.file_url;
                         System.IO.Stream get_pic = await Client.GetStreamAsync(fn);
                         if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new FileToSend(fn.Split('/').Last(), get_pic), succ?System.String.Empty:exc, replyToMessageId: msg.MessageId);
@@ -123,6 +125,7 @@ namespace Pic_finder
                 while (!succ);
             }
             if (!is_res) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunately we have no result\'s.");
+            else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Posts has been sent.", replyToMessageId: msg.MessageId);
         }
     }
 }
