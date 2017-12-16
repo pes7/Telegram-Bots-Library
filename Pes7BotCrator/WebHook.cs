@@ -59,12 +59,12 @@ namespace Pes7BotCrator
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 Thread the = new Thread(() =>
                                 {
-                                    sy.doFunc(ms, Parent, getArgs(ms.Text));
+                                    sy.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
                                 });
                                 the.Start();
                                 break;
                             }
-                            Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc(ms, Parent, getArgs(ms.Text));
+                            Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 
@@ -82,7 +82,7 @@ namespace Pes7BotCrator
                     {
                         Thread the = new Thread(() =>
                         {
-                            sy.doFunc(qq, Parent);
+                            sy.doFunc.DynamicInvoke(qq, Parent);
                         });
                         the.Start();
                         break;
@@ -92,9 +92,16 @@ namespace Pes7BotCrator
                     var query = Up.InlineQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == TypeOfCommand.InlineQuery))
                     {
-                        sy.doFunc(query, Parent);
+                        sy.doFunc.DynamicInvoke(query, Parent);
                     }
                     break;
+            }
+            foreach (ISynkCommand sn in Parent.Commands.Where(fn => fn.Type == TypeOfCommand.AllwaysInWebHook))
+            {
+                List<ArgC> arg = null;
+                if(Up.Message != null)
+                    arg = getArgs(Up.Message.Text);
+                sn.doFunc.DynamicInvoke(Up,Parent, arg);
             }
             Parent.OnWebHoockUpdated();
         }
@@ -112,33 +119,38 @@ namespace Pes7BotCrator
         private List<ArgC> getArgs(string message)
         {
             List<ArgC> Args = new List<ArgC>();
-            string[] args_parse = null;
-            try
+            if (message != null)
             {
-                args_parse = message.Split('-');
-            }
-            catch { return null; }
-            if (args_parse.Length > 1)
-            {
-                for (int i = 0; i < args_parse.Length; i++)
+                string[] args_parse = null;
+                try
                 {
-                    var sf = new ArgC();
-                    try
-                    {
-                        string[] ssf = args_parse[i].Split(':');
-                        if(ssf.Length > 1)
-                        {
-                            sf.Name = ssf[0];
-                            sf.Arg = ssf[1];
-                        }else
-                        {
-                            sf.Name = ssf[0];
-                        }
-                    }
-                    catch { sf.Name = args_parse[i]; }
-                    Args.Add(sf);
+                    args_parse = message.Split('-');
                 }
-                return Args;
+                catch { return null; }
+                if (args_parse.Length > 1)
+                {
+                    for (int i = 0; i < args_parse.Length; i++)
+                    {
+                        var sf = new ArgC();
+                        try
+                        {
+                            string[] ssf = args_parse[i].Split(':');
+                            if (ssf.Length > 1)
+                            {
+                                sf.Name = ssf[0];
+                                sf.Arg = ssf[1];
+                            }
+                            else
+                            {
+                                sf.Name = ssf[0];
+                            }
+                        }
+                        catch { sf.Name = args_parse[i]; }
+                        Args.Add(sf);
+                    }
+                    return Args;
+                }
+                else return null;
             }
             else return null;
         }

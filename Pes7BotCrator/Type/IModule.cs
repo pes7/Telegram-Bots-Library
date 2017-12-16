@@ -10,7 +10,6 @@ namespace Pes7BotCrator.Type
     public interface IModule
     {
         string Name { get; set; }
-        dynamic Modulle { get; set; }
         System.Type Type { get; set; }
         Thread MainThread { get; set; }
         void Start();

@@ -14,10 +14,7 @@ namespace Pes7BotCrator.Modules
 {
     public class _2chModule : Module
     {
-        public _2chModule() : base("_2chModule",typeof(_2chModule))
-        {
-            Modulle = this;
-        }
+        public _2chModule() : base("_2chModule",typeof(_2chModule)){}
 
         public List<Webm> WebmsSent = new List<Webm>();
 

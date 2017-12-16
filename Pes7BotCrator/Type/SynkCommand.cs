@@ -11,9 +11,15 @@ namespace Pes7BotCrator.Type
     {
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
-        public dynamic doFunc { get; set; }
+        public Delegate doFunc { get; set; }
         public string Description { get; set; }
 
+        /// <summary>
+        /// Common Synk Command
+        /// </summary>
+        /// <param name="act">Action</param>
+        /// <param name="cm">Command</param>
+        /// <param name="descr">Description</param>
         public SynkCommand(Action<Message, IBotBase, List<ArgC>> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
@@ -21,6 +27,12 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
+        /// <summary>
+        /// Query Synk Command for Inline Messages
+        /// </summary>
+        /// <param name="act">Action</param>
+        /// <param name="cm">Command</param>
+        /// <param name="descr">Description</param>
         public SynkCommand(Action<InlineQuery, IBotBase> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
@@ -28,6 +40,12 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
+        /// <summary>
+        /// Query Synk Command for Buttons
+        /// </summary>
+        /// <param name="act">Action</param>
+        /// <param name="cm">Command</param>
+        /// <param name="descr">Description</param>
         public SynkCommand(Action<CallbackQuery, IBotBase> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
@@ -35,13 +53,25 @@ namespace Pes7BotCrator.Type
             Incialize(act, cm);
         }
 
-        private void Incialize(dynamic ds, List<string> cm)
+        /// <summary>
+        /// Allways in WebHook
+        /// </summary>
+        /// <param name="act">Action</param>
+        /// <param name="cm">Command</param>
+        /// <param name="descr">Description</param>
+        public SynkCommand(Action<Update, IBotBase, List<ArgC>> act)
+        {
+            Type = TypeOfCommand.AllwaysInWebHook;
+            Description = null;
+            Incialize(act,null);
+        }
+
+        private void Incialize(dynamic ds, List<string> cm = null)
         {
             if (cm == null)
                 CommandLine = new List<string>();
             else CommandLine = cm;
             doFunc = ds;
-            CommandLine = cm;
         }
     }
 }

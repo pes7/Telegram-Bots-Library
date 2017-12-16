@@ -10,8 +10,6 @@ namespace Pes7BotCrator.Type
     public class Likes
     {
         public string MessageId { get; set; }
-        //public int InstantId { get; set; }
-        //public int ChatInstanceId { get; set; }
         public long ChatId { get; set; }
         public List<long> LikeId { get; set; }
         public List<long> DisLikeId { get; set; }

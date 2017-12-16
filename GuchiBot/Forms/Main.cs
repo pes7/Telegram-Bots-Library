@@ -53,7 +53,8 @@ namespace GuchiBot
                     new _2chModule(),
                     new SaveLoadModule(60, LikePath, this),
                     new LikeDislikeModule(),
-                    new AnistarModule()
+                    new AnistarModule(),
+                    new Statistic()
                 }
             );
 
@@ -68,7 +69,8 @@ namespace GuchiBot
             }
             Bot.Commands.Add(Bot.GetModule<LikeDislikeModule>().Command);
             Bot.Commands.Add(new Pes7BotCrator.Commands.Help(Bot));
-            Bot.Commands.Add(new Statistic(Bot));
+            Bot.Commands.Add(Bot.GetModule<Statistic>().CommandHelp);
+            Bot.Commands.Add(Bot.GetModule<Statistic>().CommandRuntime);
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"
@@ -109,7 +111,7 @@ namespace GuchiBot
             }, new List<string>()
             {
                 "/testparam"
-            },descr:"Новейшая разработка Нэвельного."));
+            },descr:"Выведет сообщение ботом с праметрами `-id` `-text`"));
             Bot.Commands.Add(new SynkCommand(new BotLogic().Oprosic, new List<string>()
             {
                 "/opros"

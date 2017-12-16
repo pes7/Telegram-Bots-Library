@@ -64,7 +64,7 @@
     <Compile Include="Systems\DownloadFile.cs" />
     <Compile Include="Type\IBotBase.cs" />
     <Compile Include="Commands\Help.cs" />
-    <Compile Include="Commands\Statistic.cs" />
+    <Compile Include="Modules\Statistic.cs" />
     <Compile Include="Modules\2chModule\Types\Webm.cs" />
     <Compile Include="Modules\AnistarModule.cs" />
     <Compile Include="Modules\LikeDislikeModule.cs" />

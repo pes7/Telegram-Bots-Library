@@ -14,7 +14,7 @@ namespace Pes7BotCrator.Type
         public List<string> CommandLine { get; set; }
         public TimeReleyParams Params { get; set; }
         public Thread MainTimeThread { get; set; }
-        public dynamic doFunc { get; set; }
+        public Delegate doFunc { get; set; }
         public string Description { get; set; }
         public IBotBase Parent { get; set; }
         
@@ -52,11 +52,11 @@ namespace Pes7BotCrator.Type
                 switch (Params.Type)
                 {
                     case TypeOfTimeReley.Delayed:
-                        doFunc(Parent);
+                        doFunc.DynamicInvoke(Parent);
                         NeedToLive = false;
                         break;
                     case TypeOfTimeReley.Repeat:
-                        doFunc(Parent);
+                        doFunc.DynamicInvoke(Parent);
                         Time = 0;
                         break;
                 }

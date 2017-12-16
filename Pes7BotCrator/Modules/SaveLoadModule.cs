@@ -38,7 +38,6 @@ namespace Pes7BotCrator.Modules
             Parent = parent;
             Name = "SaveLoadModule";
             this.Type = typeof(SaveLoadModule);
-            Modulle = this;
         }
 
         private int Curtime = 0;
