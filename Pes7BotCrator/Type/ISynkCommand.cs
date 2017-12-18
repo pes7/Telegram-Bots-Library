@@ -19,6 +19,7 @@ namespace Pes7BotCrator.Type
         Query,
         InlineQuery,
         TimeReley,
-        AllwaysInWebHook
+        AllwaysInWebHook,
+        Service
     }
 }

@@ -23,16 +23,27 @@ namespace Pes7BotCrator
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
         }
+        private int time_noConnect = 0;
         public async void Start()
         {
             int offset = 0;
             while (true)
             {
-                var update = await Parent.Client.GetUpdatesAsync(offset);
-                foreach (var up in update)
+                try
                 {
-                    offset = up.Id + 1;
-                    new Thread(() => { MessageSynk(up); }).Start();
+                    var update = await Parent.Client.GetUpdatesAsync(offset);
+                    time_noConnect = 0;
+                    foreach (var up in update)
+                    {
+                        offset = up.Id + 1;
+                        new Thread(() => { MessageSynk(up); }).Start();
+                    }
+                }
+                catch
+                {
+                    Parent.Exceptions.Add(new Exception($"NOPE of Internet Acess {{{time_noConnect}}} sec."));
+                    time_noConnect += 10;
+                    Thread.Sleep(10000);
                 }
             }
         }
@@ -69,12 +80,19 @@ namespace Pes7BotCrator
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 
                             break;
+                        case Telegram.Bot.Types.Enums.MessageType.ServiceMessage:
+                            foreach(SynkCommand sy in Parent.Commands.Where(fn=>fn.Type == TypeOfCommand.Service))
+                            {
+                                Thread the = new Thread(() =>
+                                {
+                                    sy.doFunc.DynamicInvoke(Up, Parent);
+                                });
+                                the.Start();
+                            }
+                            break;
                     }
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
-                    /*
-                     Нужно сохранять лайки людей с инлайна в других группах
-                     */
                     CallbackQuery qq = Up.CallbackQuery;
                     foreach (SynkCommand sy in Parent.Commands.Where(
                         fn => fn.Type == TypeOfCommand.Query

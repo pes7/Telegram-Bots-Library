@@ -71,6 +71,7 @@ namespace GuchiBot
             Bot.Commands.Add(new Pes7BotCrator.Commands.Help(Bot));
             Bot.Commands.Add(Bot.GetModule<Statistic>().CommandHelp);
             Bot.Commands.Add(Bot.GetModule<Statistic>().CommandRuntime);
+            Bot.Commands.Add(new LogUlog(Bot,"Приветсвую тебя на нашем ГачиКанале.", "Увы, наши пути расходятся... :cry::cry::cry:"));
             Bot.Commands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"

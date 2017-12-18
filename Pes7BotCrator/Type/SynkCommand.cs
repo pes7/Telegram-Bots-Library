@@ -66,6 +66,17 @@ namespace Pes7BotCrator.Type
             Incialize(act,null);
         }
 
+        /// <summary>
+        /// Service Synk Command
+        /// </summary>
+        /// <param name="act"></param>
+        public SynkCommand(Action<Update, IBotBase> act, string descr = null)
+        {
+            Type = TypeOfCommand.Service;
+            Description = descr;
+            Incialize(act, null);
+        }
+
         private void Incialize(dynamic ds, List<string> cm = null)
         {
             if (cm == null)
