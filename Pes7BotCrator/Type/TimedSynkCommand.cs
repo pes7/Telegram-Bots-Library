@@ -10,6 +10,9 @@ namespace Pes7BotCrator.Type
 {
     class TimedSynkCommand : ISynkCommand
     {
+        /*
+         * Не оправданый функционал, нужно сделать TimeRelay на похідних от Message 
+         */
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
         public TimeReleyParams Params { get; set; }

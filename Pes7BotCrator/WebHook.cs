@@ -56,8 +56,6 @@ namespace Pes7BotCrator
                     ms = Up.Message;
                     switch (Up.Message.Type) {
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
-                            Parent.MessagesLast.Add(ms);
-                            break;
                         case Telegram.Bot.Types.Enums.MessageType.TextMessage:
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);

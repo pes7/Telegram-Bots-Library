@@ -54,6 +54,7 @@ namespace Pes7BotCrator
             Commands = new List<SynkCommand>();
             Exceptions = new List<Exception>();
             WebHook = new WebHook(this);
+            setModulesParent();
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
@@ -221,6 +222,12 @@ namespace Pes7BotCrator
                 }
             }
             Console.WriteLine("}");
+        }
+
+        public void setModulesParent() {
+            foreach (var md in Modules) {
+                md.Parent = this;
+            }
         }
     }
 }

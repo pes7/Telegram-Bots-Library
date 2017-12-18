@@ -29,5 +29,6 @@ namespace Pes7BotCrator.Type
         int CountOfAvailableMessages { get; set; }
         int RunTime { get; set; }
         string TimeToString(int i);
+        void setModulesParent();
     }
 }

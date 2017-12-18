@@ -25,11 +25,15 @@ namespace LuaAble
 
             /*Register your command here*/
             Lua.RegisterFunction("sendM", this, typeof(OLua).GetMethod("sendM"));
+            Lua.RegisterFunction("sendML", this, typeof(OLua).GetMethod("sendML"));
             Lua.RegisterFunction("sendStI", this, typeof(OLua).GetMethod("sendStI"));
             Lua.RegisterFunction("sendStS", this, typeof(OLua).GetMethod("sendStS"));
         }
-
-        public void sendM(string message)
+        public void sendM(string id, string message)
+        {
+            Bot.Client.SendTextMessageAsync(id, message);
+        }
+        public void sendML(string message)
         {
             Bot.Client.SendTextMessageAsync(Bot.MessagesLast.Last().Chat.Id,message);
         }

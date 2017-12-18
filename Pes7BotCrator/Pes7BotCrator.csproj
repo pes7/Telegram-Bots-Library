@@ -62,6 +62,9 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="Modules\DownloadPhoto\DownloadPhoto.cs" />
+    <Compile Include="Modules\TRM\TRM.cs" />
+    <Compile Include="Modules\TRM\Types\TimeRelayMessage.cs" />
     <Compile Include="Systems\DownloadFile.cs" />
     <Compile Include="Type\IBotBase.cs" />
     <Compile Include="Commands\Help.cs" />

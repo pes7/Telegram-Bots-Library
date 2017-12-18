@@ -12,6 +12,7 @@ namespace Pes7BotCrator.Type
         public string Name { get; set; }
         public Thread MainThread { get; set; }
         public System.Type Type { get; set; }
+        public IBotBase Parent { get; set; }
         public Module(string name, System.Type type, dynamic modulle = null)
         {
             Name = name;

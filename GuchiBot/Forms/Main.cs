@@ -51,10 +51,11 @@ namespace GuchiBot
             Bot = new Bot("466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw", "guchimuchibot", "G:/WebServers/home/apirrrsseer.ru/www/List_down/video", "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
                     new _2chModule(),
-                    new SaveLoadModule(60, LikePath, this),
+                    new SaveLoadModule(60, LikePath),
                     new LikeDislikeModule(),
                     new AnistarModule(),
-                    new Statistic()
+                    new Statistic(),
+                    new TRM()
                 }
             );
 
@@ -169,6 +170,19 @@ namespace GuchiBot
                     catch { }
                 }
             },new List<string>() {"_noon"}));
+            Bot.Commands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBotBase Parent, List<ArgC> args) =>
+            {
+                if (args != null)
+                {
+                    ArgC time = args.Find(fs => fs.Name == "time");
+                    ArgC text = args.Find(fs => fs.Name == "text");
+                    if(text != null && time != null)
+                        await Bot.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, text.Arg, int.Parse(time.Arg));
+                }
+            }, new List<string>()
+            {
+                "/adp"
+            }, "Auto deliting post `text` `time` - time of life."));
             Bot.Commands.Add(Bot.GetModule<AnistarModule>().Command);
             Bot.Commands.Add(new SynkCommand(new BotLogic().DefaultSynk, new List<string>()
             {

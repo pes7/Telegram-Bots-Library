@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
-namespace Pes7BotCrator.Commands
+namespace Pes7BotCrator.Modules
 {
     public class Statistic : Module
     {
