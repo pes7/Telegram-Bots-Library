@@ -73,7 +73,10 @@ namespace Pes7BotCrator
                                 the.Start();
                                 break;
                             }
-                            Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
+                            try
+                            {
+                                Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
+                            }catch{ }
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 

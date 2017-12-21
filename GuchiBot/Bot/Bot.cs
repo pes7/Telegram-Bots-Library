@@ -63,7 +63,7 @@ namespace Pes7BotCrator
                 await Parent.Client.DeleteMessageAsync(id, msgid);
             } catch (Exception ex)
             {
-                Parent.Exceptions.Add(ex);
+                //Parent.Exceptions.Add(ex);
             }
         }
 
@@ -126,7 +126,8 @@ namespace Pes7BotCrator
             }
             else
             {
-                foreach (Exception ms in Exceptions)
+                Exception[] ex = Exceptions.ToArray();
+                foreach (Exception ms in ex)
                 {
                     Console.WriteLine($"    {ms}");
                 }

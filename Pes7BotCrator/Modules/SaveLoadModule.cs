@@ -16,6 +16,10 @@ namespace Pes7BotCrator.Modules
 {
     public class SaveLoadModule : IModule
     {
+
+        /*
+         * Сделать синхронную запись в лайки, что бы потоки инвокали её, а потом писали. Иначи при нагрузке бот упадёт. 
+         */
         public int InterVal { get; set; }
         public string FileName { get; set; }
         System.Type Type { get; set; }

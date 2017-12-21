@@ -170,7 +170,7 @@ namespace Pes7BotCrator.Modules
             List<Webm> Webms = null;
             if (args != null)
             {
-                if (args.Find(fn => fn.Name == "a") != null)
+                if (args.Find(fn => fn.Name == "a" || fn.Name == "a" || fn.Name == "а") != null)
                     Webms = WebmsA;
                 else Webms = WebmsW;
             }
@@ -219,7 +219,7 @@ namespace Pes7BotCrator.Modules
                     catch (Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
-                        await Parent.Client.SendTextMessageAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.");
+                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.",10);
                         return;
                     }
                 });
