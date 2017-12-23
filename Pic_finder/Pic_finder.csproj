@@ -60,6 +60,7 @@
     <Compile Include="Ctr_panel.Designer.cs">
       <DependentUpon>Ctr_panel.cs</DependentUpon>
     </Compile>
+    <Compile Include="danbooru_api_mod.cs" />
     <Compile Include="SauceNAO_Mod.cs" />
     <Compile Include="Main_Bot.cs" />
     <Compile Include="Program.cs" />

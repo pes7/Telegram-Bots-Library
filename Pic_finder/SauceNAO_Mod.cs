@@ -88,12 +88,29 @@ namespace Pic_finder
         {
             try
             {
-                if (msg.Photo == null)
+                if (msg.Type == Telegram.Bot.Types.Enums.MessageType.PhotoMessage)
                 {
-                    foreach (var ph in msg.Photo) PrintRes(ph.FileStream, serving, msg.Chat.Id, msg.MessageId);
+                    var rec = serving.Client.GetFileAsync(msg.Photo.LastOrDefault()?.FileId).Result;
+                    System.IO.Stream photo = new System.IO.MemoryStream();
+                    await rec.FileStream.CopyToAsync(photo);
+                    HttpResponseMessage th;
+                    UInt16 i = 0;
+                    do
+                    {
+                        th = await this.DoASearchAsync(photo, this.Acc_Key);
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
+                        if (th.IsSuccessStatusCode) break;
+                        else if (this.IsSt429(ref th)) System.Threading.Thread.Sleep(10 * 1000);
+                    }
+                    while (i++ < 5 - 1);
+                    if (IsSt429(ref th)) throw new Exception(TooManyReq);
+                    else
+                    {
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, await th.Content.ReadAsStringAsync());
+                    }
+
                 }
-                if (msg.Document.FileStream != null) PrintRes(msg.Document.FileStream, serving, msg.Chat.Id);
-                else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Please paste a file and type with it a command.", replyToMessageId: msg.MessageId);
+                else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Please paste a photo and type with it a command \"/getsauce\".", replyToMessageId: msg.MessageId);
             }
             catch (Exception ex)
             {

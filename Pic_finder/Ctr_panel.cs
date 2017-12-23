@@ -19,7 +19,8 @@ namespace Pic_finder
             InitializeComponent();
             Robot = new Main_Bot("455187137:AAGs9q50RSsctI75tveQyGfQB6mE09jIu8A", mods: new List<IModule> {
                 new SauceNAO_Mod("257dedb3b7fe24c2ef1c4c9a7a8ff0f22bd2ad3a"),
-                new Yande_re_MOD(String.Empty)
+                new Yande_re_MOD(String.Empty),
+                new danbooru_api_mod()
             });
 
             Robot.Commands.Add(new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic, new List<string>()
@@ -28,11 +29,24 @@ namespace Pic_finder
                 "/getsauce@anime_pic_finder_bot"
             }));
 
-            Robot.Commands.Add(new SynkCommand(Robot.GetModule<Yande_re_MOD>().GetFromYandereAsync, new List<string>()
+            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()
             {
                 "/getyandere",
                 "/getyandere@anime_pic_finder_bot"
             }));
+
+            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetDanbooruAsync, new List<string>()
+            {
+                "/getdanbooru",
+                "/getdanbooru@anime_pic_finder_bot"
+            }));
+
+            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetGelboorruAsync, new List<string>()
+            {
+                "/getgelbooru",
+                "/getgelbooru@anime_pic_finder_bot"
+            }
+            ));
         }
 
         private void Ctr_panel_Load(object sender, EventArgs e)
