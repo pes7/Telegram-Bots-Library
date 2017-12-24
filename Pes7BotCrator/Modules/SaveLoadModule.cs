@@ -10,95 +10,64 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using Pes7BotCrator.Commands;
+using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Type;
 
 namespace Pes7BotCrator.Modules
 {
-    public class SaveLoadModule : IModule
+    public class SaveLoadModule : Module
     {
-        public int InterVal { get; set; }
-        public string FileName { get; set; }
-        public dynamic Parent { get; set; }
-        System.Type Type { get; set; }
-        public string Name { get; set; }
-        public dynamic Modulle { get; set; }
-        public Thread MainThread { get; set; }
-
-        System.Type IModule.Type { get; set; }
-
-        public void AbortThread()
-        {
-            MainThread.Abort();
-        }
-
-        public SaveLoadModule(int i, string fn, dynamic parent)
-        {
-            InterVal = i;
-            FileName = fn;
-            Parent = parent;
-            Name = "SaveLoadModule";
-            this.Type = typeof(SaveLoadModule);
-            Modulle = this;
-        }
-
+        public List<Action> SaveActions;
         private int Curtime = 0;
-        public void Start()
+        public SaveLoadModule(int interV) : base("SaveLoadModule", typeof(SaveLoadModule))
         {
-            Curtime = 0;
-            MainThread = new Thread(async () => { await SynkAsync(); });
+            SaveActions = new List<Action>();
+            MainThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    if (Curtime >= interV && Parent != null)
+                    {
+                        saveIt();
+                        Curtime = 0;
+                    }
+                    Curtime++;
+                    Thread.Sleep(1000);
+                }
+            });
             MainThread.Start();
         }
 
-        private async Task SynkAsync()
+        public void saveIt()
         {
-            while (true)
+            foreach (var act in SaveActions)
             {
-                if (Curtime >= InterVal)
-                {
-                    IBotBase bt = Parent?.Bot;
-                    if (bt != null) {
-                        LikeDislikeModule LDModule = bt.GetModule<LikeDislikeModule>();
-                        if (LDModule != null) {
-                            if (LDModule.LLikes.Count > 0)
-                            {
-                                List<Likes> ls = LDModule.LLikes;
-                                SaveLikesToFile(ls, FileName);
-                            }
-                        }
-                    }
-                    Curtime = 0;
-                }
-                Curtime++;
-                Thread.Sleep(1000);
+                act.DynamicInvoke();
             }
         }
 
-        public static void SaveLikesToFile(List<Likes> likes, string fileName)
+        public static void SaveSomething<T>(T Data, string FileName)
         {
-            if (likes == null) { return; }
+            if (Data == null) { return; }
+            T data = Data;
             try
             {
-                FileStream outFile = File.Create(fileName);
+                FileStream outFile = File.Create(FileName);
                 BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(outFile, likes);
+                formatter.Serialize(outFile, data);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        public static List<Likes> LoadLikesFromFile(string fileName)
+        public static T LoadSomething<T>(string FileName)
         {
-            if (string.IsNullOrEmpty(fileName)) { return null; }
-
-            List<Likes> list = new List<Likes>();
+            if (string.IsNullOrEmpty(FileName)) { throw new Exception("Can't read File."); }
             BinaryFormatter formatter = new BinaryFormatter();
-            FileStream aFile = new FileStream(fileName, FileMode.Open);
-            byte[] buffer = new byte[aFile.Length];
-            aFile.Read(buffer, 0, (int)aFile.Length);
-            MemoryStream stream = new MemoryStream(buffer);
-            return (List<Likes>)formatter.Deserialize(stream);
+            FileStream aFile = new FileStream(FileName, FileMode.Open);
+            return (T)formatter.Deserialize(aFile);
         }
     }
 }

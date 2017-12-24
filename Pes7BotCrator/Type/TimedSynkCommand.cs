@@ -10,18 +10,21 @@ namespace Pes7BotCrator.Type
 {
     class TimedSynkCommand : ISynkCommand
     {
+        /*
+         * Не оправданый функционал, нужно сделать TimeRelay на похідних от Message 
+         */
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
         public TimeReleyParams Params { get; set; }
         public Thread MainTimeThread { get; set; }
-        public dynamic doFunc { get; set; }
+        public Delegate doFunc { get; set; }
         public string Description { get; set; }
-        public IBotBase Parent { get; set; }
+        public IBot Parent { get; set; }
         
         private int Time { get; set; }
         private bool NeedToLive { get; set; }
 
-        public TimedSynkCommand(IBotBase parent, Action<IBotBase> act, TimeReleyParams type, List<string> cm = null, string endMessage = null, string descr = null)
+        public TimedSynkCommand(IBot parent, Action<IBot> act, TimeReleyParams type, List<string> cm = null, string endMessage = null, string descr = null)
         {
             Parent = parent;
             Description = descr;
@@ -52,11 +55,11 @@ namespace Pes7BotCrator.Type
                 switch (Params.Type)
                 {
                     case TypeOfTimeReley.Delayed:
-                        doFunc(Parent);
+                        doFunc.DynamicInvoke(Parent);
                         NeedToLive = false;
                         break;
                     case TypeOfTimeReley.Repeat:
-                        doFunc(Parent);
+                        doFunc.DynamicInvoke(Parent);
                         Time = 0;
                         break;
                 }

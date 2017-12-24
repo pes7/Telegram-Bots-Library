@@ -61,20 +61,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotBase.cs" />
-    <Compile Include="Systems\DownloadFile.cs" />
-    <Compile Include="Type\IBotBase.cs" />
+    <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="Modules\TRM\TRM.cs" />
+    <Compile Include="Modules\TRM\Types\TimeRelayMessage.cs" />
+    <Compile Include="Modules\VoteModule\Types\Likes.cs" />
+    <Compile Include="Modules\VoteModule\Types\Opros.cs" />
+    <Compile Include="Modules\VoteModule\Types\VoteMessage.cs" />
+    <Compile Include="Modules\VoteModule\VoteModule.cs" />
+    <Compile Include="Type\IBot.cs" />
     <Compile Include="Commands\Help.cs" />
-    <Compile Include="Commands\Statistic.cs" />
+    <Compile Include="Modules\Statistic.cs" />
     <Compile Include="Modules\2chModule\Types\Webm.cs" />
     <Compile Include="Modules\AnistarModule.cs" />
-    <Compile Include="Modules\LikeDislikeModule.cs" />
+    <Compile Include="Modules\LikeDislikeModule\LikeDislikeModule.cs" />
     <Compile Include="Modules\2chModule\2chModule.cs" />
     <Compile Include="Modules\SaveLoadModule.cs" />
     <Compile Include="Type\ArgC.cs" />
     <Compile Include="Type\Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\ISynkCommand.cs" />
-    <Compile Include="Type\Likes.cs" />
+    <Compile Include="Modules\LikeDislikeModule\Types\Likes.cs" />
     <Compile Include="Type\Module.cs" />
     <Compile Include="Type\IModule.cs" />
     <Compile Include="Type\SynkCommand.cs" />
@@ -85,6 +91,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Systems\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

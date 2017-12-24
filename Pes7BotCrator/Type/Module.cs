@@ -10,13 +10,12 @@ namespace Pes7BotCrator.Type
     public class Module : IModule
     {
         public string Name { get; set; }
-        public dynamic Modulle { get; set; }
         public Thread MainThread { get; set; }
         public System.Type Type { get; set; }
+        public IBot Parent { get; set; }
         public Module(string name, System.Type type, dynamic modulle = null)
         {
             Name = name;
-            Modulle = modulle;
             Type = type;
         }
         public void Start() { }

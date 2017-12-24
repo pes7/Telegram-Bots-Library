@@ -14,14 +14,11 @@ namespace Pes7BotCrator.Modules
 {
     public class _2chModule : Module
     {
-        public _2chModule() : base("_2chModule",typeof(_2chModule))
-        {
-            Modulle = this;
-        }
+        public _2chModule() : base("_2chModule",typeof(_2chModule)){}
 
         public List<Webm> WebmsSent = new List<Webm>();
 
-        private List<ThBoard> Get2chBoards(IBotBase Parent, string address)
+        private List<ThBoard> Get2chBoards(IBot Parent, string address)
         {
             List<ThBoard> Th = new List<ThBoard>();
             try
@@ -46,12 +43,12 @@ namespace Pes7BotCrator.Modules
             catch (Exception ex){ Parent.Exceptions.Add(ex); return null; }
         }
 
-        public void ParseWebmsFromDvach(IBotBase Parent)
+        public void ParseWebmsFromDvach(IBot Parent)
         {
             DvochSynkAsync(Get2chBoards(Parent, "http://2ch.hk/b/catalog_num.json"),Parent);
         }
 
-        public async Task DvochSynkAsync(List<ThBoard> th, IBotBase Parent)
+        public async Task DvochSynkAsync(List<ThBoard> th, IBot Parent)
         {
             foreach (ThBoard t in th)
             {
@@ -104,7 +101,7 @@ namespace Pes7BotCrator.Modules
             return iser;
         }
 
-        private List<Webm> getWebms(IBotBase Parent, string address)
+        private List<Webm> getWebms(IBot Parent, string address)
         {
             List<Webm> Dy = new List<Webm>();
             List<ThBoard> Th = Get2chBoards(Parent, address);
@@ -151,7 +148,7 @@ namespace Pes7BotCrator.Modules
         public static int WebmCountA = 0;
         public List<Webm> WebmsW = new List<Webm>();
         public List<Webm> WebmsA = new List<Webm>();
-        public void Ragenerated(Message ms, IBotBase Parent, List<ArgC> args)
+        public void Ragenerated(Message ms, IBot Parent, List<ArgC> args)
         {
             if (ms.From.Username == "nazarpes7")
             {
@@ -168,12 +165,12 @@ namespace Pes7BotCrator.Modules
             else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
         }
 
-        public void get2chSmartRandWebm(Message ms,IBotBase Parent, List<ArgC> args)
+        public void get2chSmartRandWebm(Message ms,IBot Parent, List<ArgC> args)
         {
             List<Webm> Webms = null;
             if (args != null)
             {
-                if (args.Find(fn => fn.Name == "a") != null)
+                if (args.Find(fn => fn.Name == "a" || fn.Name == "a" || fn.Name == "а") != null)
                     Webms = WebmsA;
                 else Webms = WebmsW;
             }
@@ -208,7 +205,7 @@ namespace Pes7BotCrator.Modules
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(IBotBase Parent, Webm webm)
+        public void SendWebm(IBot Parent, Webm webm)
         {
             if (webm != null)
             {
@@ -222,7 +219,7 @@ namespace Pes7BotCrator.Modules
                     catch (Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
-                        await Parent.Client.SendTextMessageAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.");
+                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.",10);
                         return;
                     }
                 });

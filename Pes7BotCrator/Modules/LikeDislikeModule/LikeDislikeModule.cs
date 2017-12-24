@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using Pes7BotCrator.Modules.Types;
+using Pes7BotCrator.Modules.Types.LikeDislike;
 
 namespace Pes7BotCrator.Modules
 {
@@ -17,8 +19,19 @@ namespace Pes7BotCrator.Modules
          * 
          */
 
-        public LikeDislikeModule() : base("LikeDislikeModule", typeof(LikeDislikeModule)) { Command = new LikeSynkCommand(); }
-        public List<Likes> LLikes { get; set; } = new List<Likes>();
+        private string FileName;
+        public LikeDislikeModule(string fileName) : base("LikeDislikeModule", typeof(LikeDislikeModule)) {
+            FileName = fileName;
+            Name = "SaveLoadModule";
+            Command = new LikeSynkCommand();
+            LLikes = new List<Likes>();
+            // Подгрузка лайков с файлов
+            if (System.IO.File.Exists(FileName))
+            {
+                Load();
+            }
+        }
+        public List<Likes> LLikes { get; set; }
         public int[] LikeDislikeQuata { get; set; }
         public LikeSynkCommand Command { get; set; }
 
@@ -32,7 +45,7 @@ namespace Pes7BotCrator.Modules
             InlineKeyboardMarkup keyboard = null;
             if (query == null)
             {
-                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
                     new [] {
                         new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","t:f:type:like"),
                         new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","t:f:type:dislike")
@@ -81,7 +94,7 @@ namespace Pes7BotCrator.Modules
             return keyboard;
         }
 
-        public static void Act(CallbackQuery re, IBotBase Parent)
+        public static void Act(CallbackQuery re, IBot Parent)
         {
             Message ms = re?.Message;
             long id;
@@ -179,6 +192,25 @@ namespace Pes7BotCrator.Modules
                 catch { };
             });
             th.Start();
+        }
+
+        public void Save()
+        {
+            LikeDislikeModule LDModule = Parent.GetModule<LikeDislikeModule>();
+            if (LDModule != null)
+            {
+                if (LDModule.LLikes.Count > 0)
+                {
+                    List<Likes> ls = LDModule.LLikes;
+                    SaveLoadModule.SaveSomething(ls, FileName);
+                }
+            }
+        }
+
+        public void Load()
+        {
+            var d = SaveLoadModule.LoadSomething<List<Likes>>(FileName);
+            LLikes.AddRange(d);
         }
     }
 }

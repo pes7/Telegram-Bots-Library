@@ -4,3 +4,6 @@ GuchiBot/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.txt
 *.cache
 Pic_finder/bin/Debug/Pic_finder.vshost.exe
+.vs/TelegramBots/v14/.suo
+.vs/TelegramBots/v15/.suo
+*.cache

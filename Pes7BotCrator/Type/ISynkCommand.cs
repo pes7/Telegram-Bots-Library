@@ -10,7 +10,7 @@ namespace Pes7BotCrator.Type
     {
         TypeOfCommand Type { get; set; }
         List<string> CommandLine { get; set; }
-        dynamic doFunc { get; set; }
+        Delegate doFunc { get; set; }
         string Description { get; set; }
     }
 
@@ -18,6 +18,8 @@ namespace Pes7BotCrator.Type
         Standart,
         Query,
         InlineQuery,
-        TimeReley
+        TimeReley,
+        AllwaysInWebHook,
+        Service
     }
 }

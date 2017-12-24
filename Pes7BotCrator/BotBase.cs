@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Pes7BotCrator
 {
-    public class BotBase : IBotBase
+    public class BotBase : IBot
     {
         public string Key { get; set; }
         public string Name { get; set; }
@@ -22,7 +22,7 @@ namespace Pes7BotCrator
         public WebHook WebHook { get; set; }
         public List<Message> MessagesLast { get; set; }
         public List<dynamic> MessagesQueue { get; set; }
-        public List<Command> CommandsSynk { get; set; }
+        public List<Command> ActionCommands { get; set; }
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
 
@@ -31,14 +31,22 @@ namespace Pes7BotCrator
         public List<IModule> Modules { get; set; }
         public T GetModule<T>() where T : IModule
         {
-            return (T)Modules.Find(fn => fn.Type == typeof(T));
+            try
+            {
+                return (T)Modules.Find(fn => fn.Type == typeof(T));
+            }
+            catch { throw new Exception("There is no this Module."); }
         }
         public IModule GetModule(string name)
         {
-            return Modules.Find(fn => fn.Name == name);
+            try
+            {
+                return Modules.Find(fn => fn.Name == name);
+            }
+            catch { throw new Exception("There is no this Module."); }
         }
 
-        public List<SynkCommand> Commands { get; set; }
+        public List<SynkCommand> SynkCommands { get; set; }
         public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
         public int RunTime { get; set; } = 0;
 
@@ -47,13 +55,14 @@ namespace Pes7BotCrator
             Client = new Telegram.Bot.TelegramBotClient(key);
             Name = name;
             Modules = modules;
-            CommandsSynk = new List<Command>();
+            ActionCommands = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
             ActiveUsers = new List<UserM>();
-            Commands = new List<SynkCommand>();
+            SynkCommands = new List<SynkCommand>();
             Exceptions = new List<Exception>();
             WebHook = new WebHook(this);
+            setModulesParent();
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
@@ -76,13 +85,13 @@ namespace Pes7BotCrator
                 nd.Start();
             }
         }
-        public static async Task ClearCommandAsync(long id, int msgid, IBotBase Parent)
+        public static async Task ClearCommandAsync(long id, int msgid, IBot Parent)
         {
             try
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
             }
-            catch { }
+            catch { /*No admin acces in group*/ }
         }
         public virtual void SendMessage(long ChatId, string text, UserM user = null)
         {
@@ -183,7 +192,8 @@ namespace Pes7BotCrator
             Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
-            foreach (UserM um in ActiveUsers)
+            var a = ActiveUsers;
+            foreach (UserM um in a)
             {
                 Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
             }
@@ -199,7 +209,8 @@ namespace Pes7BotCrator
             }
             else
             {
-                foreach (Message ms in MessagesLast)
+                var m = MessagesLast;
+                foreach (Message ms in m)
                 {
                     Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
                 }
@@ -215,12 +226,19 @@ namespace Pes7BotCrator
             }
             else
             {
-                foreach (Exception ms in Exceptions)
+                var s = Exceptions;
+                foreach (Exception ms in s)
                 {
                     Console.WriteLine($"    {ms}");
                 }
             }
             Console.WriteLine("}");
+        }
+
+        public void setModulesParent() {
+            foreach (var md in Modules) {
+                md.Parent = this;
+            }
         }
     }
 }

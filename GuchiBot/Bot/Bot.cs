@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules;
+using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -21,16 +22,10 @@ namespace Pes7BotCrator
         public string WebmDir { get; set; }
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
-        public List<Opros> Opros { get; set; }
 
-        public Bot(string key, string Name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<IModule> modules = null) :
-            base(key, Name, modules)
+        public Bot(string key, string name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<IModule> modules = null) :
+            base(key, name, modules)
         {
-            LikeDislikeModule LDModule = GetModule<LikeDislikeModule>() as LikeDislikeModule;
-            Opros = new List<Opros>();
-            if (LDModule.LikeDislikeQuata == null)
-                LDModule.LikeDislikeQuata = new int[] { 3, 3 };
-            LDModule.LLikes = new List<Likes>();
             LastWebms = new List<dynamic>();
             WebmDir = webmdir;
             GachiImage = gachiimage;
@@ -56,14 +51,14 @@ namespace Pes7BotCrator
                 }
             }
         }
-        public static async Task ClearCommandAsync(long id, int msgid, IBotBase Parent)
+        public static async Task ClearCommandAsync(long id, int msgid, IBot Parent)
         {
             try
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
             } catch (Exception ex)
             {
-                Parent.Exceptions.Add(ex);
+                //Parent.Exceptions.Add(ex);
             }
         }
 
@@ -80,14 +75,14 @@ namespace Pes7BotCrator
 
         public string[] getInfForList()
         {
-            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {(GetModule<LikeDislikeModule>() as LikeDislikeModule).LLikes.Count}".Split('|');
+            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {GetModule<LikeDislikeModule>().LLikes.Count}".Split('|');
         }
 
         public override void ShowInf()
         {
             Console.Clear();
             Console.WriteLine("Bot Stats: {");
-            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {(GetModule<LikeDislikeModule>() as LikeDislikeModule).LLikes.Count}");
+            Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {GetModule<LikeDislikeModule>().LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
             foreach (UserM um in ActiveUsers)
@@ -126,27 +121,13 @@ namespace Pes7BotCrator
             }
             else
             {
-                foreach (Exception ms in Exceptions)
+                Exception[] ex = Exceptions.ToArray();
+                foreach (Exception ms in ex)
                 {
                     Console.WriteLine($"    {ms}");
                 }
             }
             Console.WriteLine("}");
-        }
-    }
-    public class Opros {
-        public string About { get; set; }
-        //string First { get; set; }
-        //string Second { get; set; }
-        public int Id { get; set; }
-        public Message oprosThis { get; set; }
-        public Opros(string ab, int id, Message it)
-        {
-            About = ab;
-            //First = fr;
-            //Second = se;
-            Id = id;
-            oprosThis = it;
         }
     }
 }

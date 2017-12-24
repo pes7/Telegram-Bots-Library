@@ -15,9 +15,9 @@ namespace LuaAble
     {
         public List<LuaFile> LuaScripts = new List<LuaFile>();
         public Lua Lua { get; set; }
-        public IBotBase Bot { get; set; }
+        public IBot Bot { get; set; }
 
-        public OLua(IBotBase bot)
+        public OLua(IBot bot)
         {
             Bot = bot;
             Lua = new Lua();
@@ -25,11 +25,15 @@ namespace LuaAble
 
             /*Register your command here*/
             Lua.RegisterFunction("sendM", this, typeof(OLua).GetMethod("sendM"));
+            Lua.RegisterFunction("sendML", this, typeof(OLua).GetMethod("sendML"));
             Lua.RegisterFunction("sendStI", this, typeof(OLua).GetMethod("sendStI"));
             Lua.RegisterFunction("sendStS", this, typeof(OLua).GetMethod("sendStS"));
         }
-
-        public void sendM(string message)
+        public void sendM(string id, string message)
+        {
+            Bot.Client.SendTextMessageAsync(id, message);
+        }
+        public void sendML(string message)
         {
             Bot.Client.SendTextMessageAsync(Bot.MessagesLast.Last().Chat.Id,message);
         }
