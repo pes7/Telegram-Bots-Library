@@ -12,11 +12,11 @@ namespace Pes7BotCrator.Commands
     {
         public BotBase Parent { get; set; }
         public Help(BotBase bot) : base(Act, new List<string>() { "/help" },descr:"Список команд.") { Parent = bot; }
-        public static void Act(Message re, IBotBase Parent, List<ArgC> args)
+        public static void Act(Message re, IBot Parent, List<ArgC> args)
         {
             Parent.Client.SendTextMessageAsync(re.Chat.Id,$"This bot[{Parent.Name}] was created with pes7's Bot Creator.");
             string coms = "";
-            foreach(SynkCommand sn in Parent.Commands.Where(fn=>fn.Type==TypeOfCommand.Standart && fn.CommandLine.First() != "Default"))
+            foreach(SynkCommand sn in Parent.SynkCommands.Where(fn=>fn.Type==TypeOfCommand.Standart && fn.CommandLine.First() != "Default"))
             {
                 if(sn.Description != null)
                     coms += $"\n{sn.CommandLine.First()} - {sn.Description}";

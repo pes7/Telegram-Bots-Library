@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pes7BotCrator.Type
+namespace Pes7BotCrator.Modules.Types.VoteModule
 {
     [Serializable]
     public class Likes
@@ -15,21 +15,24 @@ namespace Pes7BotCrator.Type
         public List<long> DisLikeId { get; set; }
         public enum TypeOfLike { Common, Instant };
         public TypeOfLike Type { get; set; }
-        public Likes(long messageid, long chatid)
+        public Opros ParentO { get; set; }
+        public Likes(Opros op, long messageid, long chatid)
         {
             ChatId = chatid;
             MessageId = messageid.ToString();
             Type = TypeOfLike.Common;
             LikeId = new List<long>();
             DisLikeId = new List<long>();
+            ParentO = op;
         }
-        public Likes(string chatinstantid, long instid)
+        public Likes(Opros op, string chatinstantid, long instid)
         {
             ChatId = instid;
             MessageId = chatinstantid;
             Type = TypeOfLike.Instant;
             LikeId = new List<long>();
             DisLikeId = new List<long>();
+            ParentO = op;
         }
     }
 }

@@ -20,12 +20,12 @@ namespace Pes7BotCrator.Commands
             if (helloMassage != null) HelloMessage = helloMassage;
             else HelloMessage = "Hello, my friend. Nice to meet u in our chanel.";
         }
-        public static void Act(Update re, IBotBase Parent)
+        public static void Act(Update re, IBot Parent)
         { 
             LogUlog Th = null;
             try
             {
-                Th = Parent.Commands.Find(fn => fn.Type == TypeOfCommand.Service && fn.Description == "hlbe") as LogUlog;
+                Th = Parent.SynkCommands.Find(fn => fn.Type == TypeOfCommand.Service && fn.Description == "hlbe") as LogUlog;
             }
             catch { }
             if(re.Message != null && Th != null)

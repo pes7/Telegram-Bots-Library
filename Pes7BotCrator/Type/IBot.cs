@@ -8,7 +8,7 @@ using Telegram.Bot.Types;
 
 namespace Pes7BotCrator.Type
 {
-    public interface IBotBase
+    public interface IBot
     {
         string Key { get; set; }
         string Name { get; set; }
@@ -19,11 +19,11 @@ namespace Pes7BotCrator.Type
         WebHook WebHook { get; }
         List<Message> MessagesLast { get; set; }
         List<dynamic> MessagesQueue { get; set; }
-        List<Command> CommandsSynk { get; set; }
+        List<Command> ActionCommands { get; set; }
         List<UserM> ActiveUsers { get; set; }
         List<Exception> Exceptions { get; set; }
         List<IModule> Modules { get; set; }
-        List<SynkCommand> Commands { get; set; }
+        List<SynkCommand> SynkCommands { get; set; }
         T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
         int CountOfAvailableMessages { get; set; }

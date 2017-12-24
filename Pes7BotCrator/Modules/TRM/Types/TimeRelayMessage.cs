@@ -17,16 +17,24 @@ namespace Pes7BotCrator.Modules.Types
         public Nullable<int> Count { get; set; }
         public Thread MessageThread { get; set; }
         public bool IsAlife { get; set; } = true;
-        public IBotBase Parent { get; set; }
-        public TimeRelayMessage(IBotBase parent, Message ms, TypeOfTimeRealyMessage tp, int time, Nullable<int> count = null) : base() {
+        public IBot Parent { get; set; }
+        public TimeRelayMessage(IBot parent, Message ms, TypeOfTimeRealyMessage tp, int time, Nullable<int> count = null) : base() {
             TypeM = tp;
             Time = time;
             Count = count;
             Parent = parent;
 
+            switch (ms.Type) {
+                case Telegram.Bot.Types.Enums.MessageType.TextMessage:
+                    base.Text = ms.Text;
+                    break;
+                case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
+                    base.Photo = ms.Photo;
+                    base.Caption = ms.Caption;
+                    break;
+            }
             base.MessageId = ms.MessageId;
             base.Chat = ms.Chat;
-            base.Text = ms.Text;
             base.ReplyToMessage = ms.ReplyToMessage;
 
             MessageThread = new Thread(async () =>
@@ -49,6 +57,10 @@ namespace Pes7BotCrator.Modules.Types
                 {
                     await ForTextMessageAsync();
                 }
+                if (Type == Telegram.Bot.Types.Enums.MessageType.PhotoMessage)
+                {
+                    await ForPhotoMessageAsync();
+                }
             }
             curTime++;
         }
@@ -57,6 +69,29 @@ namespace Pes7BotCrator.Modules.Types
         {
             MessageThread.Abort();
             IsAlife = false;
+        }
+
+        private async Task ForPhotoMessageAsync()
+        {
+            switch (TypeM)
+            {
+                case TypeOfTimeRealyMessage.Repeat:
+                    if (Count > 0)
+                    {
+                        await SendPhotoMessage();
+                        Count--;
+                    }
+                    else GoToDie();
+                    break;
+                case TypeOfTimeRealyMessage.AutoDel:
+                    try
+                    {
+                        await Parent.Client.DeleteMessageAsync(Chat.Id, MessageId);
+                        GoToDie();
+                    }
+                    catch { }
+                    break;
+            }
         }
 
         // Проверить реально ли умер поток. НУЖНО!!!
@@ -80,6 +115,11 @@ namespace Pes7BotCrator.Modules.Types
                     catch { }
                     break;
             }
+        }
+
+        private async Task<Message> SendPhotoMessage()
+        {
+            return await Parent.Client.SendPhotoAsync(base.Chat.Id,new FileToSend(base.Photo.First().FileId),base.Caption, replyToMessageId: MessageId);
         }
 
         private async Task<Message> SendTextMessage()

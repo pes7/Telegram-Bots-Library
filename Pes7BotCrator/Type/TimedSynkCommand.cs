@@ -19,12 +19,12 @@ namespace Pes7BotCrator.Type
         public Thread MainTimeThread { get; set; }
         public Delegate doFunc { get; set; }
         public string Description { get; set; }
-        public IBotBase Parent { get; set; }
+        public IBot Parent { get; set; }
         
         private int Time { get; set; }
         private bool NeedToLive { get; set; }
 
-        public TimedSynkCommand(IBotBase parent, Action<IBotBase> act, TimeReleyParams type, List<string> cm = null, string endMessage = null, string descr = null)
+        public TimedSynkCommand(IBot parent, Action<IBot> act, TimeReleyParams type, List<string> cm = null, string endMessage = null, string descr = null)
         {
             Parent = parent;
             Description = descr;

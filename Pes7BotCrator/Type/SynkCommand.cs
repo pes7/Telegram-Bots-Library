@@ -20,7 +20,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Message, IBotBase, List<ArgC>> act, List<string> cm = null, string descr = null)
+        public SynkCommand(Action<Message, IBot, List<ArgC>> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
             Type = TypeOfCommand.Standart;
@@ -33,7 +33,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<InlineQuery, IBotBase> act, List<string> cm = null, string descr = null)
+        public SynkCommand(Action<InlineQuery, IBot> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
             Type = TypeOfCommand.InlineQuery;
@@ -46,7 +46,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<CallbackQuery, IBotBase> act, List<string> cm = null, string descr = null)
+        public SynkCommand(Action<CallbackQuery, IBot> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
             Type = TypeOfCommand.Query;
@@ -59,7 +59,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Update, IBotBase, List<ArgC>> act)
+        public SynkCommand(Action<Update, IBot, List<ArgC>> act)
         {
             Type = TypeOfCommand.AllwaysInWebHook;
             Description = null;
@@ -70,7 +70,7 @@ namespace Pes7BotCrator.Type
         /// Service Synk Command
         /// </summary>
         /// <param name="act"></param>
-        public SynkCommand(Action<Update, IBotBase> act, string descr = null)
+        public SynkCommand(Action<Update, IBot> act, string descr = null)
         {
             Type = TypeOfCommand.Service;
             Description = descr;

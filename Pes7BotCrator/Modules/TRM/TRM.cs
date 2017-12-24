@@ -30,7 +30,7 @@ namespace Pes7BotCrator.Modules
             MainThread.Start();
         }
 
-        public async Task<Message> SendTimeRelayMessageAsynkAsync(int id, string text, int time, int relayToMessageId = 0)
+        public async Task<Message> SendTimeRelayMessageAsynkAsync(long id, string text, int time, int relayToMessageId = 0)
         {
             var ms = await Parent.Client.SendTextMessageAsync(id, text, replyToMessageId: relayToMessageId);
             TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
@@ -47,6 +47,27 @@ namespace Pes7BotCrator.Modules
         public async Task<Message> SendTimeRelayMessageAsynkAsync(ChatId id, string text, int time, int relayToMessageId = 0)
         {
             var ms = await Parent.Client.SendTextMessageAsync(id, text, replyToMessageId: relayToMessageId);
+            TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
+            return ms;
+        }
+
+        public async Task<Message> SendTimeRelayMessageAsynkAsync(ChatId id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        {
+            var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
+            TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
+            return ms;
+        }
+
+        public async Task<Message> SendTimeRelayPhotoAsynkAsync(long id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        {
+            var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
+            TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
+            return ms;
+        }
+
+        public async Task<Message> SendTimeRelayPhotoAsynkAsync(string id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        {
+            var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
             TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
             return ms;
         }

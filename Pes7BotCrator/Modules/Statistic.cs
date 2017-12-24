@@ -26,7 +26,7 @@ namespace Pes7BotCrator.Modules
         {
             public StatisticRuntimeCommand() : base(ActAll) { }
         }
-        public static void Act(Message re, IBotBase Parent, List<ArgC> args)
+        public static void Act(Message re, IBot Parent, List<ArgC> args)
         {
             string add = "";
             if (Parent.ActiveUsers.Count > 0)
@@ -43,7 +43,7 @@ namespace Pes7BotCrator.Modules
             add += "\n}";
             Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Messages count: {Parent.MessagesLast.Count} msgs.\nRunTime: {Parent.TimeToString(Parent.RunTime)}{add}");
         }
-        public static void ActAll(Update up, IBotBase Parent, List<ArgC> args)
+        public static void ActAll(Update up, IBot Parent, List<ArgC> args)
         {
             int i = 0;
             if (up.Message != null && up?.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage && args != null)
@@ -58,7 +58,7 @@ namespace Pes7BotCrator.Modules
                 {
                     command = up.Message.Text;
                 }
-                ISynkCommand sn = Parent.Commands.Find(fn => fn.CommandLine.Contains(command));
+                ISynkCommand sn = Parent.SynkCommands.Find(fn => fn.CommandLine.Contains(command));
                 if (sn != null)
                 {
                     try

@@ -1,6 +1,6 @@
 -- heals = heals - 10;
 -- LuaFunc:CPrint("KEk");
-sendM("Andrey KEKLANs")
+sendML("Andrey KEKLANs")
 -- function g -- ERROR
 --LuaFunc:CPrint("kek");
 --end

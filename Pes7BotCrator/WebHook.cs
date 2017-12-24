@@ -17,8 +17,8 @@ namespace Pes7BotCrator
 {
     public class WebHook
     {
-        private IBotBase Parent { get; set; }
-        public WebHook(IBotBase parent)
+        private IBot Parent { get; set; }
+        public WebHook(IBot parent)
         {
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
@@ -56,10 +56,11 @@ namespace Pes7BotCrator
                     ms = Up.Message;
                     switch (Up.Message.Type) {
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
+                            //DID SOMETHING WITH ITTTTT
                         case Telegram.Bot.Types.Enums.MessageType.TextMessage:
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);
-                            foreach (SynkCommand sy in Parent.Commands.Where(
+                            foreach (SynkCommand sy in Parent.SynkCommands.Where(
                                 fn => fn.Type == TypeOfCommand.Standart &&
                                 fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()) ||
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
@@ -75,14 +76,14 @@ namespace Pes7BotCrator
                             }
                             try
                             {
-                                Parent.Commands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
+                                Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
                             }catch{ }
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.ServiceMessage:
-                            foreach(SynkCommand sy in Parent.Commands.Where(fn=>fn.Type == TypeOfCommand.Service))
+                            foreach(SynkCommand sy in Parent.SynkCommands.Where(fn=>fn.Type == TypeOfCommand.Service))
                             {
                                 Thread the = new Thread(() =>
                                 {
@@ -95,13 +96,17 @@ namespace Pes7BotCrator
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
                     CallbackQuery qq = Up.CallbackQuery;
-                    foreach (SynkCommand sy in Parent.Commands.Where(
+                    foreach (SynkCommand sy in Parent.SynkCommands.Where(
                         fn => fn.Type == TypeOfCommand.Query
                         && fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
                     {
                         Thread the = new Thread(() =>
                         {
-                            sy.doFunc.DynamicInvoke(qq, Parent);
+                            try
+                            {
+                                sy.doFunc.DynamicInvoke(qq, Parent);
+                            }
+                            catch(Exception ex) { Parent.Exceptions.Add(ex); }
                         });
                         the.Start();
                         break;
@@ -109,13 +114,13 @@ namespace Pes7BotCrator
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
                     var query = Up.InlineQuery;
-                    foreach (SynkCommand sy in Parent.Commands.Where(fn => fn.Type == TypeOfCommand.InlineQuery))
+                    foreach (SynkCommand sy in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.InlineQuery))
                     {
                         sy.doFunc.DynamicInvoke(query, Parent);
                     }
                     break;
             }
-            foreach (ISynkCommand sn in Parent.Commands.Where(fn => fn.Type == TypeOfCommand.AllwaysInWebHook))
+            foreach (ISynkCommand sn in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.AllwaysInWebHook))
             {
                 List<ArgC> arg = null;
                 if(Up.Message != null)
