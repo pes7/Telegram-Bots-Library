@@ -8,12 +8,10 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using System.IO;
 using System.Net.Http;
-using Telegram.Bot.Types;
-using Pes7BotCrator;
-using Pes7BotCrator.Type;
 using System.Drawing;
 using System.Threading;
-using Telegram.Bot;
+using Pes7BotCrator.Type;
+using Telegram.Bot.Types;
 
 namespace Pic_finder
 {
@@ -59,7 +57,7 @@ namespace Pic_finder
             return "https://yande.re/post.json?" + (param != null ? string.Join("&", Post.Select(p => p.Key + "=" + p.Value).ToArray()) : "limit=1");
         }
 
-        public async void GetFromYandereAsync(Message msg, IBotBase serving, List<ArgC> args)
+        public async void GetFromYandereAsync(Message msg, IBot serving, List<ArgC> args)
         {
             HttpResponseMessage th = null;
             try

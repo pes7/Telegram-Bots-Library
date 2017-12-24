@@ -8,12 +8,10 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using System.IO;
 using System.Net.Http;
-using Telegram.Bot.Types;
-using Pes7BotCrator;
-using Pes7BotCrator.Type;
 using System.Drawing;
 using System.Threading;
-using Telegram.Bot;
+using Pes7BotCrator.Type;
+using Telegram.Bot.Types;
 
 namespace Pic_finder
 {
@@ -30,7 +28,6 @@ namespace Pic_finder
         {
             this.Client = new HttpClient();
             this.Acc_Key = acc_key;
-            Modulle = this;
             TooManyReq = "Unfortunatelly you had reached out from search limit.\nPlease try again in next day.";
         }
 
@@ -65,7 +62,7 @@ namespace Pic_finder
             return resp.StatusCode.ToString().Contains("429");
         }
 
-        private async void PrintRes(System.IO.Stream proc, IBotBase serv, ChatId ch_id, int rep = 0)
+        private async void PrintRes(System.IO.Stream proc, IBot serv, ChatId ch_id, int rep = 0)
         {
             HttpResponseMessage th;
             UInt16 i = 0;
@@ -84,7 +81,7 @@ namespace Pic_finder
             else await serv.Client.SendTextMessageAsync(ch_id, await th.Content.ReadAsStringAsync(), replyToMessageId: rep);
         }
 
-        public async void SearchPic(Message msg, IBotBase serving, List<ArgC> args)
+        public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
             try
             {

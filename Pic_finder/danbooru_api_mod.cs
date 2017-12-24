@@ -8,12 +8,10 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using System.IO;
 using System.Net.Http;
-using Telegram.Bot.Types;
-using Pes7BotCrator;
-using Pes7BotCrator.Type;
 using System.Drawing;
 using System.Threading;
-using Telegram.Bot;
+using Pes7BotCrator.Type;
+using Telegram.Bot.Types;
 
 namespace Pic_finder
 {
@@ -27,7 +25,7 @@ namespace Pic_finder
             "id"
         };
         private HttpResponseMessage resp = null;
-        private IBotBase Serving;
+        private IBot Serving;
         private Message Msg;
         List<ArgC> Args = null;
         private bool to_file = false;
@@ -148,7 +146,7 @@ namespace Pic_finder
             else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent.", replyToMessageId: this.Msg.MessageId);
         }
 
-        public async void GetYandereAsync(Message msg, IBotBase serving, List<ArgC> args)
+        public async void GetYandereAsync(Message msg, IBot serving, List<ArgC> args)
         {
             this.Msg = msg;
             this.Serving = serving;
@@ -165,7 +163,7 @@ namespace Pic_finder
             //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent.", replyToMessageId: this.Msg.MessageId);
         }
 
-        public async void GetDanbooruAsync(Message msg, IBotBase serving, List<ArgC> args)
+        public async void GetDanbooruAsync(Message msg, IBot serving, List<ArgC> args)
         {
             if (args?.FindAll(fn => fn.Name == "tag").Count > 2)
             {
@@ -192,7 +190,7 @@ namespace Pic_finder
             //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent.", replyToMessageId: this.Msg.MessageId);
         }
 
-        public async void GetGelboorruAsync(Message msg, IBotBase serving, List<ArgC> args)
+        public async void GetGelboorruAsync(Message msg, IBot serving, List<ArgC> args)
         {
             this.Msg = msg;
             this.Serving = serving;

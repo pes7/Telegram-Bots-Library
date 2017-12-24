@@ -23,25 +23,25 @@ namespace Pic_finder
                 new danbooru_api_mod()
             });
 
-            Robot.Commands.Add(new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic, new List<string>()
             {
                 "/getsauce",
                 "/getsauce@anime_pic_finder_bot"
             }));
 
-            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()
             {
                 "/getyandere",
                 "/getyandere@anime_pic_finder_bot"
             }));
 
-            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetDanbooruAsync, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetDanbooruAsync, new List<string>()
             {
                 "/getdanbooru",
                 "/getdanbooru@anime_pic_finder_bot"
             }));
 
-            Robot.Commands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetGelboorruAsync, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetGelboorruAsync, new List<string>()
             {
                 "/getgelbooru",
                 "/getgelbooru@anime_pic_finder_bot"
