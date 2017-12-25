@@ -17,6 +17,7 @@ namespace Pes7BotCrator.Modules
 {
     public class SaveLoadModule : Module
     {
+        /*Надо написать BackUp фукції + логування еррорів і чату в файл*/
         public List<Action> SaveActions;
         private int Curtime = 0;
         public SaveLoadModule(int interV) : base("SaveLoadModule", typeof(SaveLoadModule))
@@ -26,7 +27,7 @@ namespace Pes7BotCrator.Modules
             {
                 while (true)
                 {
-                    if (Curtime >= interV && Parent != null)
+                    if (Curtime >= interV)
                     {
                         saveIt();
                         Curtime = 0;
@@ -55,6 +56,7 @@ namespace Pes7BotCrator.Modules
                 FileStream outFile = File.Create(FileName);
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(outFile, data);
+                outFile.Close();
             }
             catch (Exception ex)
             {
@@ -67,7 +69,9 @@ namespace Pes7BotCrator.Modules
             if (string.IsNullOrEmpty(FileName)) { throw new Exception("Can't read File."); }
             BinaryFormatter formatter = new BinaryFormatter();
             FileStream aFile = new FileStream(FileName, FileMode.Open);
-            return (T)formatter.Deserialize(aFile);
+            var Return = (T)formatter.Deserialize(aFile);
+            aFile.Close();
+            return Return;
         }
     }
 }

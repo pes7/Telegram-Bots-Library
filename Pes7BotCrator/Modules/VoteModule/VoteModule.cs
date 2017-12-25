@@ -33,9 +33,13 @@ namespace Pes7BotCrator.Modules
             FileNameVotes = fileNameVotes;
             FileNameLikes = fileNameLikes;
 
-            if (System.IO.File.Exists(fileNameVotes) && System.IO.File.Exists(fileNameLikes))
+            if (System.IO.File.Exists(fileNameVotes))
             {
-                Load();
+                Opros.AddRange(LoadOpros());
+            }
+            if (System.IO.File.Exists(fileNameLikes))
+            {
+                LLikes.AddRange(LoadLikes());
             }
         }
 
@@ -149,13 +153,28 @@ namespace Pes7BotCrator.Modules
 
             VoteModule LDModule = Parent.GetModule<VoteModule>();
             string[] Dd = re.Data.Split(':');
-            Opros thisOpr = Parent.GetModule<VoteModule>().Opros.Find(fn => fn.Id == int.Parse(Dd[1]));//
+            Opros thisOpr = null;
+            try
+            {
+                thisOpr = Parent.GetModule<VoteModule>().Opros.Find(fn => fn.Id == int.Parse(Dd[1]));//
+            }
+            catch { Parent.Exceptions.Add(new Exception($"Opros[{int.Parse(Dd[1])}] not faund.")); return; }
+            if (thisOpr == null)
+            {
+                Parent.Exceptions.Add(new Exception($"Opros[{int.Parse(Dd[1])}] not faund."));
+                return;
+            }
 
             Likes ll;
-            if (ms != null)
-                ll = LDModule.LLikes.Find(ff => ff.MessageId == id.ToString());
-            else
-                ll = LDModule.LLikes.Find(ff => ff.MessageId == re.InlineMessageId);
+            try
+            {
+                if (ms != null)
+                    ll = LDModule.LLikes.Find(ff => ff.ParentO.Id == thisOpr.Id);
+                else
+                    ll = LDModule.LLikes.Find(ff => ff.ParentO.Id == thisOpr.Id);
+            }
+            catch { Parent.Exceptions.Add(new Exception($"Likes for Opros not faund")); ll = null; }
+
             if (ll == null)
             {
                 if (ms != null)
@@ -203,12 +222,10 @@ namespace Pes7BotCrator.Modules
             {
                 try
                 {
-                    if (ll.Type == Likes.TypeOfLike.Common)
+                    if(re.Message != null)
                         await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
                     else
-                    {
                         await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
-                    }
                 }
                 catch { };
             });
@@ -217,19 +234,16 @@ namespace Pes7BotCrator.Modules
 
         public void Save()
         {
-            if (LLikes.Count > 0 && Opros.Count > 0)
+            if (LLikes.Count > 0)
             {
                 List<Likes> ls = LLikes;
-                List<Opros> op = Opros;
-                SaveLoadModule.SaveSomething(op , FileNameVotes);
                 SaveLoadModule.SaveSomething(ls, FileNameLikes);
             }
-        }
-
-        public void Load()
-        {
-            LLikes.AddRange(LoadLikes());
-            Opros.AddRange(LoadOpros());
+            if (Opros.Count > 0)
+            {
+                List<Opros> op = Opros;
+                SaveLoadModule.SaveSomething(op, FileNameVotes);
+            }
         }
 
         private List<Likes> LoadLikes()

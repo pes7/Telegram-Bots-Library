@@ -115,8 +115,12 @@ namespace GuchiBot
             //Example of TimeReley Photo Message. Ps: special for Mordvinov B.
             Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>
             {
-                Stream st = System.IO.File.Open("./previews/14637724531700.webm.jpg", FileMode.Open);
-                await parent.GetModule<TRM>().SendTimeRelayPhotoAsynkAsync(parent.MessagesLast.First().Chat.Id, new FileToSend("fl.jpg", st), 10, "KEKUS");
+                try
+                {
+                    Stream st = System.IO.File.Open("./previews/14637724531700.webm.jpg", FileMode.Open);
+                    await parent.GetModule<TRM>().SendTimeRelayPhotoAsynkAsync(parent.MessagesLast.First().Chat.Id, new FileToSend("fl.jpg", st), 10, "KEKUS");
+                }
+                catch { await parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id,"Error to send simple .jpg",10); }
             }, new List<string>() { "/kek" }));
             label1.Text = $"{Ms} ms";
 
