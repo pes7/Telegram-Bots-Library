@@ -68,14 +68,13 @@ namespace Pes7BotCrator
             {
                 RunTime++;
                 Thread.Sleep(1000);
-                BotSynk();
                 ShowInf();
             }
         }
 
         public string[] getInfForList()
         {
-            return $"Messages count: {MessagesLast.Count} msgs.|Available messages: {CountOfAvailableMessages}|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {GetModule<LikeDislikeModule>().LLikes.Count}".Split('|');
+            return $"Messages count: {MessagesLast.Count} msgs.|RunTime: {TimeToString(RunTime)}|Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}|Likes and dislikes: {GetModule<LikeDislikeModule>().LLikes.Count}".Split('|');
         }
 
         public override void ShowInf()
@@ -85,8 +84,9 @@ namespace Pes7BotCrator
             Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n    Webms Online: {_2chModule.WebmCountW + _2chModule.WebmCountA}\n    Likes and dislikes: {GetModule<LikeDislikeModule>().LLikes.Count}");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
-            foreach (UserM um in ActiveUsers)
+            for (int i = 0; i < ActiveUsers.Count; i++)
             {
+                var um = ActiveUsers[i];
                 Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
             }
             Console.WriteLine("}\nLast 10 Messages: {");
@@ -96,17 +96,14 @@ namespace Pes7BotCrator
                 {
 
                     Message ms = MessagesLast[i];
-                    try
-                    {
-                        Console.WriteLine($"    {UserM.usernameGet(ms.From)}: {ms.Text}");
-                    }
-                    catch (Exception ex) { Exceptions.Add(ex); }
+                    Console.WriteLine($"    {UserM.usernameGet(ms.From)}: {ms.Text}");
                 }
             }
             else
             {
-                foreach (Message ms in MessagesLast)
+                for (int i = 0; i < MessagesLast.Count; i++)
                 {
+                    var ms = MessagesLast[i];
                     Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
                 }
             }
@@ -121,10 +118,10 @@ namespace Pes7BotCrator
             }
             else
             {
-                Exception[] ex = Exceptions.ToArray();
-                foreach (Exception ms in ex)
+                for (int i = 0; i < Exceptions.Count; i++)
                 {
-                    Console.WriteLine($"    {ms}");
+                    var ex = Exceptions[i];
+                    Console.WriteLine($"    {ex}");
                 }
             }
             Console.WriteLine("}");

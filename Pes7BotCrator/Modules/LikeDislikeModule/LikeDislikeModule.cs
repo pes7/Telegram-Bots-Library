@@ -209,8 +209,7 @@ namespace Pes7BotCrator.Modules
 
         public void Load()
         {
-            var d = SaveLoadModule.LoadSomething<List<Likes>>(FileName);
-            LLikes.AddRange(d);
+            LLikes.AddRange(SaveLoadModule.LoadSomething<List<Likes>>(FileName));
         }
     }
 }

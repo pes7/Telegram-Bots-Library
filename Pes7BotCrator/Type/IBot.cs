@@ -14,7 +14,6 @@ namespace Pes7BotCrator.Type
         string Name { get; set; }
         Random Rand { get; set; }
         Telegram.Bot.TelegramBotClient Client { get; set; }
-        Thread TMessageQueueSynk { get; set; }
         Thread TimeSynk { get; set; }
         WebHook WebHook { get; }
         List<Message> MessagesLast { get; set; }
@@ -26,7 +25,6 @@ namespace Pes7BotCrator.Type
         List<SynkCommand> SynkCommands { get; set; }
         T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
-        int CountOfAvailableMessages { get; set; }
         int RunTime { get; set; }
         string TimeToString(int i);
         void setModulesParent();

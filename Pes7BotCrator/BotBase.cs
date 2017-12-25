@@ -17,7 +17,6 @@ namespace Pes7BotCrator
         public Random Rand { get; set; } = new Random();
         public Telegram.Bot.TelegramBotClient Client { get; set; }
         public Thread WebThread { get; set; }
-        public Thread TMessageQueueSynk { get; set; }
         public Thread TimeSynk { get; set; }
         public WebHook WebHook { get; set; }
         public List<Message> MessagesLast { get; set; }
@@ -47,7 +46,6 @@ namespace Pes7BotCrator
         }
 
         public List<SynkCommand> SynkCommands { get; set; }
-        public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
         public int RunTime { get; set; } = 0;
 
         public BotBase(string key, string name, List<IModule> modules = null)
@@ -68,11 +66,6 @@ namespace Pes7BotCrator
                 WebHook.Start();
             });
             WebThread.Start();
-            TMessageQueueSynk = new Thread(async () =>
-            {
-                await MessageQueueSynkAsync();
-            });
-            TMessageQueueSynk.Start();
             TimeSynk = new Thread(TimeT);
             TimeSynk.Start();
             SynkModules();
@@ -96,23 +89,6 @@ namespace Pes7BotCrator
         public virtual void SendMessage(long ChatId, string text, UserM user = null)
         {
             MessagesQueue.Add(new { id = ChatId, text = text });
-        }
-        public async Task MessageQueueSynkAsync()
-        {
-            while (true)
-            {
-                while (MessagesQueue.Count > 0 && CountOfAvailableMessages > 0)
-                {
-                    CountOfAvailableMessages--;
-                    dynamic ms = MessagesQueue.First();
-                    try
-                    {
-                        await Client.SendTextMessageAsync(ms.id, ms.text);
-                    }
-                    catch (Exception ex) { Exceptions.Add(ex); }
-                    MessagesQueue.RemoveAt(0);
-                }
-            }
         }
         /*Нужна Сильная доработка*/
         public async Task<FileStream> getFileFrom(string id, string name = null)
@@ -139,7 +115,6 @@ namespace Pes7BotCrator
         public virtual void Dispose()
         {
             WebThread.Abort();
-            TMessageQueueSynk.Abort();
             TimeSynk.Abort();
             foreach (IModule md in Modules)
             {
@@ -153,16 +128,7 @@ namespace Pes7BotCrator
             {
                 RunTime++;
                 Thread.Sleep(1000);
-                BotSynk();
                 ShowInf();
-            }
-        }
-
-        public void BotSynk()
-        {
-            if (RunTime % 60 == 0)
-            {
-                CountOfAvailableMessages = 20;
             }
         }
 
@@ -192,9 +158,9 @@ namespace Pes7BotCrator
             Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
-            var a = ActiveUsers;
-            foreach (UserM um in a)
+            for(int i = 0; i < ActiveUsers.Count; i++)
             {
+                var um = ActiveUsers[i];
                 Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
             }
             Console.WriteLine("}\nLast 10 Messages: {");
@@ -209,9 +175,9 @@ namespace Pes7BotCrator
             }
             else
             {
-                var m = MessagesLast;
-                foreach (Message ms in m)
+                for (int i =0; i< MessagesLast.Count;i++)
                 {
+                    var ms = MessagesLast[i];
                     Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
                 }
             }
@@ -226,10 +192,10 @@ namespace Pes7BotCrator
             }
             else
             {
-                var s = Exceptions;
-                foreach (Exception ms in s)
+                for (int i = 0; i < Exceptions.Count; i++)
                 {
-                    Console.WriteLine($"    {ms}");
+                    var ex = Exceptions[i];
+                    Console.WriteLine($"    {ex}");
                 }
             }
             Console.WriteLine("}");

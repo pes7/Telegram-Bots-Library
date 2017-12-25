@@ -131,7 +131,7 @@ namespace Pes7BotCrator
         }
         private void LogSystem(User us)
         {
-            UserM mu = Parent.ActiveUsers.Find(f => f.Id == us.Id && UserM.usernameGet(f) == UserM.usernameGet(us));
+            UserM mu = Parent.ActiveUsers.Find(f => UserM.usernameGet(f) == UserM.usernameGet(us));
             if (mu == null)
             {
                 Parent.ActiveUsers.Add(new UserM(us, 1));

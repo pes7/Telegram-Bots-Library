@@ -85,16 +85,13 @@
     <Compile Include="Type\IModule.cs" />
     <Compile Include="Type\SynkCommand.cs" />
     <Compile Include="Modules\2chModule\Types\ThBoard.cs" />
-    <Compile Include="Type\TimedSynkCommand.cs" />
     <Compile Include="Type\UserM.cs" />
     <Compile Include="WebHook.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Systems\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
