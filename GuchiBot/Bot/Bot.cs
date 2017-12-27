@@ -51,15 +51,13 @@ namespace Pes7BotCrator
                 }
             }
         }
-        public static async Task ClearCommandAsync(long id, int msgid, IBot Parent)
+        public static async new Task ClearCommandAsync(long id, int msgid, IBot Parent)
         {
             try
             {
                 await Parent.Client.DeleteMessageAsync(id, msgid);
-            } catch (Exception ex)
-            {
-                //Parent.Exceptions.Add(ex);
             }
+            catch {  /*Parent.Exceptions.Add(ex);*/ }
         }
 
         private void TimeT()

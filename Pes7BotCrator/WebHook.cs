@@ -58,7 +58,32 @@ namespace Pes7BotCrator
                     ms = Up.Message;
                     switch (Up.Message.Type) {
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
-                            //DID SOMETHING WITH ITTTTT
+                            Parent.MessagesLast.Add(ms);
+                            LogSystem(ms.From);
+                            if (cc >= messageCountCheck)
+                            {
+                                cc = 0;
+                                FixSimmilarUsersFromAsynkThread();
+                            }
+                            foreach (SynkCommand sy in Parent.SynkCommands.Where(
+                                fn => fn.Type == TypeOfCommand.Photo &&
+                                fn.CommandLine.Exists(sn => sn == ((ArgC.getArgs(ms.Text) == null) ? ms.Text : ArgC.getArgs(ms.Text).First().Name.Trim()) ||
+                                                           (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
+                                ))
+                            {
+                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                                Thread the = new Thread(() =>
+                                {
+                                    try
+                                    {
+                                        sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                    }
+                                    catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                                });
+                                the.Start();
+                                break;
+                            }
+                            break;
                         case Telegram.Bot.Types.Enums.MessageType.TextMessage:
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);
@@ -69,7 +94,7 @@ namespace Pes7BotCrator
                             }
                             foreach (SynkCommand sy in Parent.SynkCommands.Where(
                                 fn => fn.Type == TypeOfCommand.Standart &&
-                                fn.CommandLine.Exists(sn => sn == ((getArgs(ms.Text) == null) ? ms.Text : getArgs(ms.Text).First().Name.Trim()) ||
+                                fn.CommandLine.Exists(sn => sn == ((ArgC.getArgs(ms.Text) == null) ? ms.Text : ArgC.getArgs(ms.Text).First().Name.Trim()) ||
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
                             {
@@ -78,7 +103,7 @@ namespace Pes7BotCrator
                                 {
                                     try
                                     {
-                                        sy.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
+                                        sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
                                     } catch (Exception ex) { Parent.Exceptions.Add(ex); }
                                 });
                                 the.Start();
@@ -86,7 +111,7 @@ namespace Pes7BotCrator
                             }
                             try
                             {
-                                Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, getArgs(ms.Text));
+                                Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
                             }catch{ }
                             cc++;
                             break;
@@ -141,7 +166,7 @@ namespace Pes7BotCrator
             {
                 List<ArgC> arg = null;
                 if(Up.Message != null)
-                    arg = getArgs(Up.Message.Text);
+                    arg = ArgC.getArgs(Up.Message.Text);
                 sn.doFunc.DynamicInvoke(Up,Parent, arg);
             }
             Parent.OnWebHoockUpdated();
@@ -172,44 +197,6 @@ namespace Pes7BotCrator
                     Parent.ActiveUsers.Find(fn => UserM.nameGet(fn) == UserM.nameGet(k[0])).MessageCount = k[0].MessageCount;
                 }
             }
-        }
-        private List<ArgC> getArgs(string message)
-        {
-            List<ArgC> Args = new List<ArgC>();
-            if (message != null)
-            {
-                string[] args_parse = null;
-                try
-                {
-                    args_parse = message.Split('-');
-                }
-                catch { return null; }
-                if (args_parse.Length > 1)
-                {
-                    for (int i = 0; i < args_parse.Length; i++)
-                    {
-                        var sf = new ArgC();
-                        try
-                        {
-                            string[] ssf = args_parse[i].Split(':');
-                            if (ssf.Length > 1)
-                            {
-                                sf.Name = ssf[0];
-                                sf.Arg = ssf[1];
-                            }
-                            else
-                            {
-                                sf.Name = ssf[0];
-                            }
-                        }
-                        catch { sf.Name = args_parse[i]; }
-                        Args.Add(sf);
-                    }
-                    return Args;
-                }
-                else return null;
-            }
-            else return null;
         }
         private string tryToParseNameBotCommand(string s)
         {

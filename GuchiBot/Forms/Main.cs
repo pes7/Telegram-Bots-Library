@@ -134,11 +134,22 @@ namespace GuchiBot
             listBox1.Items.AddRange(Bot.getInfForList());
         }
 
+        private bool Triger_Alife = true;
         private void Main_Load(object sender, EventArgs e)
         {
             textBox1.Text = Bot.WebmDir;
             textBox2.Text = Bot.GachiImage;
             textBox3.Text = Bot.PreViewDir;
+
+            Thread timeTh = new Thread(() =>
+            {
+                while (Triger_Alife)
+                {
+                    InvokeUI(() => { GetInf(); });
+                    Thread.Sleep(1000);
+                }
+            });
+            timeTh.Start();
         }
 
 
@@ -231,38 +242,12 @@ namespace GuchiBot
             Bot.GetModule<_2chModule>().ParseWebmsFromDvach(Bot);
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            /*
-            if (Bot != null)
-            {
-                Thread th = new Thread( async() => {
-                    try
-                    {
-                        await Bot.Client.SendTextMessageAsync(Bot.MessagesLast.Last().Chat.Id, "test");
-                    }
-                    catch (Telegram.Bot.Exceptions.ApiRequestException)
-                    {
-                        
-                    }
-                });
-                th.Start();
-                //Bot.Client.SendTextMessageAsync(chatId: Bot.MessagesLast.Last().Chat.Id,text: "@Pro100RedBull ЛГБТ", replyMarkup: (new ForceReply() { Force = true }));
-                //Bot.SendMessage(Bot.MessagesLast.Last().Chat.Id, "Test Kek");
-            }
-            */
-        }
-
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            Triger_Alife = false;
             Bot.GetModule<SaveLoadModule>().saveIt();
             Bot.Dispose();
             base.OnFormClosed(e);
-        }
-
-        private void updateUI()
-        {
-
         }
 
         private void button3_Click(object sender, EventArgs e)
