@@ -4,7 +4,7 @@ This <b>Library</b> of creating <b>Telegram Bots</b> provides you with easy way 
 You can easy add your commands, modules, etc. to Bot and don't thinking about how it works)<br>
 You can create your own Modules and Commands from IModule and ISynkCommand and then add it in bot<br>
 If you want to controll all aspects of bot you can inherit <b>BotBase</b> or <b>IBot</b> and use all pleasure of my realisations and add you own changes to it.<br>
-In Addition, in project you can find <b>GuchiBot<b> - this is bot that have all examples of creating your own bot.
+In Addition, in project you can find <b>GuchiBot</b> - this is bot that have all examples of creating your own bot.
 # Structure
 ### Pes7BotCrator - main Library
 ### GuchiBot - example
