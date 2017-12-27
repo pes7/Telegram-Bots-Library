@@ -19,24 +19,55 @@ namespace Pes7BotCrator.Modules
     {
         /*Надо написать BackUp фукції + логування еррорів і чату в файл*/
         public List<Action> SaveActions;
-        private int Curtime = 0;
-        public SaveLoadModule(int interV) : base("SaveLoadModule", typeof(SaveLoadModule))
+        private int CurtimeSave = 0;
+        private int CurtimeBack = 0;
+        public SaveLoadModule(int interV, int backupIntervalV) : base("SaveLoadModule", typeof(SaveLoadModule))
         {
             SaveActions = new List<Action>();
-            MainThread = new Thread(() =>
+            var SaveThread = new Thread(() =>
             {
                 while (true)
                 {
-                    if (Curtime >= interV)
+                    if (CurtimeSave >= interV)
                     {
                         saveIt();
-                        Curtime = 0;
+                        CurtimeSave = 0;
                     }
-                    Curtime++;
+                    CurtimeSave++;
                     Thread.Sleep(1000);
                 }
             });
-            MainThread.Start();
+            SaveThread.Start();
+            MainThreads.Add(SaveThread);
+            var ThBackUp = new Thread(() =>
+            {
+                while (true)
+                {
+                    if (CurtimeBack >= backupIntervalV)
+                    {
+                        backupIt();
+                        CurtimeBack = 0;
+                    }
+                    CurtimeBack++;
+                    Thread.Sleep(1000);
+                }
+            });
+            ThBackUp.Start();
+            MainThreads.Add(ThBackUp);
+        }
+
+        public void backupIt()
+        {
+            if (!Directory.Exists("./BackUp"))
+                Directory.CreateDirectory("./BackUp");
+            var files = Directory.GetFiles("./","*.bot");
+            foreach (var file in files)
+            {
+                var i = DateTime.UtcNow.ToString().Split(' ');
+                var j = Path.GetFileName(file);
+                var k = $"./BackUp/{String.Join("_",i[0].Split('.'))}_{String.Join("_", i[1].Split(':'))}_{j}";
+                File.Copy(file,$"{k}");
+            }
         }
 
         public void saveIt()

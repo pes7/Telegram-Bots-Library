@@ -15,7 +15,7 @@ namespace Pes7BotCrator.Type
         string Name { get; set; }
         IBot Parent { get; set; }
         System.Type Type { get; set; }
-        Thread MainThread { get; set; }
+        List<Thread> MainThreads { get; set; }
         void Start();
         void AbortThread();
     }

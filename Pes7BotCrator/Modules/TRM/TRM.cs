@@ -16,7 +16,7 @@ namespace Pes7BotCrator.Modules
         // TimeRelayMessages
         public TRM() : base("TRM", typeof(TRM)) {
             TimeRelayMessages = new List<TimeRelayMessage>();
-            MainThread = new Thread(() =>
+            var Th = new Thread(() =>
             {
                 while (true)
                 {
@@ -27,7 +27,8 @@ namespace Pes7BotCrator.Modules
                     Thread.Sleep(30000);
                 }
             });
-            MainThread.Start();
+            Th.Start();
+            MainThreads.Add(Th);
         }
 
         public async Task<Message> SendTimeRelayMessageAsynkAsync(long id, string text, int time, int relayToMessageId = 0)

@@ -54,7 +54,7 @@ namespace GuchiBot
                 gachiimage: "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
                     new _2chModule(),
-                    new SaveLoadModule(60),
+                    new SaveLoadModule(60,120),
                     new LikeDislikeModule("./like.bot"),
                     new VoteModule("./votes.bot","./voteslike.bot"),
                     new AnistarModule(),
@@ -70,7 +70,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new Pes7BotCrator.Commands.Help(Bot));
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandHelp);
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandRuntime);
-            Bot.SynkCommands.Add(new LogUlog(Bot,"Приветсвую тебя на нашем ГачиКанале.", "Увы, наши пути расходятся... :cry::cry::cry:"));
+            Bot.SynkCommands.Add(new LogUlog(Bot,"Приветсвую тебя на нашем ГачиКанале.", "Увы, наши пути расходятся..."));
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().QueryCommand);
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().CreateCommand);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
