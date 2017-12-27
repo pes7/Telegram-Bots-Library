@@ -18,15 +18,13 @@ namespace Pic_finder
         {
             InitializeComponent();
             Robot = new Main_Bot("455187137:AAGs9q50RSsctI75tveQyGfQB6mE09jIu8A", mods: new List<IModule> {
-                new SauceNAO_Mod("257dedb3b7fe24c2ef1c4c9a7a8ff0f22bd2ad3a"),
-                new Yande_re_MOD(String.Empty),
-                new danbooru_api_mod()
+                new danbooru_api_mod(),
+                new micro_logic()
             });
 
-            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
             {
-                "/getsauce",
-                "/getsauce@anime_pic_finder_bot"
+                "/start"
             }));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()

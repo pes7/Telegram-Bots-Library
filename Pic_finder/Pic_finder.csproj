@@ -61,11 +61,10 @@
       <DependentUpon>Ctr_panel.cs</DependentUpon>
     </Compile>
     <Compile Include="danbooru_api_mod.cs" />
-    <Compile Include="SauceNAO_Mod.cs" />
     <Compile Include="Main_Bot.cs" />
+    <Compile Include="micro_logic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Yande_re_MOD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

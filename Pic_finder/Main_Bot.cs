@@ -15,6 +15,14 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pic_finder
 {
+    public class BotGetsWrongException:Exception
+    {
+        public BotGetsWrongException():base(){ }
+
+        public BotGetsWrongException(string message) : base(message) { }
+
+        public BotGetsWrongException(string message, Exception inner):base(message, inner) { }
+    }
 
     public class Main_Bot:BotBase
     {
