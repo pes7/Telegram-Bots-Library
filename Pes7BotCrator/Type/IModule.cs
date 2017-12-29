@@ -9,9 +9,6 @@ namespace Pes7BotCrator.Type
 {
     public interface IModule
     {
-        /*
-         * Сделать IBotBase и setIBotBase(IBotBase bot) для модулей, и вызывать при инициализации бота
-         */
         string Name { get; set; }
         IBot Parent { get; set; }
         System.Type Type { get; set; }

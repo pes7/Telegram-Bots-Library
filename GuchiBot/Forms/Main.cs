@@ -37,6 +37,8 @@ namespace GuchiBot
 
         public OLua lua; // Ради фана
 
+        public static string PostToId = "@guchithread";
+
         public Main()
         {
             InitializeComponent();
@@ -54,7 +56,7 @@ namespace GuchiBot
                 gachiimage: "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
                     new _2chModule(),
-                    new SaveLoadModule(60,120),
+                    new SaveLoadModule(60,10*60),
                     new LikeDislikeModule("./like.bot"),
                     new VoteModule("./votes.bot","./voteslike.bot"),
                     new AnistarModule(),
@@ -150,6 +152,7 @@ namespace GuchiBot
                 }
             });
             timeTh.Start();
+            label3.Text = $"Trafic to: {PostToId}";
         }
 
 
@@ -212,17 +215,16 @@ namespace GuchiBot
                     if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
                     {
                         _2chModule Ch = Bot.GetModule<_2chModule>();
-                        if (Bot.Rand.Next(0, 1) == 0)
-                        {
+                        if (!checkBox1.Checked) {
                             int rd = Bot.Rand.Next(0, _2chModule.WebmCountW);
-                            Ch.SendWebm(Bot,  Ch.WebmsW[rd]);
+                            Ch.SendWebm(Bot,  Ch.WebmsW[rd], PostToId);
                             Ch.WebmsW.RemoveAt(rd);
                             _2chModule.WebmCountW = Ch.WebmsW.Count;
                         }
                         else
                         {
                             int rd = Bot.Rand.Next(0, _2chModule.WebmCountA);
-                            Ch.SendWebm(Bot, Ch.WebmsA[rd]);
+                            Ch.SendWebm(Bot, Ch.WebmsA[rd], PostToId);
                             Ch.WebmsA.RemoveAt(rd);
                             _2chModule.WebmCountA = Ch.WebmsA.Count;
                         }
@@ -309,6 +311,11 @@ namespace GuchiBot
                 lua.Lua.DoString(textBox4.Text);
             }
             catch { }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

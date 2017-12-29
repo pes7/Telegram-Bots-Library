@@ -170,7 +170,7 @@ namespace Pes7BotCrator.Modules
             List<Webm> Webms = null;
             if (args != null)
             {
-                if (args.Find(fn => fn.Name == "a" || fn.Name == "a" || fn.Name == "а") != null)
+                if (args.Find(fn => fn.Name.Trim() == "a" || fn.Name.Trim() == "a" || fn.Name.Trim() == "а") != null)
                     Webms = WebmsA;
                 else Webms = WebmsW;
             }
@@ -179,7 +179,7 @@ namespace Pes7BotCrator.Modules
             if (Webms != null && Webms?.Count > 0)
             {
                 Webm webm;
-                ArgC Count = args?.Find(sn => sn.Name == "c");
+                ArgC Count = args?.Find(sn => sn.Name.Trim() == "c");
                 if (Count != null)
                 {
                     try
@@ -188,7 +188,7 @@ namespace Pes7BotCrator.Modules
                         {
                             webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                             Webms.Remove(webm);
-                            SendWebm(Parent, webm);
+                            SendWebm(Parent, webm, Parent.MessagesLast.First().Chat.Id.ToString());
                         }
                     }
                     catch {}
@@ -197,7 +197,7 @@ namespace Pes7BotCrator.Modules
                 {
                     webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                     Webms.Remove(webm);
-                    SendWebm(Parent, webm);
+                    SendWebm(Parent, webm, Parent.MessagesLast.First().Chat.Id.ToString());
                 }
             }
             else
@@ -205,7 +205,7 @@ namespace Pes7BotCrator.Modules
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(IBot Parent, Webm webm)
+        public void SendWebm(IBot Parent, Webm webm, string id)
         {
             if (webm != null)
             {
@@ -213,13 +213,13 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.getKeyBoard(webm.Path));
+                        await Parent.Client.SendPhotoAsync(id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
-                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.",10);
+                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(id, "Sorry, but something went wrong.",10);
                         return;
                     }
                 });
