@@ -59,6 +59,7 @@ namespace GuchiBot
                     new SaveLoadModule(60,10*60),
                     new LikeDislikeModule("./like.bot"),
                     new VoteModule("./votes.bot","./voteslike.bot"),
+                    new TransitFileModule("./Downloads"),
                     new AnistarModule(),
                     new Statistic(),
                     new TRM()
@@ -75,6 +76,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new LogUlog(Bot,"Приветсвую тебя на нашем ГачиКанале.", "Увы, наши пути расходятся..."));
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().QueryCommand);
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().CreateCommand);
+            Bot.SynkCommands.Add(Bot.GetModule<TransitFileModule>().DownloadCommandSynk);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"

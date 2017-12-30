@@ -21,11 +21,23 @@ namespace Pes7BotCrator.Type
             if (message != null)
             {
                 string[] args_parse = null;
+                string realArc = null;
                 try
                 {
                     args_parse = message.Split('-');
                 }
                 catch { return null; }
+                if(args_parse.Length == 2)
+                {
+                    try
+                    {
+                        Args.Add(new ArgC(args_parse.First()));
+                        realArc = message.Split('[').Last();
+                        if (realArc != null) Args.Add(new ArgC("default", realArc.Trim(']')));
+                        return Args;
+                    }
+                    catch { Args.Clear(); }
+                }
                 if (args_parse.Length > 1)
                 {
                     for (int i = 0; i < args_parse.Length; i++)

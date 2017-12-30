@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="Modules\TransitFileModule.cs" />
     <Compile Include="Modules\TRM\TRM.cs" />
     <Compile Include="Modules\TRM\Types\TimeRelayMessage.cs" />
     <Compile Include="Modules\VoteModule\Types\Likes.cs" />
