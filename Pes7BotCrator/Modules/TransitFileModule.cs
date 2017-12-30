@@ -46,19 +46,20 @@ namespace Pes7BotCrator.Modules
 
                         Thread th = new Thread(async () =>
                         {
-                            using (FileStream sourceStream = new FileStream(path,
-                                FileMode.Append, FileAccess.Write, FileShare.None,
-                                bufferSize: 4096*4, useAsync: true))
+                            if (!System.IO.File.Exists(path))
                             {
-                                await sourceStream.WriteAsync(content, 0, content.Length);
-                            };
-
-                            //GetPreViewOfFile(path, $"{dir}");
-                            
-                            //await Parent.Client.SendPhotoAsync(re.
-                                //Chat.Id, new FileToSend($"{path}.jpg",
-                                //System.IO.File.Open($"{path}.jpg", FileMode.Open)));
-                            await Parent.Client.SendDocumentAsync(re.Chat.Id, new FileToSend(Path.GetFileName(path), System.IO.File.Open(path, FileMode.Open)));
+                                using (FileStream sourceStream = new FileStream(path,
+                                    FileMode.Append, FileAccess.Write, FileShare.None,
+                                    bufferSize: 4096 * 4, useAsync: true))
+                                {
+                                    await sourceStream.WriteAsync(content, 0, content.Length);
+                                    sourceStream.Close();
+                                };
+                            }
+                            using (var iostr = System.IO.File.Open(path, FileMode.Open))
+                            {
+                                Parent.Client.SendDocumentAsync(re.Chat.Id, new FileToSend(Path.GetFileName(path), iostr));
+                            }
                         });
                         th.Start();
                     }
