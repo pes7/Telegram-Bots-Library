@@ -27,6 +27,11 @@ namespace Pic_finder
                 "/start"
             }));
 
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().EmExit, new List<string>()
+            {
+                "/emexit"
+            }));
+
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()
             {
                 "/getyandere",

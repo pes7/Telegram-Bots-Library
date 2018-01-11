@@ -16,5 +16,11 @@ For example you can type: ""/getyandere -limit:100 -tag:loli -tag:feet -page:2""
 If you want to get picture as file, just type with other parameter's ""-file"".
 If you a bad guy or a girl, type a ""-show_any"", to see as photo's an explicit pic's");
         }
+
+        public async void EmExit(Message msg, IBot serving, List<ArgC> args)
+        {
+            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Bot will got shut down.");
+            System.Environment.Exit(0);
+        }
     }
 }
