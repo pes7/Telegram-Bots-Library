@@ -69,7 +69,7 @@ namespace Pes7BotCrator.Type
         /// <summary>
         /// Service Synk Command
         /// </summary>
-        /// <param name="act"></param>
+        /// <param name="act">Action</param>
         public SynkCommand(Action<Update, IBot> act, string descr = null)
         {
             Type = TypeOfCommand.Service;

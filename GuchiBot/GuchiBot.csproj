@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Bot\Bot.cs" />
     <Compile Include="Bot\Logic\BotLogic.cs" />
+    <Compile Include="Commands\FindImageStick.cs" />
     <Compile Include="Interface\MessageUI.cs">
       <SubType>UserControl</SubType>
     </Compile>

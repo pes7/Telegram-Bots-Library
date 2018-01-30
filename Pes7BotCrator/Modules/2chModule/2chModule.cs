@@ -123,7 +123,10 @@ namespace Pes7BotCrator.Modules
                                     {
                                         foreach (dynamic f in c.files)
                                         {
-                                            Webm file = new Webm($"https://2ch.hk{f.path}", $"https://2ch.hk{f.thumbnail}", $"{f.fullname}");
+                                            var sec = 0;
+                                            if (f.duration_secs != null)
+                                                sec = int.Parse((string)f.duration_secs);
+                                            Webm file = new Webm($"https://2ch.hk{f.path}", $"https://2ch.hk{f.thumbnail}", $"{f.fullname}", sec);
                                             string format = ((string)file.Path).Split('.')[2];
                                             if (format == "webm" || format == "mp4")
                                             {
@@ -132,7 +135,8 @@ namespace Pes7BotCrator.Modules
                                         }
                                     }
                                 }
-                            } catch (Exception ex) { Parent.Exceptions.Add(ex); return null; }
+                            }
+                            catch (Exception ex) { Parent.Exceptions.Add(ex); return null; }
                         }
                     }
                 }

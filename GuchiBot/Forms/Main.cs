@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Collections;
 using GuchiBot.Interface;
 using Telegram.Bot.Types;
+using GuchiBot.Commands;
 
 namespace GuchiBot
 {
@@ -62,7 +63,7 @@ namespace GuchiBot
                     new TransitFileModule("./Downloads"),
                     new AnistarModule(),
                     new Statistic(),
-                    new TRM()
+                    new TRM(),
                 }
             );
 
@@ -77,6 +78,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().QueryCommand);
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().CreateCommand);
             Bot.SynkCommands.Add(Bot.GetModule<TransitFileModule>().DownloadCommandSynk);
+            Bot.SynkCommands.Add(new FindImageStick());
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"
@@ -208,27 +210,55 @@ namespace GuchiBot
             label1.Text = $"{CurTime} sec";
         }
 
+        private int DurPreSet = 0;
         private void TimerSynk()
         {
             if (Bot != null)
             {
                 if (CurTime >= Ms/1000)
                 {
-                    if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
+                    if (DurPreSet == 0)
                     {
-                        _2chModule Ch = Bot.GetModule<_2chModule>();
-                        if (!checkBox1.Checked) {
-                            int rd = Bot.Rand.Next(0, _2chModule.WebmCountW);
-                            Ch.SendWebm(Bot,  Ch.WebmsW[rd], PostToId);
-                            Ch.WebmsW.RemoveAt(rd);
-                            _2chModule.WebmCountW = Ch.WebmsW.Count;
-                        }
-                        else
+                        if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
                         {
-                            int rd = Bot.Rand.Next(0, _2chModule.WebmCountA);
-                            Ch.SendWebm(Bot, Ch.WebmsA[rd], PostToId);
-                            Ch.WebmsA.RemoveAt(rd);
-                            _2chModule.WebmCountA = Ch.WebmsA.Count;
+                            _2chModule Ch = Bot.GetModule<_2chModule>();
+                            if (!checkBox1.Checked)
+                            {
+                                int rd = Bot.Rand.Next(0, _2chModule.WebmCountW);
+                                Ch.SendWebm(Bot, Ch.WebmsW[rd], PostToId);
+                                Ch.WebmsW.RemoveAt(rd);
+                                _2chModule.WebmCountW = Ch.WebmsW.Count;
+                            }
+                            else
+                            {
+                                int rd = Bot.Rand.Next(0, _2chModule.WebmCountA);
+                                Ch.SendWebm(Bot, Ch.WebmsA[rd], PostToId);
+                                Ch.WebmsA.RemoveAt(rd);
+                                _2chModule.WebmCountA = Ch.WebmsA.Count;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (_2chModule.WebmCountA > 0 && _2chModule.WebmCountW > 0)
+                        {
+                            _2chModule Ch = Bot.GetModule<_2chModule>();
+                            if (!checkBox1.Checked)
+                            {
+                                var webms = Ch.WebmsW.Where(sn => sn.DurationSec < DurPreSet);
+                                int rd = Bot.Rand.Next(0, webms.Count());
+                                Ch.SendWebm(Bot, webms.ElementAt(rd), PostToId);
+                                Ch.WebmsW.Remove(webms.ElementAt(rd));
+                                _2chModule.WebmCountW = Ch.WebmsW.Count;
+                            }
+                            else
+                            {
+                                var webms = Ch.WebmsA.Where(sn => sn.DurationSec < DurPreSet);
+                                int rd = Bot.Rand.Next(0, _2chModule.WebmCountA);
+                                Ch.SendWebm(Bot, webms.ElementAt(rd), PostToId);
+                                Ch.WebmsA.Remove(webms.ElementAt(rd));
+                                _2chModule.WebmCountA = Ch.WebmsA.Count;
+                            }
                         }
                     }
                     CurTime = 0;
@@ -318,6 +348,15 @@ namespace GuchiBot
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                DurPreSet = int.Parse(textBox5.Text);
+            }
+            catch { DurPreSet = 0; }
         }
     }
 }
