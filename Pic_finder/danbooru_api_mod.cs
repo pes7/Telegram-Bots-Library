@@ -15,7 +15,7 @@ using Telegram.Bot.Types;
 
 namespace Pic_finder
 {
-    public class danbooru_api_mod : Module
+    public class danbooru_api_mod : Module //Module to handle with danbooru like API`s.
     {
         private HttpClient Client = new HttpClient();
         private List<System.String> Service_Args = new List<string>() //Service tags for bot workaround, but doesn`t include into URL constructor.
@@ -54,7 +54,7 @@ namespace Pic_finder
                     if (this.Args.Find(fn => fn.Name == "limit") == null) Post.Add("limit", "1"); //Automatically adding limit.
                     else if (Convert.ToInt32(this.Args.Find(fn => fn.Name == "limit").Arg) > max_lim) throw new ArgumentOutOfRangeException("Limit can\'t be more than 100."); //If maximal limit was overrided.
                 }
-                else //If id was specified.
+                else //If post id was specified.
                 {
                     Post.Clear();
                     Tags.Clear();
@@ -85,32 +85,32 @@ namespace Pic_finder
             catch (Exception ex)
             {
                 this.Serving.Exceptions.Add(ex);
-                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, ex.Message, replyToMessageId: this.Msg.MessageId);
+                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, ex.Message/*, replyToMessageId: this.Msg.MessageId*/);
                 return false;
             }
             if (!this.resp.IsSuccessStatusCode)
             {
-                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we had error.", replyToMessageId: this.Msg.MessageId);
+                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we had error."/*, replyToMessageId: this.Msg.MessageId*/);
                 return false;
             }
             else return true;
         }
 
-        private async Task GetAndSendPicAsync(System.String url, System.String rate = "", System.String srate = "s") //Getting and sending a pic from API-result`s.
+        private async Task GetAndSendPicAsync(System.String url, System.String rate = "", System.String erate = "e") //Getting and sending a pic from API-result`s.
         {
             bool sd_fl = this.to_file, shw_a = this.show_a;
             bool succ = true; //If current operation was successed.
             if (rate == null) rate = System.String.Empty;
-            if (srate == null) srate = "s";
+            if (erate == null) erate = "e";
             System.String exc = System.String.Empty;
             if (url != null) do
                 {
                     try
                     {
-                        if (succ && rate != srate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\", \"questionable\" or undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
+                        if (succ && rate == erate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
                         System.IO.Stream get_pic = await Client.GetStreamAsync(url);
-                        if (sd_fl) await this.Serving.Client.SendDocumentAsync(this.Msg.Chat.Id, new FileToSend(url.Split('/').Last(), get_pic), exc, replyToMessageId: this.Msg.MessageId);
-                        else await this.Serving.Client.SendPhotoAsync(this.Msg.Chat.Id, new FileToSend(url.Split('/').Last(), get_pic), replyToMessageId: this.Msg.MessageId);
+                        if (sd_fl) await this.Serving.Client.SendDocumentAsync(this.Msg.Chat.Id, new FileToSend(url.Split('/').Last(), get_pic), exc/*, replyToMessageId: this.Msg.MessageId*/);
+                        else await this.Serving.Client.SendPhotoAsync(this.Msg.Chat.Id, new FileToSend(url.Split('/').Last(), get_pic)/*, replyToMessageId: this.Msg.MessageId*/);
                         exc = System.String.Empty;
                         this.is_res = true;
                         succ = true;
@@ -124,10 +124,10 @@ namespace Pic_finder
                     }
                 }
                 while (!succ);
-            else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Can\'t send the post: download link wasn\'t provided.", replyToMessageId: this.Msg.MessageId);
+            else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Can\'t send the post: download link wasn\'t provided."/*, replyToMessageId: this.Msg.MessageId*/);
         }
 
-        private async Task DoAStJobAsync(System.String req_url, UInt16 max_lim=100, System.String fl_url= "file_url", System.String rt_prop= "rating", System.String s_rate="s", System.String url_prefix = "") //Do a typical job to get art`s.
+        private async Task DoAStJobAsync(System.String req_url, UInt16 max_lim=100, System.String fl_url= "file_url", System.String rt_prop= "rating", System.String e_rate="e", System.String url_prefix = "") //Do a typical job to get art`s.
         {
             this.Args?.RemoveAt(0); //A little "crunch".
             this.Args?.ForEach(delegate (ArgC to_norm) //Normalizing the arg`s to prevent a blank space`s.
@@ -141,10 +141,10 @@ namespace Pic_finder
             foreach (var post in result)
             {
                 System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop];
-                await this.GetAndSendPicAsync(url, rating, s_rate);
+                await this.GetAndSendPicAsync(url, rating, e_rate);
             }
-            if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s.", replyToMessageId: this.Msg.MessageId);
-            else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent.", replyToMessageId: this.Msg.MessageId);
+            if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
+            //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
         }
 
         public async void GetYandereAsync(Message msg, IBot serving, List<ArgC> args) //Function to browse yande.re.
@@ -159,7 +159,7 @@ namespace Pic_finder
         {
             if (args?.FindAll(fn => fn.Name == "tag").Count > 2) //Caution about using more than two tags.
             {
-                await serving.Client.SendTextMessageAsync(msg.MessageId, "Unfortunatelly you can\'t input more than two tags, using danbooru.", replyToMessageId: msg.MessageId);
+                await serving.Client.SendTextMessageAsync(msg.MessageId, "Unfortunatelly you can\'t input more than two tags, using danbooru."/*, replyToMessageId: msg.MessageId*/);
                 return;
             }
             this.Msg = msg;
@@ -172,7 +172,7 @@ namespace Pic_finder
         {
             this.Msg = msg;
             this.Serving = serving;
-            if (args != null) args.ForEach(delegate (ArgC arg) { if (arg.Name.IndexOf("page") != -1) args.ElementAt(args.IndexOf(arg)).Name = arg.Name.Replace("page", "pid"); });
+            if (args != null) args.ForEach(delegate (ArgC arg) { if (arg.Name.IndexOf("page") != -1) args.ElementAt(args.IndexOf(arg)).Name = arg.Name.Replace("page", "pid"); }); //Replacing "page" to "pid" for normal browsing.
             this.Args = args;
             await this.DoAStJobAsync("https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&");
         }
