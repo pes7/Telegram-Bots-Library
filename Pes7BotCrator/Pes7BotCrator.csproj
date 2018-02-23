@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -62,6 +63,7 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="Modules\SpeechRecognationModule.cs" />
     <Compile Include="Modules\TransitFileModule.cs" />
     <Compile Include="Modules\TRM\TRM.cs" />
     <Compile Include="Modules\TRM\Types\TimeRelayMessage.cs" />

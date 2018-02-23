@@ -15,7 +15,7 @@ namespace GuchiBot.Commands
         public static void InlineAct(InlineQuery query, IBot Parent)
         {
             Random rand = new Random();
-            if (Parent.Modules.Exists(fn => fn.Name == "BindedImages") && query.Query.Contains("ib"))
+            if (query.Query.Contains("ib"))
             {
                 var image = query.Query.Split('b').Last();
                 if (image != null)

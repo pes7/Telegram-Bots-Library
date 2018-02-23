@@ -12,6 +12,7 @@ using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using System.Diagnostics;
 using System.Collections;
+using System.Speech.Recognition;
 
 namespace Pes7BotCrator
 {
@@ -57,6 +58,43 @@ namespace Pes7BotCrator
                 case Telegram.Bot.Types.Enums.UpdateType.MessageUpdate:
                     ms = Up.Message;
                     switch (Up.Message.Type) {
+                        case Telegram.Bot.Types.Enums.MessageType.VoiceMessage:
+                            /* Скачует хорошо, но вот роспознать проблема.
+                            var voice = Up.Message.Voice;
+                            var file = await Parent.Client.GetFileAsync(voice.FileId);
+                            if (!Directory.Exists("Voice"))
+                                Directory.CreateDirectory("Voice");
+                            var filename = $"Voice/{voice.FileId}.{voice.FileId.Split('.').Last()}.mp3";
+                            using (var saveImageStream = System.IO.File.Open(filename, FileMode.Create))
+                            {
+                                await file.FileStream.CopyToAsync(saveImageStream);
+                            }
+                            rec(file.FileStream);
+                            */
+                            /* Роспозновалка, нужно сконвертить mp3 в waw что бы заработала.
+                             public void rec(Stream source)
+                            {
+                                using (SpeechRecognitionEngine recognizer =
+                                    new SpeechRecognitionEngine(
+                                        new System.Globalization.CultureInfo("en-US")))
+                                {
+                                    recognizer.LoadGrammar(new DictationGrammar());
+                                    recognizer.SetInputToAudioStream(source,new System.Speech.AudioFormat.SpeechAudioFormatInfo(8000,System.Speech.AudioFormat.AudioBitsPerSample.Eight,System.Speech.AudioFormat.AudioChannel.Mono));
+                                    recognizer.InitialSilenceTimeout = TimeSpan.FromSeconds(2);
+                                    RecognitionResult result = recognizer.Recognize();
+
+                                    if (result != null)
+                                    {
+                                        Parent.Exceptions.Add(new Exception(result.Text));
+                                    }
+                                    else
+                                    {
+                                        Parent.Exceptions.Add(new Exception("SHIT"));
+                                    }
+                                }
+                            } 
+                             */
+                            break;
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
                             Parent.MessagesLast.Add(ms);
                             LogSystem(ms.From);
@@ -71,6 +109,7 @@ namespace Pes7BotCrator
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
                             {
+                                /*Нужно поубирать потоки, так как это уже и так поток.*/
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 Thread the = new Thread(() =>
                                 {
