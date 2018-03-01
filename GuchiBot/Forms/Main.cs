@@ -22,6 +22,7 @@ using System.Collections;
 using GuchiBot.Interface;
 using Telegram.Bot.Types;
 using GuchiBot.Commands;
+using Pes7BotCrator.Modules.FunFunc;
 
 namespace GuchiBot
 {
@@ -64,6 +65,7 @@ namespace GuchiBot
                     new AnistarModule(),
                     new Statistic(),
                     new TRM(),
+                    new FunFunc()
                 }
             );
 
@@ -79,6 +81,8 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().CreateCommand);
             Bot.SynkCommands.Add(Bot.GetModule<TransitFileModule>().DownloadCommandSynk);
             Bot.SynkCommands.Add(new FindImageStick());
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandElse);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandInf);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"

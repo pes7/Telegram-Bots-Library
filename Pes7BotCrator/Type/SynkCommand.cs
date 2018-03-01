@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Telegram.Bot.Types;
 
 namespace Pes7BotCrator.Type
 {
     public class SynkCommand : ISynkCommand
     {
+        private Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act;
+        private List<string> list;
+        private string descr;
+
         public TypeOfCommand Type { get; set; }
         public List<string> CommandLine { get; set; }
         public Delegate doFunc { get; set; }
@@ -20,7 +25,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Message, IBot, List<ArgC>> act, List<string> cm = null, string descr = null)
+        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, string descr = null)
         {
             Description = descr;
             Type = TypeOfCommand.Standart;

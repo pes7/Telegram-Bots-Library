@@ -27,7 +27,8 @@ namespace Pes7BotCrator.Type
                     args_parse = message.Split('-');
                 }
                 catch { return null; }
-                if(args_parse.Length == 2)
+                /*
+               if(args_parse.Length == 2)
                 {
                     try
                     {
@@ -38,6 +39,7 @@ namespace Pes7BotCrator.Type
                     }
                     catch { Args.Clear(); }
                 }
+               */
                 if (args_parse.Length > 1)
                 {
                     for (int i = 0; i < args_parse.Length; i++)

@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -63,6 +64,12 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="Modules\FunFunc\FunFunc.cs" />
+    <Compile Include="Modules\FunFunc\FunRes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FunRes.resx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\SpeechRecognationModule.cs" />
     <Compile Include="Modules\TransitFileModule.cs" />
     <Compile Include="Modules\TRM\TRM.cs" />
@@ -94,7 +101,15 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Modules\FunFunc\FunRes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FunRes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bomg.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
