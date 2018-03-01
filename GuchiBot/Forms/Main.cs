@@ -74,7 +74,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new Pes7BotCrator.Commands.Help(Bot));
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandHelp);
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandRuntime);
-            Bot.SynkCommands.Add(new LogUlog(Bot,"Приветсвую тебя на нашем ГачиКанале.", "Увы, наши пути расходятся..."));
+            Bot.SynkCommands.Add(new LogUlog(Bot,LogUlog.TypeOf.MessageWithNameAndChannelName,"Приветсвую тебя @{0} в нашем {1}!","Увы, наши пути расходятся..."));
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().QueryCommand);
             Bot.SynkCommands.Add(Bot.GetModule<VoteModule>().CreateCommand);
             Bot.SynkCommands.Add(Bot.GetModule<TransitFileModule>().DownloadCommandSynk);

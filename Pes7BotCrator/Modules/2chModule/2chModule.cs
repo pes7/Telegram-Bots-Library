@@ -223,7 +223,11 @@ namespace Pes7BotCrator.Modules
                     catch (Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
-                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(id, "Sorry, but something went wrong.",10);
+                        try
+                        {
+                            await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(id, "Sorry, but something went wrong.", 10);
+                        }
+                        catch { }
                         return;
                     }
                 });
