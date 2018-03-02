@@ -54,8 +54,12 @@ namespace Pes7BotCrator.Modules
                 if (arg != null)
                 {
                     ArgC text = arg.Where(fn => fn.Name.Contains("text")).First();
-                    ArgC first = arg.Where(fn => fn.Name.Contains("answ1")).First();
-                    ArgC second = arg.Where(fn => fn.Name.Contains("answ2")).First();
+                    ArgC first = null, second = null;
+                    if (arg.Count > 2)
+                    {
+                        first = arg.Where(fn => fn.Name.Contains("answ1")).First();
+                        second = arg.Where(fn => fn.Name.Contains("answ2")).First();
+                    }  
                     if (text != null) {
                         Opros op;
                         int id = Parent.GetModule<VoteModule>().Opros.Count;

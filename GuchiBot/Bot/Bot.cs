@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules;
+using Pes7BotCrator.Modules.LikeDislikeModule;
 using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;

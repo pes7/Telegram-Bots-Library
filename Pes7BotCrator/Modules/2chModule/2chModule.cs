@@ -9,6 +9,7 @@ using System.Threading;
 using System.Diagnostics;
 using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules.Types;
+using Pes7BotCrator.Modules.LikeDislikeModule;
 
 namespace Pes7BotCrator.Modules
 {
@@ -140,7 +141,7 @@ namespace Pes7BotCrator.Modules
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     //Parent.Exceptions.Add(ex);
                 }
@@ -217,7 +218,7 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.getKeyBoard(webm.Path));
+                        await Parent.Client.SendPhotoAsync(id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.LikeDislikeModule.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)

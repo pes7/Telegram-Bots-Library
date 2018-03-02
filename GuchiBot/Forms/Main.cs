@@ -23,6 +23,7 @@ using GuchiBot.Interface;
 using Telegram.Bot.Types;
 using GuchiBot.Commands;
 using Pes7BotCrator.Modules.FunFunc;
+using Pes7BotCrator.Modules.LikeDislikeModule;
 
 namespace GuchiBot
 {
@@ -65,7 +66,7 @@ namespace GuchiBot
                     new AnistarModule(),
                     new Statistic(),
                     new TRM(),
-                    new FunFunc()
+                    new FunFunc("FaceYouZerro","Who/WhoTitles","Who/WhoAnswers")
                 }
             );
 
@@ -83,6 +84,8 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new FindImageStick());
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandElse);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandInf);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandGuchi);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"

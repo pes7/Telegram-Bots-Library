@@ -10,7 +10,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Modules.Types.LikeDislike;
 
-namespace Pes7BotCrator.Modules
+namespace Pes7BotCrator.Modules.LikeDislikeModule
 {
     public class LikeDislikeModule : Module
     {

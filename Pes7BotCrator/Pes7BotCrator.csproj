@@ -70,6 +70,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FunRes.resx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\LikeDislikeModule\LikeMe.cs" />
     <Compile Include="Modules\SpeechRecognationModule.cs" />
     <Compile Include="Modules\TransitFileModule.cs" />
     <Compile Include="Modules\TRM\TRM.cs" />
