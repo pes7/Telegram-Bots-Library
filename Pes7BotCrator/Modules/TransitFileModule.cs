@@ -26,7 +26,7 @@ namespace Pes7BotCrator.Modules
 
         public class DownloadCommand : SynkCommand
         {
-            public DownloadCommand() : base(ActAsync, new List<string> { "/down" }, "Download file with `url`") { }
+            public DownloadCommand() : base(ActAsync, new List<string> { "/down" }, descr:"Download file with `url`") { }
         }
 
         public static void ActAsync(Telegram.Bot.Types.Message re, IBot Parent, List<ArgC> args)

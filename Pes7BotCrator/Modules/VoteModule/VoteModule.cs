@@ -79,7 +79,7 @@ namespace Pes7BotCrator.Modules
                         }
                     }
                 }
-            }, new List<string> { "/vcreate" }, "You can create ur own Vote; Args: `text` and optional `answ1` `answ2`") { }
+            }, new List<string> { "/vcreate" }, descr: "You can create ur own Vote; Args: `text` and optional `answ1` `answ2`") { }
         }
 
         /*как вариант 

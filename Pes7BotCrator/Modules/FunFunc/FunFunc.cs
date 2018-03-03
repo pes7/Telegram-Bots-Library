@@ -166,9 +166,14 @@ namespace Pes7BotCrator.Modules.FunFunc
                         {
                             await us.DownloadImageToDirectory(Parent);
                         }
-                        Image mg = Image.FromFile($"./UserPhotoes/{us.Id}.jpg");
+                        Image mg;
+                        try
+                        {
+                            mg = Image.FromFile($"./UserPhotoes/{us.Id}.jpg");
+                            graphics.DrawImage(ResizeImage(mg, 140, 140), 70, 10);
+                        }
+                        catch { }
                         var d = new Font(new FontFamily("Segoe Script"), 25);
-                        graphics.DrawImage(ResizeImage(mg, 140, 140), 70, 10);
                         graphics.DrawString($"{us.FirstName}", d, Brushes.DeepSkyBlue, 50, 10);
                         graphics.DrawImage(ResizeImage(answer, 190, 190), 350, 220);
                         graphics.Save();

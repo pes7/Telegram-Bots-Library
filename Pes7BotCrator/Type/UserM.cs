@@ -33,17 +33,21 @@ namespace Pes7BotCrator.Type
                 }
             }
             var photo = await Parent.Client.GetUserProfilePhotosAsync(this.Id, 0, 1);
-            if (photo?.Photos.First() != null)
+            if (photo?.Photos.Length > 0)
             {
-                if (!Directory.Exists("./UserPhotoes"))
-                Directory.CreateDirectory("./UserPhotoes");
-                using (var file = System.IO.File.Create($"./UserPhotoes/{this.Id}.jpg", 32 * 8 * 1024, FileOptions.Asynchronous))
+                if (photo.Photos.First() != null)
                 {
-                    file.Flush(true);
-                    await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId, file);
+                    if (!Directory.Exists("./UserPhotoes"))
+                        Directory.CreateDirectory("./UserPhotoes");
+                    using (var file = System.IO.File.Create($"./UserPhotoes/{this.Id}.jpg", 32 * 8 * 1024, FileOptions.Asynchronous))
+                    {
+                        file.Flush(true);
+                        await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId, file);
+                    }
+                    PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
+                    return true;
                 }
-                PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
-                return true;
+                else return false;
             }
             else return false;
         }

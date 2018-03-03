@@ -11,6 +11,7 @@ namespace Pes7BotCrator.Type
     public class SynkCommand : ISynkCommand
     {
         public TypeOfCommand Type { get; set; }
+        public TypeOfAccess TypeOfAccess { get; set; }
         public List<string> CommandLine { get; set; }
         public Delegate doFunc { get; set; }
         public string Description { get; set; }
@@ -21,9 +22,10 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, string descr = null)
+        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, TypeOfAccess access = TypeOfAccess.Public, string descr = null)
         {
             Description = descr;
+            TypeOfAccess = access;
             Type = TypeOfCommand.Standart;
             Incialize(act, cm);
         }
@@ -38,6 +40,7 @@ namespace Pes7BotCrator.Type
         {
             Description = descr;
             Type = TypeOfCommand.InlineQuery;
+            TypeOfAccess = TypeOfAccess.Public;
             Incialize(act, cm);
         }
 
@@ -51,6 +54,7 @@ namespace Pes7BotCrator.Type
         {
             Description = descr;
             Type = TypeOfCommand.Query;
+            TypeOfAccess = TypeOfAccess.Public;
             Incialize(act, cm);
         }
 
@@ -63,6 +67,7 @@ namespace Pes7BotCrator.Type
         public SynkCommand(Action<Update, IBot, List<ArgC>> act)
         {
             Type = TypeOfCommand.AllwaysInWebHook;
+            TypeOfAccess = TypeOfAccess.Public;
             Description = null;
             Incialize(act,null);
         }
@@ -74,6 +79,7 @@ namespace Pes7BotCrator.Type
         public SynkCommand(Action<Update, IBot> act, string descr = null)
         {
             Type = TypeOfCommand.Service;
+            TypeOfAccess = TypeOfAccess.Public;
             Description = descr;
             Incialize(act, null);
         }

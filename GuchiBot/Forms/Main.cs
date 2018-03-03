@@ -93,7 +93,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new SynkCommand(bt.GachiAttakSynk, new List<string>()
             {
                 "/gachiattak"
-            },descr:"Секретное оружие."));
+            },TypeOfAccess.Admin,descr:"Секретное оружие."));
             Bot.SynkCommands.Add(new SynkCommand(bt.GetGachiImageLogic, new List<string>()
             {
                 "/sendrandimg"
@@ -119,13 +119,14 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new SynkCommand(bt.AutoDelMessage, new List<string>()
             {
                 "/adp"
-            }, "Auto deliting post `text` `time` - time of life."));
+            }, descr:"Auto deliting post `text` `time` - time of life."));
             Bot.SynkCommands.Add(Bot.GetModule<AnistarModule>().Command);
             Bot.SynkCommands.Add(new SynkCommand(bt.DefaultSynk, new List<string>()
             {
                 "Default"
             }));
             //Example of TimeReley Photo Message. Ps: special for Mordvinov B.
+            /*
             Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>
             {
                 try
@@ -136,6 +137,7 @@ namespace GuchiBot
                 catch { await parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id,"Error to send simple .jpg",10); }
             }, new List<string>() { "/kek" }));
             label1.Text = $"{Ms} ms";
+            */
 
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<LikeDislikeModule>().Save);
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<VoteModule>().Save);

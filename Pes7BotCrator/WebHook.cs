@@ -109,17 +109,21 @@ namespace Pes7BotCrator
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
                             {
-                                /*Нужно поубирать потоки, так как это уже и так поток.*/
-                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                Thread the = new Thread(() =>
+                                if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
                                 {
-                                    try
+                                    var ty = await IsAdminAsync(Parent, ms.Chat.Id, ms.From.Id);
+                                    if (ty == false)
                                     {
-                                        sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
+                                        break;
                                     }
-                                    catch (Exception ex) { Parent.Exceptions.Add(ex); }
-                                });
-                                the.Start();
+                                }
+                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                                try
+                                {
+                                    sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                }
+                                catch (Exception ex) { Parent.Exceptions.Add(ex); }
                                 break;
                             }
                             break;
@@ -137,15 +141,20 @@ namespace Pes7BotCrator
                                                            (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
                                 ))
                             {
-                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                Thread the = new Thread(() =>
+                                if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
                                 {
-                                    try
+                                    var ty = await IsAdminAsync(Parent,ms.Chat.Id, ms.From.Id);
+                                    if (ty == false)
                                     {
-                                        sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
-                                    } catch (Exception ex) { Parent.Exceptions.Add(ex); }
-                                });
-                                the.Start();
+                                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
+                                        break;
+                                    }
+                                }
+                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                                try
+                                {
+                                    sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                } catch (Exception ex) { Parent.Exceptions.Add(ex); }
                                 break;
                             }
                             try
@@ -244,6 +253,22 @@ namespace Pes7BotCrator
                 return s.Split('@').First();
             }
             catch { return null; }
+        }
+        /// <summary>
+        /// WARNING: NOT FOR PRIVATE CHAT
+        /// </summary>
+        /// <param name="Parent"></param>
+        /// <param name="idchat"></param>
+        /// <param name="iduser"></param>
+        /// <returns></returns>
+        public static async Task<bool> IsAdminAsync(IBot Parent,long idchat, int iduser)
+        {
+            var admins = await Parent.Client.GetChatAdministratorsAsync(idchat);
+            var yuo = admins.Where(fn => fn.User.Id == iduser);
+            if (yuo.Count() > 0)
+                return true;
+            else
+                return false;
         }
     }
 }
