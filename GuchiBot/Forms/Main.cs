@@ -66,7 +66,7 @@ namespace GuchiBot
                     new AnistarModule(),
                     new Statistic(),
                     new TRM(),
-                    new FunFunc("FaceYouZerro","Who/WhoTitles","Who/WhoAnswers")
+                    new FunFunc("FunFunc/FaceYouZerro","FunFunc/Who/WhoTitles","FunFunc/Who/WhoAnswers","FunFunc/Trigger")
                 }
             );
 
@@ -86,6 +86,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandInf);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandGuchi);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"

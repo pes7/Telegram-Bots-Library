@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,19 +20,23 @@ namespace Pes7BotCrator.Modules.FunFunc
         public ElseElse _CommandElse { get; set; }
         public GuchiName _CommandGuchi { get; set; }
         public WhoAreYou _CommandWhoAreU { get; set; }
+        public Triggered _Triggered { get; set; }
         public Random Rand { get; set; }
         public string FaceImageDir { get; set; }
         public string WhoTitles { get; set; }
         public string WhoAnswers { get; set; }
-        public FunFunc(string imageDir = null, string whoTitles = null, string whoAnswers = null) : base("FunFunc", typeof(FunFunc))
+        public string Triggers { get; set; }
+        public FunFunc(string imageDir = null, string whoTitles = null, string whoAnswers = null, string trigger = null) : base("FunFunc", typeof(FunFunc))
         {
             _CommandInf = new InfTrue();
             _CommandElse = new ElseElse();
             _CommandGuchi = new GuchiName();
             _CommandWhoAreU = new WhoAreYou();
+            _Triggered = new Triggered();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
+            Triggers = trigger;
             if (Directory.Exists("FunPics"))
                 Directory.CreateDirectory("FunPics");
             Rand = new Random();
@@ -52,6 +57,19 @@ namespace Pes7BotCrator.Modules.FunFunc
         public class WhoAreYou : SynkCommand
         {
             public WhoAreYou() : base(ActWho, new List<string>() { "/who" }, descr: "Кто ты такой?") { }
+        }
+        public class Triggered : SynkCommand
+        {
+            public Triggered() : base(ActTrig, new List<string>() { "/t" }, descr: "TRIGGERED!") { }
+        }
+        public static void ActTrig(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                var th = Parent.GetModule<FunFunc>();
+                var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.Triggers, filter, SearchOption.AllDirectories)).ToArray();
+                Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("trigger", System.IO.File.Open($"{files[th.Rand.Next(0,files.Length)]}", FileMode.Open)));
+            }
         }
         public static void ActInf(Message re, IBot Parent, List<ArgC> args)
         {
@@ -94,8 +112,8 @@ namespace Pes7BotCrator.Modules.FunFunc
                             graphics.Save();
                         }
                     }
-                    MemoryStream memoryStream = new MemoryStream();
-                    bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    //MemoryStream memoryStream = new MemoryStream();
+                    //bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
                     int count = Directory.GetFiles("FunPics", "*").Length;
                     bmp.Save($"FunPics/test{count}.jpg");
                     Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/test{count}.jpg",FileMode.Open)));
@@ -134,8 +152,8 @@ namespace Pes7BotCrator.Modules.FunFunc
                             graphics.Save();
 
                         }
-                        MemoryStream memoryStream = new MemoryStream();
-                        bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        //MemoryStream memoryStream = new MemoryStream();
+                        //bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
                         int count = Directory.GetFiles("FunPics", "*").Length;
                         bmp.Save($"FunPics/guchi{count}.jpg");
                         Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/guchi{count}.jpg", FileMode.Open)));
@@ -170,16 +188,16 @@ namespace Pes7BotCrator.Modules.FunFunc
                         try
                         {
                             mg = Image.FromFile($"./UserPhotoes/{us.Id}.jpg");
-                            graphics.DrawImage(ResizeImage(mg, 140, 140), 70, 10);
+                            graphics.DrawImage(ResizeImage(mg, 285, 180), 5, 10);
                         }
                         catch { }
                         var d = new Font(new FontFamily("Segoe Script"), 25);
                         graphics.DrawString($"{us.FirstName}", d, Brushes.DeepSkyBlue, 50, 10);
-                        graphics.DrawImage(ResizeImage(answer, 190, 190), 350, 220);
+                        graphics.DrawImage(ResizeImage(answer, 400, 270), 300, 220);
                         graphics.Save();
                     }
-                    MemoryStream memoryStream = new MemoryStream();
-                    bmp.Save(memoryStream, ImageFormat.Jpeg);
+                    //MemoryStream memoryStream = new MemoryStream();
+                    //bmp.Save(memoryStream, ImageFormat.Jpeg);
                     int count = Directory.GetFiles("FunPics", "*").Length;
                     bmp.Save($"FunPics/who{count}.jpg");
                     await Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/who{count}.jpg", FileMode.Open)));
