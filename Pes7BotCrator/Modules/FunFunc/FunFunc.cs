@@ -54,7 +54,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class ElseElse : SynkCommand
         {
-            public ElseElse() : base(ActElse, new List<string>() { "/else" }, commandName: "оцени", descr: "То или другое `-t1` первое `t2` второе") { }
+            public ElseElse() : base(ActElse, new List<string>() { "/else" }, commandName: "сравни", descr: "То или другое `-t1` первое `t2` второе") { }
         }
         public class WhoAreYou : SynkCommand
         {
@@ -142,7 +142,8 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             if(re != null)
             {
-                var arg = args.Find(fn => fn.Name == "w");
+                var g = args.Find(fn => fn.Name == "w");
+                var arg = g == null ? args.Find(fn => fn.Name == "0") : g;
                 if (arg?.Arg != null)
                 {
                     Parent.Client.SendTextMessageAsync(re.Chat.Id,$"{arg.Arg}: {Parent.GetModule<FunFunc>().Rand.Next(0,100)}%");
@@ -159,31 +160,38 @@ namespace Pes7BotCrator.Modules.FunFunc
                 var arg2 = c == null ? args.Find(fn => fn.Name == "1") : c;
                 if (arg1?.Arg != null && arg1?.Arg != null)
                 {
-                    var bmp = new Bitmap(FunRes.bomg);
-                    var th = Parent.GetModule<FunFunc>();
-                    using (Graphics graphics = Graphics.FromImage(bmp))
+                    if (arg1.Arg.Trim().ToUpper() != arg2.Arg.Trim().ToUpper())
                     {
-                        using (Font arialFont = new Font("Arial", 10))
+                        var bmp = new Bitmap(FunRes.bomg);
+                        var th = Parent.GetModule<FunFunc>();
+                        using (Graphics graphics = Graphics.FromImage(bmp))
                         {
-                            string text1, text2;
-                            if (th.Rand.Next(0, 100) <= 50)
+                            using (Font arialFont = new Font("Arial", 10))
                             {
-                                text1 = arg1.Arg;
-                                text2 = arg2.Arg;
+                                string text1, text2;
+                                if (th.Rand.Next(0, 100) <= 50)
+                                {
+                                    text1 = arg1.Arg;
+                                    text2 = arg2.Arg;
+                                }
+                                else
+                                {
+                                    text1 = arg2.Arg;
+                                    text2 = arg1.Arg;
+                                }
+                                var d = new Font(FontFamily.Families[0], 20f, FontStyle.Regular);
+                                graphics.DrawString(text1, d, Brushes.Blue, 30, 20);
+                                graphics.DrawString(text2, d, Brushes.Red, 350, 20);
+                                graphics.Save();
                             }
-                            else
-                            {
-                                text1 = arg2.Arg;
-                                text2 = arg1.Arg;
-                            }
-                            var d = new Font(FontFamily.Families[0],20f,FontStyle.Regular);
-                            graphics.DrawString(text1, d, Brushes.Blue, 30,20);
-                            graphics.DrawString(text2, d, Brushes.Red, 350,20);
-                            graphics.Save();
                         }
+                        string dir = SaveIt(re.From.Id, "test", bmp, th);
+                        Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
                     }
-                    string dir = SaveIt(re.From.Id, "test", bmp, th);
-                    Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
+                    else
+                    {
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Ты @{re.From.Username} что дурак?");
+                    }
                 }
             }
         }

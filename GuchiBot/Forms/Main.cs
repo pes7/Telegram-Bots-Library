@@ -128,6 +128,15 @@ namespace GuchiBot
             {
                 "Default"
             }));
+            Bot.SynkCommands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args)=> {
+                parent.Client.SendTextMessageAsync(ms.Chat.Id,"Слушаюсь, уже сплю...");
+                Bot.GetModule<SaveLoadModule>().saveIt();
+                Bot.Dispose();
+                Application.Exit();
+            }, new List<string>()
+            {
+                "_"
+            },commandName:"спать", access:TypeOfAccess.Admin, descr: "Бот ложиться спать."));
             //Example of TimeReley Photo Message. Ps: special for Mordvinov B.
             /*
             Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>
