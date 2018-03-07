@@ -53,10 +53,13 @@ namespace Pes7BotCrator
         private int cc = 0;
         private async void MessageSynk(Update Up) {
             Message ms;
+            ms = Up.Message;
+            var args = ArgC.getArgs(ms?.Text, Parent);
+            var str = (args == null) ? ms?.Text : args.First().Name.Trim();
+            var com = tryToParseNameBotCommand(ms?.Text);
             switch (Up.Type)
             {
                 case Telegram.Bot.Types.Enums.UpdateType.MessageUpdate:
-                    ms = Up.Message;
                     switch (Up.Message.Type) {
                         case Telegram.Bot.Types.Enums.MessageType.VoiceMessage:
                             /* Скачует хорошо, но вот роспознать проблема.
@@ -101,12 +104,19 @@ namespace Pes7BotCrator
                             if (cc >= messageCountCheck)
                             {
                                 cc = 0;
-                                FixSimmilarUsersFromAsynkThread();
+                                try
+                                {
+                                    FixSimmilarUsersFromAsynkThread();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Parent.Exceptions.Add(ex);
+                                }
                             }
                             foreach (SynkCommand sy in Parent.SynkCommands.Where(
                                 fn => fn.Type == TypeOfCommand.Photo &&
-                                fn.CommandLine.Exists(sn => sn == ((ArgC.getArgs(ms.Text) == null) ? ms.Text : ArgC.getArgs(ms.Text).First().Name.Trim()) ||
-                                                           (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
+                                (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
+                                fn.CommandName.ToUpper() == args?.ElementAt(0)?.Name.ToUpper() && fn.CommandName != null)
                                 ))
                             {
                                 if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
@@ -121,7 +131,7 @@ namespace Pes7BotCrator
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 try
                                 {
-                                    sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                    sy.doFunc.DynamicInvoke(ms, Parent, args);
                                 }
                                 catch (Exception ex) { Parent.Exceptions.Add(ex); }
                                 break;
@@ -137,8 +147,8 @@ namespace Pes7BotCrator
                             }
                             foreach (SynkCommand sy in Parent.SynkCommands.Where(
                                 fn => fn.Type == TypeOfCommand.Standart &&
-                                fn.CommandLine.Exists(sn => sn == ((ArgC.getArgs(ms.Text) == null) ? ms.Text : ArgC.getArgs(ms.Text).First().Name.Trim()) ||
-                                                           (sn == tryToParseNameBotCommand(ms.Text) && tryToParseNameBotCommand(ms.Text) != null))
+                                (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
+                                fn.CommandName?.ToUpper() == args?.ElementAt(0)?.Name?.ToUpper() && fn.CommandName != null)
                                 ))
                             {
                                 if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
@@ -153,13 +163,13 @@ namespace Pes7BotCrator
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 try
                                 {
-                                    sy.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                    sy.doFunc.DynamicInvoke(ms, Parent, args);
                                 } catch (Exception ex) { Parent.Exceptions.Add(ex); }
                                 break;
                             }
                             try
                             {
-                                Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, ArgC.getArgs(ms.Text));
+                                Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, args);
                             }catch{ }
                             cc++;
                             break;
@@ -214,7 +224,7 @@ namespace Pes7BotCrator
             {
                 List<ArgC> arg = null;
                 if(Up.Message != null)
-                    arg = ArgC.getArgs(Up.Message.Text);
+                    arg = args;
                 sn.doFunc.DynamicInvoke(Up,Parent, arg);
             }
             Parent.OnWebHoockUpdated();

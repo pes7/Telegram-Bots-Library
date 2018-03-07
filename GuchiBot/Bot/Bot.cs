@@ -24,8 +24,8 @@ namespace Pes7BotCrator
         public string GachiImage { get; set; }
         public string PreViewDir { get; set; } //If nun, generated.
 
-        public Bot(string key, string name, string webmdir = null, string gachiimage = null, string preViewDir = null, List<IModule> modules = null) :
-            base(key, name, modules)
+        public Bot(string key, string name, string nameString, string webmdir = null, string gachiimage = null, string preViewDir = null, List<IModule> modules = null) :
+            base(key, name, nameString, modules)
         {
             LastWebms = new List<dynamic>();
             WebmDir = webmdir;

@@ -21,6 +21,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         public GuchiName _CommandGuchi { get; set; }
         public WhoAreYou _CommandWhoAreU { get; set; }
         public Triggered _Triggered { get; set; }
+        public ActiveUsersMosaic _ActiveUsersMosaic { get; set; }
         public Random Rand { get; set; }
         public string FaceImageDir { get; set; }
         public string WhoTitles { get; set; }
@@ -33,6 +34,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             _CommandGuchi = new GuchiName();
             _CommandWhoAreU = new WhoAreYou();
             _Triggered = new Triggered();
+            _ActiveUsersMosaic = new ActiveUsersMosaic();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -43,24 +45,89 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class InfTrue : SynkCommand
         {
-            public InfTrue() : base(ActInf, new List<string>() { "/inf" }, descr: "Проверить правдивость инфы. `-w` инфа") { }
+            public InfTrue() : base(ActInf, new List<string>() { "/inf" }, commandName: "инфа", descr: "Проверить правдивость инфы. `-w` инфа") { }
 
         }
         public class GuchiName : SynkCommand
         {
-            public GuchiName() : base(ActGuchi, new List<string>() { "/guchi" }, descr: "`name` имя пациента") { }
+            public GuchiName() : base(ActGuchi, new List<string>() { "/guchi" }, commandName: "аватар", descr: "`name` имя пациента") { }
         }
         public class ElseElse : SynkCommand
         {
-            public ElseElse() : base(ActElse, new List<string>() { "/else" }, descr: "То или другое `-t1` первое `t2` второе") { }
+            public ElseElse() : base(ActElse, new List<string>() { "/else" }, commandName: "оцени", descr: "То или другое `-t1` первое `t2` второе") { }
         }
         public class WhoAreYou : SynkCommand
         {
-            public WhoAreYou() : base(ActWho, new List<string>() { "/who" }, descr: "Кто ты такой?") { }
+            public WhoAreYou() : base(ActWho, new List<string>() { "/who" }, commandName: "тестик", descr: "Кто ты такой?") { }
+        }
+        public class ActiveUsersMosaic : SynkCommand
+        {
+            public ActiveUsersMosaic() : base(ActMosaic, new List<string>() { "/mos" }, commandName: "актив", descr: "А какой у нас тут актив?") { }
         }
         public class Triggered : SynkCommand
         {
-            public Triggered() : base(ActTrig, new List<string>() { "/t" }, descr: "TRIGGERED!") { }
+            public Triggered() : base(ActTrig, new List<string>() { "/t" }, commandName: "триггер", descr: "TRIGGERED!") { }
+        }
+        public static void ActMosaic(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                Thread tg = new Thread(() =>
+                {
+                    var files = Directory.GetFiles("UserPhotoes","*");
+                    List<Image> ActiveImage = new List<Image>();
+                    foreach (var im in files)
+                    {
+                        ActiveImage.Add(new Bitmap(System.IO.File.Open(im, FileMode.Open)));
+                    }
+                    /*
+                    Nullable<int> max_x = null, max_y = null, min_x = null, min_y = null;
+                    foreach(var im in ActiveImage)
+                    {
+                        if(max_x == null && max_y == null)
+                        {
+                            max_x = im.Size.Width;
+                            max_y = im.Size.Height;
+                        }
+                        if(min_x == null && min_y == null)
+                    }
+                    */
+                    //160,160
+                    var all = new Bitmap(500,500);
+                    int last_x = 0, last_y = 0;
+                    int width = 120, height = 120;
+                    using (Graphics graphics = Graphics.FromImage(all))
+                    {
+                        foreach (var im in ActiveImage)
+                        {
+                            if ((last_x + width) > 500)
+                            {
+                                last_y += height;
+                                last_x = 0;
+                            }
+                            graphics.DrawImage(ResizeImageWithAspet(im, width, height, im.Size.Width,im.Size.Height), new PointF(last_x, last_y));
+                            last_x += width;
+                        }
+                    }
+                    all.Save("kek.jpg");
+                    /*
+                    var th = Parent.GetModule<FunFunc>();
+                    var ActiveUsers = Parent.ActiveUsers;
+                    for (int i = 0; i < ActiveUsers.Count; i++)
+                    {
+                        var user = ActiveUsers[i];
+                        List<Image> ActiveImage = new List<Image>();
+                        if (!System.IO.File.Exists($"./UserPhotoes/{user.Id}.jpg"))
+                        {
+                            await user.DownloadImageToDirectory(Parent);
+                            ActiveImage.Add(new Bitmap(System.IO.File.Open($"./UserPhotoes/{user.Id}.jpg",FileMode.Open)));
+                        }
+                        //500 x 500
+                    }
+                    */
+                });
+                tg.Start();
+            }
         }
         public static void ActTrig(Message re, IBot Parent, List<ArgC> args)
         {
@@ -86,17 +153,20 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             if (re != null)
             {
-                var arg1 = args.Find(fn => fn.Name == "t1");
-                var arg2 = args.Find(fn => fn.Name == "t2");
+                var g = args.Find(fn => fn.Name == "t1");
+                var arg1 = g == null ? args.Find(fn=>fn.Name=="0") : g;
+                var c = args.Find(fn => fn.Name == "t2");
+                var arg2 = c == null ? args.Find(fn => fn.Name == "1") : c;
                 if (arg1?.Arg != null && arg1?.Arg != null)
                 {
                     var bmp = new Bitmap(FunRes.bomg);
+                    var th = Parent.GetModule<FunFunc>();
                     using (Graphics graphics = Graphics.FromImage(bmp))
                     {
                         using (Font arialFont = new Font("Arial", 10))
                         {
                             string text1, text2;
-                            if(Parent.GetModule<FunFunc>().Rand.Next(0, 10) <= 5)
+                            if (th.Rand.Next(0, 100) <= 50)
                             {
                                 text1 = arg1.Arg;
                                 text2 = arg2.Arg;
@@ -112,11 +182,8 @@ namespace Pes7BotCrator.Modules.FunFunc
                             graphics.Save();
                         }
                     }
-                    //MemoryStream memoryStream = new MemoryStream();
-                    //bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    int count = Directory.GetFiles("FunPics", "*").Length;
-                    bmp.Save($"FunPics/test{count}.jpg");
-                    Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/test{count}.jpg",FileMode.Open)));
+                    string dir = SaveIt(re.From.Id, "test", bmp, th);
+                    Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
                 }
             }
         }
@@ -152,11 +219,8 @@ namespace Pes7BotCrator.Modules.FunFunc
                             graphics.Save();
 
                         }
-                        //MemoryStream memoryStream = new MemoryStream();
-                        //bmp.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        int count = Directory.GetFiles("FunPics", "*").Length;
-                        bmp.Save($"FunPics/guchi{count}.jpg");
-                        Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/guchi{count}.jpg", FileMode.Open)));
+                        string dir = SaveIt(re.From.Id,"guchi", bmp, th);
+                        Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
                     }
                 }
             }
@@ -196,11 +260,8 @@ namespace Pes7BotCrator.Modules.FunFunc
                         graphics.DrawImage(ResizeImage(answer, 400, 270), 300, 220);
                         graphics.Save();
                     }
-                    //MemoryStream memoryStream = new MemoryStream();
-                    //bmp.Save(memoryStream, ImageFormat.Jpeg);
-                    int count = Directory.GetFiles("FunPics", "*").Length;
-                    bmp.Save($"FunPics/who{count}.jpg");
-                    await Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open($"FunPics/who{count}.jpg", FileMode.Open)));
+                    string dir = SaveIt(re.From.Id,"who",bmp,th);
+                    await Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
                 });
                 ther.Start();
             }
@@ -228,6 +289,74 @@ namespace Pes7BotCrator.Modules.FunFunc
             }
 
             return destImage;
+        }
+
+        public static Image ResizeImageWithAspet(Image image,
+                     /* note changed names */
+                     int canvasWidth, int canvasHeight,
+                     /* new */
+                     int originalWidth, int originalHeight)
+        {
+            System.Drawing.Image thumbnail =
+                new Bitmap(canvasWidth, canvasHeight); // changed parm names
+            System.Drawing.Graphics graphic =
+                         System.Drawing.Graphics.FromImage(thumbnail);
+
+            graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphic.SmoothingMode = SmoothingMode.HighQuality;
+            graphic.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            graphic.CompositingQuality = CompositingQuality.HighQuality;
+
+            /* ------------------ new code --------------- */
+
+            // Figure out the ratio
+            double ratioX = (double)canvasWidth / (double)originalWidth;
+            double ratioY = (double)canvasHeight / (double)originalHeight;
+            // use whichever multiplier is smaller
+            double ratio = ratioX < ratioY ? ratioX : ratioY;
+
+            // now we can get the new height and width
+            int newHeight = Convert.ToInt32(originalHeight * ratio);
+            int newWidth = Convert.ToInt32(originalWidth * ratio);
+
+            // Now calculate the X,Y position of the upper-left corner 
+            // (one of these will always be zero)
+            int posX = Convert.ToInt32((canvasWidth - (originalWidth * ratio)) / 2);
+            int posY = Convert.ToInt32((canvasHeight - (originalHeight * ratio)) / 2);
+
+            graphic.Clear(Color.White); // white padding
+            graphic.DrawImage(image, posX, posY, newWidth, newHeight);
+
+            /* ------------- end new code ---------------- */
+
+            System.Drawing.Imaging.ImageCodecInfo[] info =
+                             ImageCodecInfo.GetImageEncoders();
+            EncoderParameters encoderParameters;
+            encoderParameters = new EncoderParameters(1);
+            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality,
+                             100L);
+            return thumbnail;
+        }
+
+        public static string SaveIt(int id, string prefix, Image what, FunFunc Parent)
+        {
+            int rander = 0;
+            if (!Directory.Exists($"FunPics/{id}"))
+                Directory.CreateDirectory($"FunPics/{id}");
+            do
+            {
+                rander = Parent.Rand.Next(0, 999999);
+            } while (System.IO.File.Exists($"FunPics/{id}/{prefix}_{rander}.jpg"));
+            try
+            {
+                string savedir = $"FunPics/{id}/{prefix}_{rander}.jpg";
+                what.Save(savedir);
+                return savedir;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

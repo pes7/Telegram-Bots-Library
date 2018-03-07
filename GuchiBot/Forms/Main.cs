@@ -55,6 +55,7 @@ namespace GuchiBot
             Bot = new Bot(
                 key: "466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw",
                 name: "guchimuchibot",
+                nameString: "гачи",
                 webmdir: "G:/WebServers/home/apirrrsseer.ru/www/List_down/video",
                 gachiimage: "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
@@ -87,14 +88,15 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandGuchi);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
+            //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
                 "/sendrandwebm"
-            },descr:"Webm с личной колекции."));
+            }, commandName:"картика", descr:"Webm с личной колекции."));
             Bot.SynkCommands.Add(new SynkCommand(bt.GachiAttakSynk, new List<string>()
             {
                 "/gachiattak"
-            },TypeOfAccess.Admin,descr:"Секретное оружие."));
+            },TypeOfAccess.Admin, commandName: "атака", descr:"Секретное оружие."));
             Bot.SynkCommands.Add(new SynkCommand(bt.GetGachiImageLogic, new List<string>()
             {
                 "/sendrandimg"
@@ -102,7 +104,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new SynkCommand(Bot.GetModule<_2chModule>().get2chSmartRandWebm, new List<string>()
             {
                 "/2ch"
-            },descr:"Пост webm в тред, Argc: `-a` если хотите аниме. `-c:` количество"));
+            }, commandName: "двач", descr:"Пост webm в тред, Argc: `-a` если хотите аниме. `-c:` количество"));
             Bot.SynkCommands.Add(new SynkCommand(Bot.GetModule<_2chModule>().Ragenerated, new List<string>()
             {
                 "/regenerate"
@@ -110,11 +112,11 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new SynkCommand(bt.GetArgkSynk, new List<string>()
             {
                 "/testmemory"
-            },descr: "Бот повторит за вами."));
+            }, commandName: "парсдвача", descr: "Бот повторит за вами."));
             Bot.SynkCommands.Add(new SynkCommand(bt.ArgMessage, new List<string>()
             {
                 "/testparam"
-            },descr:"Выведет сообщение ботом с праметрами `-id` `-text`"));
+            }, descr:"Выведет сообщение ботом с праметрами `-id` `-text`"));
             //Inline
             Bot.SynkCommands.Add(new SynkCommand(bt.InlineMenu,new List<string>() {"_noon"}));
             Bot.SynkCommands.Add(new SynkCommand(bt.AutoDelMessage, new List<string>()

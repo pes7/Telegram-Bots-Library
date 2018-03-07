@@ -13,6 +13,7 @@ namespace Pes7BotCrator.Type
         public TypeOfCommand Type { get; set; }
         public TypeOfAccess TypeOfAccess { get; set; }
         public List<string> CommandLine { get; set; }
+        public string CommandName { get; set; }
         public Delegate doFunc { get; set; }
         public string Description { get; set; }
 
@@ -22,10 +23,11 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, TypeOfAccess access = TypeOfAccess.Public, string descr = null)
+        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, TypeOfAccess access = TypeOfAccess.Public, string commandName = null, string descr = null)
         {
             Description = descr;
             TypeOfAccess = access;
+            CommandName = commandName;
             Type = TypeOfCommand.Standart;
             Incialize(act, cm);
         }

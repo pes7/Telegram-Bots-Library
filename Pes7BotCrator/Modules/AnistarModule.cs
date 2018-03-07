@@ -28,7 +28,7 @@ namespace Pes7BotCrator.Modules
                 OverrideEncoding = Encoding.GetEncoding("windows-1251")
             };
             HtmlDocument html = web.Load("https://anistar.me/raspisanie-vyhoda-seriy-ongoingov.html");
-            var dle = html.GetElementbyId("dle-content");
+            var dle = html.GetElementbyId("dle-content").ChildNodes.Where(fs => fs.Name == "small").First();
             var news = dle.ChildNodes.Where(fn => fn.HasClass("news-top"));
             var animenow = news.ElementAt(0).ChildNodes.Where(fn => fn.HasClass("top-new")).First().ChildNodes.Where(sn => sn.Name == "div");
             foreach (var an in animenow)
