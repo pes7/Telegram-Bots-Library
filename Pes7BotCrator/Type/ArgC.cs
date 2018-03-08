@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Pes7BotCrator.Type
@@ -45,7 +46,11 @@ namespace Pes7BotCrator.Type
                             for (int i = 0; i < andorelse.Length; i++)
                             {
                                 if (andorelse[i].Trim() != "")
+                                {
+                                    andorelse[i] = Regex.Replace(andorelse[i], @"^\s+", "");
+                                    andorelse[i] = Regex.Replace(andorelse[i], @"\s+$", "");
                                     Args.Add(new ArgC($"{i}", andorelse[i], TypeOfArg.Named));
+                                }
                             }
                             return Args;
                         }

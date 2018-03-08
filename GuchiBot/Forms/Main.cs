@@ -88,6 +88,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandGuchi);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._TrueFalse);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
@@ -137,6 +138,12 @@ namespace GuchiBot
             {
                 "_"
             },commandName:"спать", access:TypeOfAccess.Admin, descr: "Бот ложиться спать."));
+            Bot.SynkCommands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) => {
+                parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Это мой господин, {ms.From.FirstName} {ms.From.LastName}, мой создатель и повелитель анусов в Fate/KPI");
+            }, new List<string>()
+            {
+                "/me"
+            }, commandName: "я", access: TypeOfAccess.Admin, descr: "СОЗДАТЕЛЬ БОТА"));
             //Example of TimeReley Photo Message. Ps: special for Mordvinov B.
             /*
             Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>

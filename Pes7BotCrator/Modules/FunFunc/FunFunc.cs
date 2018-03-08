@@ -21,6 +21,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         public GuchiName _CommandGuchi { get; set; }
         public WhoAreYou _CommandWhoAreU { get; set; }
         public Triggered _Triggered { get; set; }
+        public TrueFalse _TrueFalse { get; set; }
         public ActiveUsersMosaic _ActiveUsersMosaic { get; set; }
         public Random Rand { get; set; }
         public string FaceImageDir { get; set; }
@@ -35,6 +36,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             _CommandWhoAreU = new WhoAreYou();
             _Triggered = new Triggered();
             _ActiveUsersMosaic = new ActiveUsersMosaic();
+            _TrueFalse = new TrueFalse();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -68,6 +70,20 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             public Triggered() : base(ActTrig, new List<string>() { "/t" }, commandName: "триггер", descr: "TRIGGERED!") { }
         }
+        public class TrueFalse : SynkCommand {
+            public TrueFalse() : base(ActTrueFalse, new List<string>() { "/tf" }, commandName: "правда", descr: "Проверяет инфу на правду или лошь") { }
+        }
+
+        public static void ActTrig(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                var th = Parent.GetModule<FunFunc>();
+                var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.Triggers, filter, SearchOption.AllDirectories)).ToArray();
+                Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("trigger", System.IO.File.Open($"{files[th.Rand.Next(0, files.Length)]}", FileMode.Open)));
+            }
+        }
+
         public static void ActMosaic(Message re, IBot Parent, List<ArgC> args)
         {
             if (re != null)
@@ -129,13 +145,22 @@ namespace Pes7BotCrator.Modules.FunFunc
                 tg.Start();
             }
         }
-        public static void ActTrig(Message re, IBot Parent, List<ArgC> args)
+        public static void ActTrueFalse(Message re, IBot Parent, List<ArgC> args)
         {
             if (re != null)
             {
-                var th = Parent.GetModule<FunFunc>();
-                var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.Triggers, filter, SearchOption.AllDirectories)).ToArray();
-                Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("trigger", System.IO.File.Open($"{files[th.Rand.Next(0,files.Length)]}", FileMode.Open)));
+                var w = args.Find(fn => fn.Name == "w");
+                var arg = w != null ? w : args.Find(fn => fn.Name == "0");
+                if (arg != null) {
+                    var th = Parent.GetModule<FunFunc>();
+                    var tr = th.Rand.Next(0, 100) <= 50 ? true : false;
+                    string txt;
+                    if (tr)
+                        txt = $"Бот сказал что, \"{arg.Arg}\" правда!";
+                    else
+                        txt = $"Бот сказал что, \"{arg.Arg}\" ложь!";
+                    Parent.Client.SendTextMessageAsync(re.Chat.Id, txt);
+                }
             }
         }
         public static void ActInf(Message re, IBot Parent, List<ArgC> args)
