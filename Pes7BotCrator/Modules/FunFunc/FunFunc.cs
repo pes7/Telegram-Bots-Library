@@ -225,7 +225,8 @@ namespace Pes7BotCrator.Modules.FunFunc
             if (re != null)
             {
                 var th = Parent.GetModule<FunFunc>();
-                var arg1 = args.Find(fn => fn.Name == "name");
+                var g = args.Find(fn => fn.Name == "name");
+                var arg1 = g == null ? args.Find(fn => fn.Name == "0") : g;
                 if (arg1?.Arg != null && th.FaceImageDir != null)
                 {
                     var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.FaceImageDir, filter, SearchOption.AllDirectories)).ToArray();
