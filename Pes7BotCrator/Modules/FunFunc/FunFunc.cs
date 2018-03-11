@@ -48,7 +48,6 @@ namespace Pes7BotCrator.Modules.FunFunc
         public class InfTrue : SynkCommand
         {
             public InfTrue() : base(ActInf, new List<string>() { "/inf" }, commandName: "инфа", descr: "Проверить правдивость инфы. `-w` инфа") { }
-
         }
         public class GuchiName : SynkCommand
         {
@@ -156,9 +155,9 @@ namespace Pes7BotCrator.Modules.FunFunc
                     var tr = th.Rand.Next(0, 100) <= 50 ? true : false;
                     string txt;
                     if (tr)
-                        txt = $"Бот сказал что, \"{arg.Arg}\" правда!";
+                        txt = $"{Parent.NameString} сказал что, \"{arg.Arg}\" правда!";
                     else
-                        txt = $"Бот сказал что, \"{arg.Arg}\" ложь!";
+                        txt = $"{Parent.NameString} сказал что, \"{arg.Arg}\" ложь!";
                     Parent.Client.SendTextMessageAsync(re.Chat.Id, txt);
                 }
             }

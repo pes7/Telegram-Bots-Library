@@ -15,6 +15,7 @@ namespace Pes7BotCrator
         public string Key { get; set; }
         public string Name { get; set; }
         public string NameString { get; set; }
+        public string UserNameOfCreator { get; set; }
         public Random Rand { get; set; } = new Random();
         public Telegram.Bot.TelegramBotClient Client { get; set; }
         public Thread WebThread { get; set; }
@@ -49,12 +50,13 @@ namespace Pes7BotCrator
         public List<SynkCommand> SynkCommands { get; set; }
         public int RunTime { get; set; } = 0;
 
-        public BotBase(string key, string name, string nameString, List<IModule> modules = null)
+        public BotBase(string key, string name, string nameString, string usernameofcreator = null, List<IModule> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             Name = name;
             NameString = nameString;
             Modules = modules;
+            UserNameOfCreator = usernameofcreator;
             ActionCommands = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();

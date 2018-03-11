@@ -13,6 +13,7 @@ namespace Pes7BotCrator.Type
         string Key { get; set; }
         string Name { get; set; }
         string NameString { get; set; }
+        string UserNameOfCreator { get; set; }
         Random Rand { get; set; }
         Telegram.Bot.TelegramBotClient Client { get; set; }
         Thread TimeSynk { get; set; }

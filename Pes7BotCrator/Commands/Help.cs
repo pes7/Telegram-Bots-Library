@@ -17,7 +17,7 @@ namespace Pes7BotCrator.Commands
         {
             Parent.Client.SendTextMessageAsync(re.Chat.Id,$"This bot[{Parent.Name}] was created with pes7's Bot Creator.");
             string coms = "";
-            if (args == null)
+            if (args == null || args.Count < 2)
             {
                 foreach (SynkCommand sn in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Standart && fn.TypeOfAccess == TypeOfAccess.Public && fn.CommandLine.First() != "Default"))
                 {
@@ -30,8 +30,9 @@ namespace Pes7BotCrator.Commands
             }
             else
             {
-                var arg = args.Find(fn => fn.Name == "admin");
-                if(arg != null)
+                var d = args.Find(fn => fn.Name == "0");
+                var arg = d == null ? args.Find(fn => fn.Name == "admin") : d;
+                if(arg != null || arg.Arg == "админ")
                 {
                     Thread th = new Thread(async () =>
                     {

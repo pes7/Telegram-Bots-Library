@@ -20,6 +20,7 @@ namespace Pes7BotCrator.Type
         Public,
         Hide,
         Admin,
+        Named
     }
 
     public enum TypeOfCommand {

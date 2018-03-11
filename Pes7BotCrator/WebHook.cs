@@ -127,6 +127,14 @@ namespace Pes7BotCrator
                                         await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
                                         break;
                                     }
+                                    else if (sy.TypeOfAccess == TypeOfAccess.Named)
+                                    {
+                                        if (Parent.UserNameOfCreator != ms.From.Username)
+                                        {
+                                            await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
+                                            break;
+                                        }
+                                    }
                                 }
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 try
@@ -151,10 +159,18 @@ namespace Pes7BotCrator
                                 fn.CommandName?.ToUpper() == args?.ElementAt(0)?.Name?.ToUpper() && fn.CommandName != null)
                                 ))
                             {
+                                /*Рефакторнуть код*/
                                 if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
                                 {
                                     var ty = await IsAdminAsync(Parent,ms.Chat.Id, ms.From.Id);
                                     if (ty == false)
+                                    {
+                                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
+                                        break;
+                                    }
+                                }else if(sy.TypeOfAccess == TypeOfAccess.Named)
+                                {
+                                    if(Parent.UserNameOfCreator != ms.From.Username)
                                     {
                                         await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
                                         break;

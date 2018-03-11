@@ -55,7 +55,8 @@ namespace GuchiBot
             Bot = new Bot(
                 key: "466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw",
                 name: "guchimuchibot",
-                nameString: "гачи",
+                nameString: "Гачи",
+                usernameofcreator:"nazarpes7",
                 webmdir: "G:/WebServers/home/apirrrsseer.ru/www/List_down/video",
                 gachiimage: "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
@@ -89,6 +90,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._TrueFalse);
+            Bot.SynkCommands.Add(Bot.GetModule<TRM>()._SayAfterMe);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
@@ -110,10 +112,12 @@ namespace GuchiBot
             {
                 "/regenerate"
             },descr:"Перепарсить двач."));
+            /*
             Bot.SynkCommands.Add(new SynkCommand(bt.GetArgkSynk, new List<string>()
             {
                 "/testmemory"
             }, commandName: "парсдвача", descr: "Бот повторит за вами."));
+            */
             Bot.SynkCommands.Add(new SynkCommand(bt.ArgMessage, new List<string>()
             {
                 "/testparam"
@@ -143,7 +147,7 @@ namespace GuchiBot
             }, new List<string>()
             {
                 "/me"
-            }, commandName: "я", access: TypeOfAccess.Admin, descr: "СОЗДАТЕЛЬ БОТА"));
+            }, commandName: "я", access: TypeOfAccess.Named, descr: "СОЗДАТЕЛЬ БОТА"));
             //Example of TimeReley Photo Message. Ps: special for Mordvinov B.
             /*
             Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>
