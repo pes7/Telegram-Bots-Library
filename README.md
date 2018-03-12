@@ -10,7 +10,7 @@ In Addition, in project you can find <b>GuchiBot</b> - this is bot that have all
 This is main and independent part of Bot. What is it? It is a class that iclude some local storge and list of commands that u can include to bot easely.
 ### Async Threads
 Yes, of corse this bot works async so u can add him on a lot of groups and don't worry about laggyng
-### Simple Commands Add
+### Easy Adding of Commands
 This library provide u with ISynkCommand and SynkCommands interface and class, so if u wan't to add ur command u don't won't to think how it do, u just inherit this class or interface and add command to bot. Example in bottom. In addition you can controll Access to commands
 ### Named Input
 What it is? It is a type of input commands to bot, for using it u need to give bot information of his short name like "guchi" and when u will create commands u need to give them names like "picture" after that u can invoce it by input in chat something like that "guchi picture". Very simple to use, isn't it?
