@@ -69,6 +69,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>FunRes.resx</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Modules\LikeDislikeModule\LikeMe.cs" />
     <Compile Include="Modules\SpeechRecognationModule.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Modules\VoteModule\Types\Opros.cs" />
     <Compile Include="Modules\VoteModule\Types\VoteMessage.cs" />
     <Compile Include="Modules\VoteModule\VoteModule.cs" />
+    <Compile Include="Type\GList.cs" />
     <Compile Include="Type\IBot.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Modules\Statistic.cs" />
@@ -106,40 +108,13 @@
     <EmbeddedResource Include="Modules\FunFunc\FunRes.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>FunRes.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <None Include="Resources\bomg.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered3.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered1.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered2.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered4.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered5.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered6.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered7.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered8.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\trigered9.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Image1.bmp" />
+    <Content Include="Resources\bomg.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

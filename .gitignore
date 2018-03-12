@@ -4,6 +4,8 @@
 *.bot
 *.mp3
 *.waw
-*.jpg
 *.mp4
-*.png
+GuchiBot/bin/Debug/FunPics/
+GuchiBot/bin/Debug/UserPhotoes
+/
+GuchiBot/bin/Debug/previews/

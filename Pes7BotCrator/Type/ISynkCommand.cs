@@ -11,6 +11,7 @@ namespace Pes7BotCrator.Type
         TypeOfCommand Type { get; set; }
         TypeOfAccess TypeOfAccess { get; set; }
         List<string> CommandLine { get; set; }
+        string CommandName { get; set; }
         Delegate doFunc { get; set; }
         string Description { get; set; }
     }

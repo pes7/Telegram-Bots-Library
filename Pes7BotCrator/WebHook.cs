@@ -28,6 +28,7 @@ namespace Pes7BotCrator
         public async void Start()
         {
             int offset = 0;
+            PreDefineAllwaysInWebHook();
             while (true)
             {
                 try
@@ -37,7 +38,13 @@ namespace Pes7BotCrator
                     foreach (var up in update)
                     {
                         offset = up.Id + 1;
-                        new Thread(() => { MessageSynk(up); }).Start();
+                        new Thread(() => {
+                            try
+                            {
+                                MessageSynk(up);
+                            }
+                            catch (Exception ex){ Parent.Exceptions.Add(ex); }
+                        }).Start();
                     }
                 }
                 catch
@@ -97,25 +104,12 @@ namespace Pes7BotCrator
                                 }
                             } 
                              */
+                            //} catch (Exception ex) { Parent.Exceptions.Add(ex); }
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
-                            Parent.MessagesLast.Add(ms);
-                            LogSystem(ms.From);
-                            if (cc >= messageCountCheck)
-                            {
-                                cc = 0;
-                                try
-                                {
-                                    FixSimmilarUsersFromAsynkThread();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Parent.Exceptions.Add(ex);
-                                }
-                            }
-                            foreach (SynkCommand sy in Parent.SynkCommands.Where(
-                                fn => fn.Type == TypeOfCommand.Photo &&
-                                (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
+                            SimpleMessageHere(ms);
+                            foreach (SynkCommand sy in Photo_commands.Where(
+                                fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
                                 fn.CommandName.ToUpper() == args?.ElementAt(0)?.Name.ToUpper() && fn.CommandName != null)
                                 ))
                             {
@@ -137,113 +131,113 @@ namespace Pes7BotCrator
                                     }
                                 }
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                try
-                                {
-                                    sy.doFunc.DynamicInvoke(ms, Parent, args);
-                                }
-                                catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                                sy.doFunc.DynamicInvoke(ms, Parent, args);
                                 break;
                             }
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.TextMessage:
-                            Parent.MessagesLast.Add(ms);
-                            LogSystem(ms.From);
-                            if (cc >= messageCountCheck)
-                            {
-                                cc = 0;
-                                FixSimmilarUsersFromAsynkThread();
-                            }
-                            foreach (SynkCommand sy in Parent.SynkCommands.Where(
-                                fn => fn.Type == TypeOfCommand.Standart &&
-                                (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
+                            SimpleMessageHere(ms);
+                            foreach (SynkCommand sy in Standart_commands.Where(
+                                fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
                                 fn.CommandName?.ToUpper() == args?.ElementAt(0)?.Name?.ToUpper() && fn.CommandName != null)
                                 ))
                             {
                                 /*Рефакторнуть код*/
                                 if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)
                                 {
-                                    var ty = await IsAdminAsync(Parent,ms.Chat.Id, ms.From.Id);
+                                    var ty = await IsAdminAsync(Parent, ms.Chat.Id, ms.From.Id);
                                     if (ty == false)
                                     {
                                         await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
                                         break;
                                     }
-                                }else if(sy.TypeOfAccess == TypeOfAccess.Named)
+                                } else if (sy.TypeOfAccess == TypeOfAccess.Named)
                                 {
-                                    if(Parent.UserNameOfCreator != ms.From.Username)
+                                    if (Parent.UserNameOfCreator != ms.From.Username)
                                     {
                                         await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id, $"You, @{ms.From.Username}, not have access to this command.", 10);
                                         break;
                                     }
                                 }
                                 await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
-                                try
-                                {
-                                    sy.doFunc.DynamicInvoke(ms, Parent, args);
-                                } catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                                sy.doFunc.DynamicInvoke(ms, Parent, args);
                                 break;
                             }
                             try
                             {
                                 Parent.SynkCommands.Find(fn => fn.CommandLine.Exists(nf => nf == "Default"))?.doFunc.DynamicInvoke(ms, Parent, args);
-                            }catch{ }
+                            } catch { }
                             cc++;
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
 
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.ServiceMessage:
-                            foreach(SynkCommand sy in Parent.SynkCommands.Where(fn=>fn.Type == TypeOfCommand.Service))
+                            foreach (SynkCommand sy in Service_commands)
                             {
-                                Thread the = new Thread(() =>
+                                doInNewThread(() =>
                                 {
-                                    try
-                                    {
-                                        sy.doFunc.DynamicInvoke(Up, Parent);
-                                    } catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                                    sy.doFunc.DynamicInvoke(Up, Parent);
                                 });
-                                the.Start();
                             }
                             break;
                     }
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
                     CallbackQuery qq = Up.CallbackQuery;
-                    foreach (SynkCommand sy in Parent.SynkCommands.Where(
-                        fn => fn.Type == TypeOfCommand.Query
-                        && fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
+                    foreach (SynkCommand sy in Query_commands.Where(fn => fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
                     {
-                        Thread the = new Thread(() =>
-                        {
-                            try
-                            {
-                                sy.doFunc.DynamicInvoke(qq, Parent);
-                            }
-                            catch(Exception ex) { Parent.Exceptions.Add(ex); }
-                        });
-                        the.Start();
+                        sy.doFunc.DynamicInvoke(qq, Parent);
                         break;
                     }
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
                     var query = Up.InlineQuery;
-                    foreach (SynkCommand sy in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.InlineQuery))
+                    foreach (SynkCommand sy in InlineQuery_commands)
                     {
-                        try
+                        doInNewThread(() =>
                         {
                             sy.doFunc.DynamicInvoke(query, Parent);
-                        } catch (Exception ex) { Parent.Exceptions.Add(ex); }
+                        });
                     }
                     break;
             }
-            foreach (ISynkCommand sn in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.AllwaysInWebHook))
+            foreach (ISynkCommand sn in AllwaysInWebHook_commands)
             {
                 List<ArgC> arg = null;
-                if(Up.Message != null)
+                if (Up.Message != null)
                     arg = args;
-                sn.doFunc.DynamicInvoke(Up,Parent, arg);
+                doInNewThread(() =>
+                {
+                    sn.doFunc.DynamicInvoke(Up, Parent, arg);
+                });
             }
-            Parent.OnWebHoockUpdated();
+            Parent.OnWebHoockUpdated?.Invoke();
+        }
+        private void SimpleMessageHere(Message ms)
+        {
+            Parent.MessagesLast.Add(ms);
+            LogSystem(ms.From);
+            if (cc >= messageCountCheck)
+            {
+                cc = 0;
+                FixSimmilarUsersFromAsynkThread();
+            }
+        }
+        private List<ISynkCommand> AllwaysInWebHook_commands;
+        private List<ISynkCommand> InlineQuery_commands;
+        private List<ISynkCommand> Query_commands;
+        private List<ISynkCommand> Service_commands;
+        private List<ISynkCommand> Standart_commands;
+        private List<ISynkCommand> Photo_commands;
+        public void PreDefineAllwaysInWebHook()
+        {
+            AllwaysInWebHook_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.AllwaysInWebHook).ToList<ISynkCommand>();
+            InlineQuery_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.InlineQuery).ToList<ISynkCommand>();
+            Query_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Query).ToList<ISynkCommand>();
+            Service_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Service).ToList<ISynkCommand>();
+            Standart_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Standart).ToList<ISynkCommand>();
+            Photo_commands = Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Photo).ToList<ISynkCommand>();
         }
         private void LogSystem(User us)
         {
@@ -271,6 +265,10 @@ namespace Pes7BotCrator
                     Parent.ActiveUsers.Find(fn => UserM.nameGet(fn) == UserM.nameGet(k[0])).MessageCount = k[0].MessageCount;
                 }
             }
+        }
+        private void doInNewThread(Action act)
+        {
+            new Thread(() => { act.Invoke(); }).Start();
         }
         private string tryToParseNameBotCommand(string s)
         {

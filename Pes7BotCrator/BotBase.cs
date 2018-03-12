@@ -27,7 +27,7 @@ namespace Pes7BotCrator
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
 
-        public Action OnWebHoockUpdated { get; set; } = ()=> { };
+        public Action OnWebHoockUpdated { get; set; } = null;
 
         public List<IModule> Modules { get; set; }
         public T GetModule<T>() where T : IModule
@@ -47,7 +47,8 @@ namespace Pes7BotCrator
             catch { throw new Exception("There is no this Module."); }
         }
 
-        public List<SynkCommand> SynkCommands { get; set; }
+        public GList<SynkCommand> SynkCommands { get; set; }
+
         public int RunTime { get; set; } = 0;
 
         public BotBase(string key, string name, string nameString, string usernameofcreator = null, List<IModule> modules = null)
@@ -61,7 +62,7 @@ namespace Pes7BotCrator
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
             ActiveUsers = new List<UserM>();
-            SynkCommands = new List<SynkCommand>();
+            SynkCommands = new GList<SynkCommand>(this);
             Exceptions = new List<Exception>();
             WebHook = new WebHook(this);
             setModulesParent();

@@ -24,7 +24,7 @@ namespace Pes7BotCrator.Type
         List<UserM> ActiveUsers { get; set; }
         List<Exception> Exceptions { get; set; }
         List<IModule> Modules { get; set; }
-        List<SynkCommand> SynkCommands { get; set; }
+        GList<SynkCommand> SynkCommands { get; set; }
         T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
         int RunTime { get; set; }

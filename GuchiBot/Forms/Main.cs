@@ -111,7 +111,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(new SynkCommand(Bot.GetModule<_2chModule>().Ragenerated, new List<string>()
             {
                 "/regenerate"
-            },descr:"Перепарсить двач."));
+            },TypeOfAccess.Named,"парс",descr:"Перепарсить двач."));
             /*
             Bot.SynkCommands.Add(new SynkCommand(bt.GetArgkSynk, new List<string>()
             {
@@ -141,7 +141,7 @@ namespace GuchiBot
             }, new List<string>()
             {
                 "_"
-            },commandName:"спать", access:TypeOfAccess.Admin, descr: "Бот ложиться спать."));
+            },commandName:"спать", access:TypeOfAccess.Named, descr: "Бот ложиться спать."));
             Bot.SynkCommands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) => {
                 parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Это мой господин, {ms.From.FirstName} {ms.From.LastName}, мой создатель и повелитель анусов в Fate/KPI");
             }, new List<string>()

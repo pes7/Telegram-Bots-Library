@@ -155,19 +155,15 @@ namespace Pes7BotCrator.Modules
         public List<Webm> WebmsA = new List<Webm>();
         public void Ragenerated(Message ms, IBot Parent, List<ArgC> args)
         {
-            if (ms.From.Username == "nazarpes7")
-            {
-                if (WebmsA != null)
-                    WebmsA.Clear();
-                if (WebmsW != null)
-                    WebmsW.Clear();
-                WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
-                WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
-                WebmCountW = WebmsW.Count;
-                WebmCountA = WebmsA.Count;
-                Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
-            }
-            else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
+            if (WebmsA != null)
+                WebmsA.Clear();
+            if (WebmsW != null)
+                WebmsW.Clear();
+            WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
+            WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
+            WebmCountW = WebmsW.Count;
+            WebmCountA = WebmsA.Count;
+            Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
         }
 
         public void get2chSmartRandWebm(Message ms,IBot Parent, List<ArgC> args)
@@ -193,7 +189,7 @@ namespace Pes7BotCrator.Modules
                         {
                             webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                             Webms.Remove(webm);
-                            SendWebm(Parent, webm, Parent.MessagesLast.First().Chat.Id.ToString());
+                            SendWebm(Parent, webm, ms.Chat.Id.ToString());
                         }
                     }
                     catch {}
@@ -202,7 +198,7 @@ namespace Pes7BotCrator.Modules
                 {
                     webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                     Webms.Remove(webm);
-                    SendWebm(Parent, webm, Parent.MessagesLast.First().Chat.Id.ToString());
+                    SendWebm(Parent, webm, ms.Chat.Id.ToString());
                 }
             }
             else

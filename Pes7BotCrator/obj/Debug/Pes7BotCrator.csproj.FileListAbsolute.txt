@@ -28,3 +28,5 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\HtmlAgilityPack.xml
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.Modules.FunFunc.FunRes.resources
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.GenerateResource.Cache
+C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.resx
+C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
