@@ -16,6 +16,8 @@ This library provide u with ISynkCommand and SynkCommands interface and class, s
 What it is? It is a type of input commands to bot, for using it u need to give bot information of his short name like "guchi" and when u will create commands u need to give them names like "picture" after that u can invoce it by input in chat something like that "guchi picture". Very simple to use, isn't it?
 ### Optimisation
 A huge work i did for optimisation bot for much commands, so you will never disappoint on it (0_O) ;)
+### It has much included modules
+Yes, i added some own modules for you, so u can easy create votes, time reley messages, like or dislike posts, wath statistic, save and load ur module resources, make buckup of files, use save funny functions and etc.. <b>If u created really interesting module - contact me and i will add it on library!</b>
 ### If u have some PROBLEMS with library
 You can find me on discord https://discord.gg/VfhRvdW and ask about something
 ### Yes of corse I have problemm with discribing library and with good Documenty on it. If u can help write me pls. All examples you can find on <b>GuchiBot</b>
