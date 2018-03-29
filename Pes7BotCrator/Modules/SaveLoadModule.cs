@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -99,10 +100,48 @@ namespace Pes7BotCrator.Modules
         {
             if (string.IsNullOrEmpty(FileName)) { throw new Exception("Can't read File."); }
             BinaryFormatter formatter = new BinaryFormatter();
-            FileStream aFile = new FileStream(FileName, FileMode.Open);
-            var Return = (T)formatter.Deserialize(aFile);
-            aFile.Close();
-            return Return;
+            try
+            {
+                FileStream aFile = new FileStream(FileName, FileMode.Open);
+                var Return = (T)formatter.Deserialize(aFile);
+                aFile.Close();
+                return Return;
+            }
+            catch (SerializationException) {
+                Console.WriteLine("Starting the proces of restoring data...");
+                Console.WriteLine("Serching BackUps...");
+                var str = RestoreData(FileName);
+                if(str != null)
+                {
+                    FileStream aFile = new FileStream(str, FileMode.Open);
+                    var Return = (T)formatter.Deserialize(aFile);
+                    aFile.Close();
+                    return Return;
+                }
+                else
+                {
+                    throw new Exception("Error u don't have any backups");
+                }
+            }            
+        }
+
+        public static string RestoreData(string FileName)
+        {
+            if (Directory.Exists("BackUp"))
+            {
+                FileName = FileName.Trim('.', '/');
+                var directory = new DirectoryInfo("BackUp");
+                var myFiles = (from f in directory.GetFiles("*.bot")
+                              orderby f.LastWriteTime descending
+                              select f);
+                foreach(var file in myFiles)
+                {
+                    if (file.Name.Split('_').Last() == FileName)
+                        return $"BackUp/{file.Name}";
+                }
+                return null;
+            }
+            else { new Exception("No BackUp Folder"); return null; }
         }
     }
 }

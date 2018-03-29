@@ -39,8 +39,10 @@ namespace Pes7BotCrator.Type
                     {
                         if (args_parse[0].ToUpper() == Parent.NameString.ToUpper())
                         {
-                            message = message.Replace(args_parse[0], "");
-                            message = message.Replace(args_parse[1], "");
+                            if(args_parse[0]?.Length > 0)
+                                message = message.Replace(args_parse[0], "");
+                            if (args_parse[1]?.Length > 0)
+                                message = message.Replace(args_parse[1], "");
                             Args.Add(new ArgC($"{args_parse[1]}", null, TypeOfArg.Named));
                             var andorelse = message.Split(new string[] { " и ", " или ", " И ", " ИЛИ " }, StringSplitOptions.None);
                             for (int i = 0; i < andorelse.Length; i++)

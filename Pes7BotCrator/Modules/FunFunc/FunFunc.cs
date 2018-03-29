@@ -146,7 +146,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public static void ActTrueFalse(Message re, IBot Parent, List<ArgC> args)
         {
-            if (re != null)
+            if (re != null && args != null)
             {
                 var w = args.Find(fn => fn.Name == "w");
                 var arg = w != null ? w : args.Find(fn => fn.Name == "0");
@@ -164,7 +164,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public static void ActInf(Message re, IBot Parent, List<ArgC> args)
         {
-            if(re != null)
+            if(re != null && args != null)
             {
                 var g = args.Find(fn => fn.Name == "w");
                 var arg = g == null ? args.Find(fn => fn.Name == "0") : g;
@@ -176,7 +176,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public static void ActElse(Message re, IBot Parent, List<ArgC> args)
         {
-            if (re != null)
+            if (re != null && args != null)
             {
                 var g = args.Find(fn => fn.Name == "t1");
                 var arg1 = g == null ? args.Find(fn=>fn.Name=="0") : g;
@@ -221,7 +221,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public static void ActGuchi(Message re, IBot Parent, List<ArgC> args)
         {
-            if (re != null)
+            if (re != null && args != null)
             {
                 var th = Parent.GetModule<FunFunc>();
                 var g = args.Find(fn => fn.Name == "name");
