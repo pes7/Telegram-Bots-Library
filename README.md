@@ -4,7 +4,23 @@ This <b>Library</b> of creating <b>Telegram Bots</b> provides you with easy way 
 You can easy add your commands, modules, etc. to Bot and don't thinking about how it works)<br>
 You can create your own Modules and Commands from IModule and ISynkCommand and then add it in bot<br>
 If you want to controll all aspects of bot you can inherit <b>BotBase</b> or <b>IBot</b> and use all pleasure of my realisations and add you own changes to it.<br>
-In Addition, in project you can find <b>GuchiBot</b> - this is bot that have all examples of creating your own bot.
+In Addition, in project you can find <b>GuchiBot</b> - this is bot that have all examples of creating your own bot.<br>
+# What this Library Can???
+### Modules
+This is main and independent part of Bot. What is it? It is a class that iclude some local storge and list of commands that u can include to bot easely.
+### Async Threads
+Yes, of corse this bot works async so u can add him on a lot of groups and don't worry about laggyng
+### Easy Adding of Commands
+This library provide u with ISynkCommand and SynkCommands interface and class, so if u wan't to add ur command u don't won't to think how it do, u just inherit this class or interface and add command to bot. Example in bottom. In addition you can controll Access to commands
+### Named Input
+What it is? It is a type of input commands to bot, for using it u need to give bot information of his short name like "guchi" and when u will create commands u need to give them names like "picture" after that u can invoce it by input in chat something like that "guchi picture". Very simple to use, isn't it?
+### Optimisation
+A huge work i did for optimisation bot for much commands, so you will never disappoint on it (0_O) ;)
+### It has much included modules
+Yes, i added some own modules for you, so u can easy create votes, time reley messages, like or dislike posts, wath statistic, save and load ur module resources, make buckup of files, use save funny functions and etc.. <b>If u created really interesting module - contact me and i will add it on library!</b>
+### If u have some PROBLEMS with library
+You can find me on discord https://discord.gg/VfhRvdW and ask about something
+### Yes of corse I have problemm with discribing library and with good Documenty on it. If u can help write me pls. All examples you can find on <b>GuchiBot</b>
 # Structure
 ### Pes7BotCrator - main Library
 ### GuchiBot - example
@@ -33,6 +49,8 @@ Bot = new Bot(
     {
         string Key { get; set; }
         string Name { get; set; }
+        string NameString { get; set; }
+        string UserNameOfCreator { get; set; }
         Random Rand { get; set; }
         Telegram.Bot.TelegramBotClient Client { get; set; }
         Thread TimeSynk { get; set; }
@@ -43,7 +61,7 @@ Bot = new Bot(
         List<UserM> ActiveUsers { get; set; }
         List<Exception> Exceptions { get; set; }
         List<IModule> Modules { get; set; }
-        List<SynkCommand> SynkCommands { get; set; }
+        GList<SynkCommand> SynkCommands { get; set; }
         T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
         int RunTime { get; set; }
@@ -66,7 +84,9 @@ Bot = new Bot(
     public interface ISynkCommand
     {
         TypeOfCommand Type { get; set; }
+        TypeOfAccess TypeOfAccess { get; set; }
         List<string> CommandLine { get; set; }
+        string CommandName { get; set; }
         Delegate doFunc { get; set; }
         string Description { get; set; }
     }
@@ -107,8 +127,19 @@ We have some base types of Command:
         Photo
     }
 ```
+We have some base Type of Access to Commands:
+```
+    public enum TypeOfAccess{
+        Public,
+        Hide,
+        Admin,
+        Named
+    }
+```
 ### Standart
 This is command that provide you with trigger of simple text message to bot or in chat with bot. Standart command creates with <b>Action<Message, IBot, List<ArgC>></b> parameter.<br>
+### Photo
+As a message message but it contains Image
 ### Query 
 This is command that calls when bot reacive Query from buttons and etc. Query command creates with <b>Action<CallbackQuery, IBot></b> parameter.</br>
 ### InlineQuery
@@ -132,15 +163,15 @@ We have many different types of this action but we can select 3 mait types:
 ```
 #### From lambda function
 ``` c#
-    Bot.SynkCommands.Add(new SynkCommand(async (Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args) =>
-    {
-        try
-        {
-            Stream st = System.IO.File.Open("./previews/14637724531700.webm.jpg", FileMode.Open);
-            await parent.GetModule<TRM>().SendTimeRelayPhotoAsynkAsync(parent.MessagesLast.First().Chat.Id, new FileToSend("fl.jpg", st), 10, "KEKUS");
-        }
-        catch { await parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(ms.Chat.Id,"Error to send simple .jpg",10); }
-    }, new List<string>() { "/kek" }));
+    Bot.SynkCommands.Add(new SynkCommand((Telegram.Bot.Types.Message ms, IBot parent, List<ArgC> args)=> {
+                parent.Client.SendTextMessageAsync(ms.Chat.Id,"Слушаюсь, уже сплю...");
+                Bot.GetModule<SaveLoadModule>().saveIt();
+                Bot.Dispose();
+                Application.Exit();
+            }, new List<string>()
+            {
+                "_"
+            },commandName:"спать", access:TypeOfAccess.Named, descr: "Бот ложиться спать."));
 ````
 # Modules:
   ## Aim of Modules
@@ -193,119 +224,6 @@ We have many different types of this action but we can select 3 mait types:
   ## Adding in Bot:
   ``` c#
     Bot.SynkCommands.Add(new Pes7BotCrator.Commands.Help(Bot));
-  ```
-# Description of Existing Modules:
-  ## 2chModule
-  ### Aim:
-  The main aim of this module is to parse 2ch.hk and select from there .webm and .mp4 files.
-  ### Types:
-  ThBoard<br>
-  Webm
-  ## LikeDislikeModule
-  ### Aim:
-  Aim of this module so simple to describe and so hard to creating... This module provides you with ability of Like and Dislike some posts in your channel, chat, etc. This module have his own Query command in it.
-  ### Types:
-  Likes
-  ### Use:
-  Adding module command to bot
-  ``` c#
-    Bot.SynkCommands.Add(Bot.GetModule<LikeDislikeModule>().Command);
-  ```
-  Adding buttons to post
-  ``` c#
-    var keys = LikeDislikeModule.getKeyBoard(webm.Path);
-    await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, keys);
-  ```
-  ## TRM [Time Relay Module]
-  ### Aim:
-  The main aim of this module is available creating AutoDeliting and Delayed posts.
-  ### Types:
-  TimeRelayMessage
-  ### Use:
-  ``` c#
-    Stream st = System.IO.File.Open("./previews/14637724531700.webm.jpg", FileMode.Open);
-    await parent.GetModule<TRM>().SendTimeRelayPhotoAsynkAsync(parent.MessagesLast.First().Chat.Id, new FileToSend("fl.jpg", st), 10, "image");
-  ```
-  ## VoteModule
-  ### Aim:
-  Creating Polls and share it on other chats.
-  ### Types:
-  Likes<br>
-  Opros<br>
-  VoteMessage
-  ### Use:
-  In Developing....
-  ## AnistarModule
-  ### Aim:
-  It module parse anistar.me and select todays anime ;)
-  ## SaveLoadModule
-  ### Aim:
-  Automatic saving and backuping binary files.
-  ### Use:
-  Firs of all, you need create new Save function in your module:
-  ``` c#
-    public void Save()
-      {
-          if (LLikes.Count > 0)
-          {
-              List<Likes> ls = LLikes;
-              SaveLoadModule.SaveSomething(ls, FileNameLikes);
-          }
-          if (Opros.Count > 0)
-          {
-              List<Opros> op = Opros;
-              SaveLoadModule.SaveSomething(op, FileNameVotes);
-          }
-      }
-  ```
-  Add your save func in Module
-  ``` c#
-    Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<VoteModule>().Save);
-  ```
-  ## Statistic:
-  ### Aim:
-  Create statistic of chat and command usage, etc.
-# Other Classes:
-  ## ArgC
-  This class needs to parse arguments of command.
-  ``` c#
-    public class ArgC
-    {
-        public string Name { get; set; }
-        public string Arg { get; set; }
-        public ArgC(string name = null, string arg = null)
-        {
-            Name = name;
-            Arg = arg;
-        }
-        public static List<ArgC> getArgs(string message){
-          ...
-        }
-    }
-  ```
-  ## UserM
-  This class needs to save Online Users of chat and Bot.
-  ``` c#
-    public string PhotoPath { get; set; } = null;
-      public int MessageCount { get; set; }
-      public UserM(User us, int i = 0) : base()
-      {
-          this.Username = us.Username;
-          this.LastName = us.LastName;
-          this.Id = us.Id;
-          this.FirstName = us.FirstName;
-          MessageCount = i;
-      }
-      public async Task<bool> DownloadImageToDirectory(IBot Parent, bool isOverride = false){
-        ...
-      }
-      public static string nameGet(User us){
-        ...
-      }
-      public static string usernameGet(User us){
-        ...
-      }
-    }
   ```
 # Built With:
 <a href = "https://github.com/TelegramBots/telegram.bot">.NET Client for Telegram Bot API</a><br>
