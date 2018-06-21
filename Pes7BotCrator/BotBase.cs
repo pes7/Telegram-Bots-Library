@@ -51,6 +51,7 @@ namespace Pes7BotCrator
 
         public int RunTime { get; set; } = 0;
 
+        public CrushReloader Reload { get; set; }
         public BotBase(string key, string name, string nameString, string usernameofcreator = null, List<IModule> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
@@ -74,6 +75,7 @@ namespace Pes7BotCrator
             TimeSynk = new Thread(TimeT);
             TimeSynk.Start();
             SynkModules();
+            Reload = new CrushReloader();
         }
 
         private void SynkModules()
@@ -125,6 +127,7 @@ namespace Pes7BotCrator
             {
                 md.AbortThread();
             }
+            Reload.MainTh.Abort();
         }
 
         private  void TimeT()

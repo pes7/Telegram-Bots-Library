@@ -25,6 +25,7 @@ namespace Pes7BotCrator.Type
         List<Exception> Exceptions { get; set; }
         List<IModule> Modules { get; set; }
         GList<SynkCommand> SynkCommands { get; set; }
+        CrushReloader Reload { get; set; }
         T GetModule<T>() where T : IModule;
         Action OnWebHoockUpdated { get; set; }
         int RunTime { get; set; }

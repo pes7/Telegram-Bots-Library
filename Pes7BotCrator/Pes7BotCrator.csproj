@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="CrushReloader.cs" />
     <Compile Include="Modules\FunFunc\FunFunc.cs" />
     <Compile Include="Modules\FunFunc\FunRes.Designer.cs">
       <AutoGen>True</AutoGen>

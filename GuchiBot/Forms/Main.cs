@@ -65,7 +65,6 @@ namespace GuchiBot
                     new LikeDislikeModule("./like.bot"),
                     new VoteModule("./votes.bot","./voteslike.bot"),
                     new TransitFileModule("./Downloads"),
-                    new AnistarModule(),
                     new Statistic(),
                     new TRM(),
                     new FunFunc("FunFunc/FaceYouZerro","FunFunc/Who/WhoTitles","FunFunc/Who/WhoAnswers","FunFunc/Trigger")
@@ -128,7 +127,6 @@ namespace GuchiBot
             {
                 "/adp"
             }, descr:"Auto deliting post `text` `time` - time of life."));
-            Bot.SynkCommands.Add(Bot.GetModule<AnistarModule>().Command);
             Bot.SynkCommands.Add(new SynkCommand(bt.DefaultSynk, new List<string>()
             {
                 "Default"

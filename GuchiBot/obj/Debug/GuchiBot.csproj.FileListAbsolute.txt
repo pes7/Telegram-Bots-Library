@@ -58,3 +58,5 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debu
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.resx
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.resx
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs

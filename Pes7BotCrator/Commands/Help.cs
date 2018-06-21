@@ -32,7 +32,7 @@ namespace Pes7BotCrator.Commands
             {
                 var d = args.Find(fn => fn.Name == "0");
                 var arg = d == null ? args.Find(fn => fn.Name == "admin") : d;
-                if(arg != null || arg.Arg == "админ")
+                if(arg != null || arg?.Arg == "админ")
                 {
                     Thread th = new Thread(async () =>
                     {

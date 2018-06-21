@@ -32,7 +32,7 @@ namespace Pes7BotCrator.Type
                 }
                 catch { return null; }
 
-                if(args_parse.Length == 1)
+                if(args_parse.Length == 1 || args_parse[0].ToUpper().Contains(Parent.NameString.ToUpper()))
                 {
                     args_parse = message.Split(' ');
                     if (args_parse.Length > 1)

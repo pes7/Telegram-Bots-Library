@@ -30,3 +30,7 @@ C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\o
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.GenerateResource.Cache
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.resx
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.resx
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.Modules.FunFunc.FunRes.resources
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.GenerateResource.Cache

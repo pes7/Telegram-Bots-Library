@@ -182,7 +182,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                 var arg1 = g == null ? args.Find(fn=>fn.Name=="0") : g;
                 var c = args.Find(fn => fn.Name == "t2");
                 var arg2 = c == null ? args.Find(fn => fn.Name == "1") : c;
-                if (arg1?.Arg != null && arg1?.Arg != null)
+                if (arg1?.Arg != null && arg2?.Arg != null)
                 {
                     if (arg1.Arg.Trim().ToUpper() != arg2.Arg.Trim().ToUpper())
                     {
