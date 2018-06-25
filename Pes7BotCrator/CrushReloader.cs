@@ -28,6 +28,10 @@ namespace Pes7BotCrator
                 currentDomain.UnhandledException += new UnhandledExceptionEventHandler(MyHandler);
                 void MyHandler(object sender, UnhandledExceptionEventArgs args)
                 {
+                    if (!Directory.Exists("Crush"))
+                        Directory.CreateDirectory("Crush");
+                    var f = File.CreateText($"Crush/crush_{Directory.GetFiles("Crush").Length}.txt");
+                    f.Write($"[Sender]:{sender}\n[Report]:{args}");
                     Process.Start($"{Application.ExecutablePath}/GuchiBot.exe");
                 }
             });

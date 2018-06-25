@@ -100,5 +100,17 @@ namespace Pes7BotCrator.Type
             }
             else return null;
         }
+        public static ArgC GetArg(List<ArgC> a, string name, string num = null)
+        {
+            if (num != null)
+            {
+                var g = a.Find(fn => fn.Name == name);
+                return g == null ? a.Find(fn => fn.Name == num) : g;
+            }
+            else
+            {
+                return a.Find(fn => fn.Name == name);
+            }
+        }
     }
 }

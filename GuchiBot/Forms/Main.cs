@@ -89,6 +89,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._CommandWhoAreU);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._TrueFalse);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._DvachRoll);
             Bot.SynkCommands.Add(Bot.GetModule<TRM>()._SayAfterMe);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
@@ -182,7 +183,7 @@ namespace GuchiBot
                 while (Triger_Alife)
                 {
                     InvokeUI(() => { GetInf(); });
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
                 }
             });
             timeTh.Start();

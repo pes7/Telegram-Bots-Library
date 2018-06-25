@@ -22,6 +22,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         public WhoAreYou _CommandWhoAreU { get; set; }
         public Triggered _Triggered { get; set; }
         public TrueFalse _TrueFalse { get; set; }
+        public DvachRoll _DvachRoll { get; set; }
         public ActiveUsersMosaic _ActiveUsersMosaic { get; set; }
         public Random Rand { get; set; }
         public string FaceImageDir { get; set; }
@@ -37,6 +38,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             _Triggered = new Triggered();
             _ActiveUsersMosaic = new ActiveUsersMosaic();
             _TrueFalse = new TrueFalse();
+            _DvachRoll = new DvachRoll();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -71,6 +73,78 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class TrueFalse : SynkCommand {
             public TrueFalse() : base(ActTrueFalse, new List<string>() { "/tf" }, commandName: "правда", descr: "Проверяет инфу на правду или лошь") { }
+        }
+
+        public class DvachRoll : SynkCommand
+        {
+            public DvachRoll() : base(RollAct, new List<string>() { "/roll" }, commandName: "ролл", descr: "Старая-добрая руллетка со времён двоща. Праметры: c, min, max") { }
+        }
+
+        public static void RollAct(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                ArgC arg = null, arg1 = null, arg2 = null;
+                if (args != null)
+                {
+                    arg1 = ArgC.GetArg(args, "min", "0");
+                    arg2 = ArgC.GetArg(args, "max", "1");
+                    if (arg1 == null || arg2 == null)
+                        arg = ArgC.GetArg(args, "c", "0");
+                }
+                if (arg1 == null || arg2 == null)
+                {
+                    if (arg?.Arg == null)
+                    {
+                        var d = Parent.Rand.Next(0, 1000);
+                        var s = Parent.Rand.Next(0, 9);
+                        if (d < 150 && d > 50)
+                            d = int.Parse($"{s}{s}");
+                        if (d < 50 && d > 7)
+                            d = int.Parse($"{s}{s}{s}");
+                        if (d < 7)
+                            d = int.Parse($"{s}{s}{s}{s}");
+                        if (d < 3)
+                            d = int.Parse($"1488");
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                    }
+                    else
+                    {
+                        int c = -1;
+                        int.TryParse(arg.Arg, out c);
+                        if (c > 0 && c < 7)
+                        {
+                            string k = "9";
+                            int h = 1;
+                            while (h != c)
+                            {
+                                k = $"{k}9";
+                                h++;
+                            }
+                            var d = Parent.Rand.Next(0, int.Parse(k));
+                            Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                        }
+                        else
+                        {
+                            Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(re.Chat.Id, $"@{re.From.Username} ты что дурак?", 10);
+                        }
+                    }
+                }
+                else
+                {
+                    int min = -1, max = -1;
+                    int.TryParse(arg1.Arg, out min);
+                    int.TryParse(arg2.Arg, out max);
+                    if (min >= 0 && max >= 0 && min < max) {
+                        var d = Parent.Rand.Next(min, max);
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                    }
+                    else
+                    {
+                        Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(re.Chat.Id, $"@{re.From.Username} ты что дурак?", 10);
+                    }
+                }
+            }
         }
 
         public static void ActTrig(Message re, IBot Parent, List<ArgC> args)
@@ -148,8 +222,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             if (re != null && args != null)
             {
-                var w = args.Find(fn => fn.Name == "w");
-                var arg = w != null ? w : args.Find(fn => fn.Name == "0");
+                var arg = ArgC.GetArg(args, "w", "0");
                 if (arg != null) {
                     var th = Parent.GetModule<FunFunc>();
                     var tr = th.Rand.Next(0, 100) <= 50 ? true : false;
@@ -166,8 +239,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             if(re != null && args != null)
             {
-                var g = args.Find(fn => fn.Name == "w");
-                var arg = g == null ? args.Find(fn => fn.Name == "0") : g;
+                var arg = ArgC.GetArg(args, "w", "0");
                 if (arg?.Arg != null)
                 {
                     Parent.Client.SendTextMessageAsync(re.Chat.Id,$"{arg.Arg}: {Parent.GetModule<FunFunc>().Rand.Next(0,100)}%");
@@ -178,10 +250,8 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             if (re != null && args != null)
             {
-                var g = args.Find(fn => fn.Name == "t1");
-                var arg1 = g == null ? args.Find(fn=>fn.Name=="0") : g;
-                var c = args.Find(fn => fn.Name == "t2");
-                var arg2 = c == null ? args.Find(fn => fn.Name == "1") : c;
+                var arg1 = ArgC.GetArg(args, "t1", "0");
+                var arg2 = ArgC.GetArg(args, "t2", "1");
                 if (arg1?.Arg != null && arg2?.Arg != null)
                 {
                     if (arg1.Arg.Trim().ToUpper() != arg2.Arg.Trim().ToUpper())
@@ -214,7 +284,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                     }
                     else
                     {
-                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Ты @{re.From.Username} что дурак?");
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Ты @{re.From.Username} что ?");
                     }
                 }
             }
@@ -224,8 +294,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             if (re != null && args != null)
             {
                 var th = Parent.GetModule<FunFunc>();
-                var g = args.Find(fn => fn.Name == "name");
-                var arg1 = g == null ? args.Find(fn => fn.Name == "0") : g;
+                var arg1 = ArgC.GetArg(args, "name", "0");
                 if (arg1?.Arg != null && th.FaceImageDir != null)
                 {
                     var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.FaceImageDir, filter, SearchOption.AllDirectories)).ToArray();

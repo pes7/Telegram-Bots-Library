@@ -42,7 +42,6 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\De
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.pdb
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.xml
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\NReco.xml
-C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csprojResolveAssemblyReference.cache
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.exe
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.pdb
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\LuaInterface.dll
@@ -60,3 +59,6 @@ C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\De
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.resx
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csprojAssemblyReference.cache
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.CopyComplete

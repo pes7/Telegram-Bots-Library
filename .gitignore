@@ -10,3 +10,9 @@ GuchiBot/bin/Debug/UserPhotoes
 /
 GuchiBot/bin/Debug/previews/
 GuchiBot/bin/Debug/olduserph/
+*.psess
+*.ide-wal
+*.ide
+*.lock
+*.ide-shm
+*.vspx
