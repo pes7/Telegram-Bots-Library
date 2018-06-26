@@ -32,6 +32,7 @@ namespace Pes7BotCrator
                         Directory.CreateDirectory("Crush");
                     var f = File.CreateText($"Crush/crush_{Directory.GetFiles("Crush").Length}.txt");
                     f.Write($"[Sender]:{sender}\n[Report]:{args}");
+                    f.Close();
                     Process.Start($"{Application.ExecutablePath}/GuchiBot.exe");
                 }
             });

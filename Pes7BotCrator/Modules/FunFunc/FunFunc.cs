@@ -9,6 +9,7 @@ using System.Resources;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 
@@ -23,6 +24,8 @@ namespace Pes7BotCrator.Modules.FunFunc
         public Triggered _Triggered { get; set; }
         public TrueFalse _TrueFalse { get; set; }
         public DvachRoll _DvachRoll { get; set; }
+        public ChtoEto _ChtoEto { get; set; }
+        public Otvetka _Otvetka { get; set; }
         public ActiveUsersMosaic _ActiveUsersMosaic { get; set; }
         public Random Rand { get; set; }
         public string FaceImageDir { get; set; }
@@ -39,6 +42,8 @@ namespace Pes7BotCrator.Modules.FunFunc
             _ActiveUsersMosaic = new ActiveUsersMosaic();
             _TrueFalse = new TrueFalse();
             _DvachRoll = new DvachRoll();
+            _ChtoEto = new ChtoEto();
+            _Otvetka = new Otvetka();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -71,20 +76,92 @@ namespace Pes7BotCrator.Modules.FunFunc
         {
             public Triggered() : base(ActTrig, new List<string>() { "/t" }, commandName: "триггер", descr: "TRIGGERED!") { }
         }
-        public class TrueFalse : SynkCommand {
+        public class TrueFalse : SynkCommand
+        {
             public TrueFalse() : base(ActTrueFalse, new List<string>() { "/tf" }, commandName: "правда", descr: "Проверяет инфу на правду или лошь") { }
         }
-
         public class DvachRoll : SynkCommand
         {
             public DvachRoll() : base(RollAct, new List<string>() { "/roll" }, commandName: "ролл", descr: "Старая-добрая руллетка со времён двоща. Праметры: c, min, max") { }
         }
+        public class Otvetka : SynkCommand
+        {
+            public Otvetka() : base(ActTrig) { }
+        }
+        //https://www.google.com/imghp?source=lnms&tbm=isch
+        public class ChtoEto : SynkCommand
+        {
+            public ChtoEto() : base(ChtoAct, new List<string>() { "/chto" }, commandName: "росскажи", descr: "Гачи найдёт информацию в гугле. Параметры: text, photo или video") { }
+        }
 
-        public static void RollAct(Message re, IBot Parent, List<ArgC> args)
+        public static void ActTrig(Update up, IBot Parent, List<ArgC> args)
+        {
+            if (args == null)
+            {
+                if(up.Message != null && up.Message?.Text != null)
+                {
+                    if (up.Message.Text.ToUpper().Contains(Parent.NameString.ToUpper()))
+                    {
+                        string[] otvetka = {"Да?", "Что?", "Нет","Да","Чо","Что хочешь?","Сдесь","Слушаю","Сам такой" };
+                        Parent.Client.SendTextMessageAsync(up.Message.Chat.Id, $"{otvetka[Parent.Rand.Next(0,otvetka.Length)]}", Telegram.Bot.Types.Enums.ParseMode.Default);
+                    }
+                }
+            }
+        }
+
+        //БАгнутая Дич, нужно убрать или доработать
+        public static void ChtoAct(Message re, IBot Parent, List<ArgC> args)
         {
             if (re != null)
             {
+                var what = ArgC.GetArg(args, "text", "0");
+                var addition = ArgC.GetArg(args, "photo", "1");
+                if(addition == null)
+                    addition = ArgC.GetArg(args, "video", "1");
+                var web = new HtmlWeb();
+                if (what != null && addition == null)
+                {
+                    //lnms&tbm=isch - photo
+                    try
+                    {
+                        HtmlDocument html = web.Load($"https://www.google.com/search?biw=1920&bih=525&ei=hEcyW7WVLs6LmgXuu6agDA&q={what.Arg}&oq={what.Arg}&gs_l=psy-ab.12...0.0.0.598.0.0.0.0.0.0.0.0..0.0....0...1c..64.psy-ab..0.0.0....0.qKc87Pgh1a4");
+                        var d = html.GetElementbyId("search");
+                        var c = d.ChildNodes.Where(gn => gn.Name == "div").First().ChildNodes.Where(gn => gn.Name == "ol").First().
+                            ChildNodes.Where(gn => gn.Name == "div").First().ChildNodes.Where(gn => gn.Name == "div").First().
+                            ChildNodes.Where(gn => gn.Name == "span").First().InnerText;
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"{c}", Telegram.Bot.Types.Enums.ParseMode.Html);
+                        /*
+                        var c = d.ChildNodes.Where(gn => gn.Name == "div").First(). //DATA-VED
+                                ChildNodes.Where(gn => gn.Name == "div").First(). //data-async
+                                ChildNodes.Where(gn => gn.Name == "div").First(). //eid
+                                ChildNodes.Where(gn => gn.Name == "div").First(). //bkWMgd
+                                ChildNodes.Where(gn => gn.Name == "div").First().   //srg
+                                ChildNodes.Where(gn => gn.Name == "div").First(); //g
+                        var g = c.ChildNodes.Where(gn => gn.Name == "div").First(). //data-hveid
+                                ChildNodes.Where(gn => gn.Name == "div").First(). //class=rc
+                                ChildNodes.Where(gn => gn.Name == "h3").First(). //class=r
+                                ChildNodes.Where(gn => gn.Name == "a").First().InnerText; //a href
+                        */
+                        //var k = g.ChildNodes;
+                        /*
+                        var h = g.Where(sb => sb.Name == "a");
+                        var e = h.First().InnerText;
+                        */
+                        int gs = 0;
+                    }
+                    catch { }
+                    int i = 0;
+                }
+            }
+        }
+
+        public static void RollAct(Message re, IBot Parent, List<ArgC> args)
+        {
+
+            if (re != null)
+            {
                 ArgC arg = null, arg1 = null, arg2 = null;
+                string username = re.From.Username.Replace("_", "[_]");
                 if (args != null)
                 {
                     arg1 = ArgC.GetArg(args, "min", "0");
@@ -106,7 +183,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                             d = int.Parse($"{s}{s}{s}{s}");
                         if (d < 3)
                             d = int.Parse($"1488");
-                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
                     }
                     else
                     {
@@ -122,7 +199,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                                 h++;
                             }
                             var d = Parent.Rand.Next(0, int.Parse(k));
-                            Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                            Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
                         }
                         else
                         {
@@ -137,7 +214,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                     int.TryParse(arg2.Arg, out max);
                     if (min >= 0 && max >= 0 && min < max) {
                         var d = Parent.Rand.Next(min, max);
-                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{re.From.Username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"@{username}: `{d}`", Telegram.Bot.Types.Enums.ParseMode.Markdown);
                     }
                     else
                     {

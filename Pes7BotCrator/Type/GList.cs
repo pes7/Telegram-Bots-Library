@@ -16,8 +16,8 @@ namespace Pes7BotCrator.Type
         public new void Add(T item)
         {
             base.Add(item);
-            if (Parent.WebHook != null)
-                Parent.WebHook.PreDefineAllwaysInWebHook();
+            //if (Parent.WebHook != null)
+                //Parent.WebHook.PreDefineAllwaysInWebHook();
         }
     }
 }

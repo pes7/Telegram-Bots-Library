@@ -65,17 +65,21 @@ namespace Pes7BotCrator
             ActiveUsers = new List<UserM>();
             SynkCommands = new GList<SynkCommand>(this);
             Exceptions = new List<Exception>();
-            WebHook = new WebHook(this);
             setModulesParent();
+            TimeSynk = new Thread(TimeT);
+            TimeSynk.Start();
+            SynkModules();
+            Reload = new CrushReloader();
+        }
+
+        public void Start()
+        {
+            WebHook = new WebHook(this);
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
             });
             WebThread.Start();
-            TimeSynk = new Thread(TimeT);
-            TimeSynk.Start();
-            SynkModules();
-            Reload = new CrushReloader();
         }
 
         private void SynkModules()

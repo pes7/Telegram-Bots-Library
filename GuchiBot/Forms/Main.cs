@@ -1,26 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.IO;
 using Pes7BotCrator;
 using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using System.Threading;
 using Pes7BotCrator.Commands;
-using Telegram.Bot.Types.ReplyMarkups;
 using LuaAble;
-using System.Diagnostics;
-using System.Collections;
 using GuchiBot.Interface;
-using Telegram.Bot.Types;
 using GuchiBot.Commands;
 using Pes7BotCrator.Modules.FunFunc;
 using Pes7BotCrator.Modules.LikeDislikeModule;
@@ -61,7 +52,7 @@ namespace GuchiBot
                 gachiimage: "C:/Users/user/Desktop/GachiArch",
                 modules: new List<IModule> {
                     new _2chModule(),
-                    new SaveLoadModule(60,10*60),
+                    new SaveLoadModule(60,30*60),
                     new LikeDislikeModule("./like.bot"),
                     new VoteModule("./votes.bot","./voteslike.bot"),
                     new TransitFileModule("./Downloads"),
@@ -90,6 +81,8 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Triggered);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._TrueFalse);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._DvachRoll);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ChtoEto);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Otvetka);
             Bot.SynkCommands.Add(Bot.GetModule<TRM>()._SayAfterMe);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
@@ -163,6 +156,7 @@ namespace GuchiBot
 
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<LikeDislikeModule>().Save);
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<VoteModule>().Save);
+            Bot.Start();
         }
 
         private async Task GetInf()

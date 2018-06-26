@@ -31,5 +31,6 @@ namespace Pes7BotCrator.Type
         int RunTime { get; set; }
         string TimeToString(int i);
         void setModulesParent();
+        void Start();
     }
 }

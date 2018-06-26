@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
-using System.Diagnostics;
-using System.Collections;
-using System.Speech.Recognition;
 
 namespace Pes7BotCrator
 {
@@ -23,12 +16,12 @@ namespace Pes7BotCrator
         {
             Parent = parent;
             Parent.Client.SetWebhookAsync("");
+            PreDefineAllwaysInWebHook();
         }
         private int time_noConnect = 0;
         public async void Start()
         {
             int offset = 0;
-            PreDefineAllwaysInWebHook();
             while (true)
             {
                 try
