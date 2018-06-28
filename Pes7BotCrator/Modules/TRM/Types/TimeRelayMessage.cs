@@ -25,10 +25,10 @@ namespace Pes7BotCrator.Modules.Types
             Parent = parent;
 
             switch (ms.Type) {
-                case Telegram.Bot.Types.Enums.MessageType.TextMessage:
+                case Telegram.Bot.Types.Enums.MessageType.Text:
                     base.Text = ms.Text;
                     break;
-                case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
+                case Telegram.Bot.Types.Enums.MessageType.Photo:
                     base.Photo = ms.Photo;
                     base.Caption = ms.Caption;
                     break;
@@ -53,11 +53,11 @@ namespace Pes7BotCrator.Modules.Types
         {
             if (curTime >= Time)
             {
-                if (Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
+                if (Type == Telegram.Bot.Types.Enums.MessageType.Text)
                 {
                     await ForTextMessageAsync();
                 }
-                if (Type == Telegram.Bot.Types.Enums.MessageType.PhotoMessage)
+                if (Type == Telegram.Bot.Types.Enums.MessageType.Photo)
                 {
                     await ForPhotoMessageAsync();
                 }
@@ -119,7 +119,7 @@ namespace Pes7BotCrator.Modules.Types
 
         private async Task<Message> SendPhotoMessage()
         {
-            return await Parent.Client.SendPhotoAsync(base.Chat.Id,new FileToSend(base.Photo.First().FileId),base.Caption, replyToMessageId: MessageId);
+            return await Parent.Client.SendPhotoAsync(base.Chat.Id,new Telegram.Bot.Types.InputFiles.InputOnlineFile(base.Photo.First().FileId),base.Caption, replyToMessageId: MessageId);
         }
 
         private async Task<Message> SendTextMessage()

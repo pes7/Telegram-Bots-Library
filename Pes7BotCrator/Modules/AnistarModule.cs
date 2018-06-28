@@ -37,7 +37,7 @@ namespace Pes7BotCrator.Modules
                 var t = anime.ChildNodes.Where(sf => sf.HasClass("timer_cal")).First();
                 string picHref = anime.Attributes["style"].Value.Split('\'').Where(fn => fn.Contains("uploads")).First();
                 string time = t.ChildNodes.Where(fs => fs.Name == "smal" || fs.Name == "span").First().InnerText;
-                Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(new Uri($"https://anistar.me{picHref}")), time);
+                //Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(new Uri($"https://anistar.me{picHref}").), time); //Нужно исправить
             }
         }
 

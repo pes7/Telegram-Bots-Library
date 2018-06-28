@@ -69,18 +69,12 @@ namespace GuchiBot
                 Webm webm = Parent.GetModule<_2chModule>().WebmsSent.Find(fn => fn.Path == query.Query);
                 if (webm != null)
                 {
-                    var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
-                    {
-                        MessageText = $"<a href=\"{ webm.Thumbnail }\">&#8204;</a>{webm.Path}",
-                        ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html,
-                    };
+                    var msg = new Telegram.Bot.Types.InlineQueryResults.InputTextMessageContent($"<a href=\"{ webm.Thumbnail }\">&#8204;</a>{webm.Path}")
+                    { ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html};
 
-                    Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
-                            new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
-                                Id = "0",
-                                InputMessageContent = msg,
+                    Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle[] results = {
+                            new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle("0","WEBM",msg){
                                 ReplyMarkup = LikeDislikeModule.getKeyBoard(),
-                                Title = "WEBM",
                                 Description = "POST"
                             }
                     };
@@ -95,9 +89,8 @@ namespace GuchiBot
                     var Oprs = Parent.GetModule<VoteModule>().Opros.Find(fn => fn.Id == int.Parse(id));
                     if (Oprs != null)
                     {
-                        var msg = new Telegram.Bot.Types.InputMessageContents.InputTextMessageContent
+                        var msg = new Telegram.Bot.Types.InlineQueryResults.InputTextMessageContent($"{Oprs.About}")
                         {
-                            MessageText = $"{Oprs.About}",
                             ParseMode = Telegram.Bot.Types.Enums.ParseMode.Html
                         };
 
@@ -107,15 +100,12 @@ namespace GuchiBot
                             ll = Parent.GetModule<VoteModule>().LLikes.Find(fn => fn.ParentO.Id == int.Parse(id));
                         }
                         catch { }
-                        Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
-                            new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle{
-                                Id = "0",
-                                InputMessageContent = msg,
+                        Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle[] results = {
+                            new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultArticle("0","Opros",msg){
                                 ReplyMarkup = VoteModule.getKeyBoard(ll.LikeId.Count, ll.DisLikeId.Count, Oprs,Oprs.Query),
-                                Title = "Opros",
                                 Description = "POST"
                             }
-                    };
+                        };
                     Parent.Client.AnswerInlineQueryAsync(query.Id, results);
                     }
                 }
@@ -127,7 +117,7 @@ namespace GuchiBot
         {
             String[] files = Directory.GetFiles(Parent.GachiImage, "*");
             int index = Parent.Rand.Next(0, files.Length);
-            Parent.Client.SendPhotoAsync(chatid, new FileToSend(Path.GetFileName(files[index]), System.IO.File.Open(files[index], FileMode.Open)));
+            Parent.Client.SendPhotoAsync(chatid, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(files[index], FileMode.Open), Path.GetFileName(files[index])));
         }
 
         private static bool GachiAttakTrigger = false;

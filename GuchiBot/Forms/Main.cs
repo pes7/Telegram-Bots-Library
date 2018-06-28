@@ -44,7 +44,7 @@ namespace GuchiBot
              * В опрос надо добавить параметрический ввод своего текста кнопок. Так же сделать не анонимное голосование.
              */
             Bot = new Bot(
-                key: "466088141:AAHIcb1aG8F6P5YQSgcQlqaKJBD9vlLuMAw",
+                key: "466088141:AAEpmcmKEZ5Fq5IWrsJmDtHkeSH4n5h-rMY",
                 name: "guchimuchibot",
                 nameString: "Гачи",
                 usernameofcreator:"nazarpes7",
@@ -328,7 +328,7 @@ namespace GuchiBot
                     var afs = await Bot.getFileFrom(ms.Photo.ToList().First().FileId);
                     InvokeUI(() =>
                     {
-                        if (ms.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage)
+                        if (ms.Type == Telegram.Bot.Types.Enums.MessageType.Text)
                         {
                             MessageUI mu = new MessageUI(files.Find(fs => ms.From.Id == fs.id).Image, ms.Text)
                             {
@@ -337,7 +337,7 @@ namespace GuchiBot
                             flowLayoutPanel1.Controls.Add(mu);
                         }
                         
-                        else if (ms.Type == Telegram.Bot.Types.Enums.MessageType.PhotoMessage)
+                        else if (ms.Type == Telegram.Bot.Types.Enums.MessageType.Photo)
                         {
                             MessageUIPhoto mu = new MessageUIPhoto(Image.FromStream(afs));
                             mu.Width = flowLayoutPanel1.Width - 25;

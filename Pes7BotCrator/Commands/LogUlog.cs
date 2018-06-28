@@ -37,7 +37,7 @@ namespace Pes7BotCrator.Commands
                 switch (Th.TypeOfMessage)
                 {
                     case TypeOf.OnlyMessage:
-                        if (re.Message.NewChatMember != null)
+                        if (re.Message.NewChatMembers != null)
                         {
                             Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.HelloMessage);
                         }
@@ -47,7 +47,7 @@ namespace Pes7BotCrator.Commands
                         }
                         break;
                     case TypeOf.MessageWithChanellName:
-                        if (re.Message.NewChatMember != null)
+                        if (re.Message.NewChatMembers != null)
                         {
                             var msg = String.Format($"{Th.HelloMessage}",re.Message.Chat.FirstName);
                             Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, msg);
@@ -58,9 +58,9 @@ namespace Pes7BotCrator.Commands
                         }
                         break;
                     case TypeOf.MessageWithNameAndChannelName:
-                        if (re.Message.NewChatMember != null)
+                        if (re.Message.NewChatMembers != null)
                         {
-                            var msg = String.Format($"{Th.HelloMessage}", re.Message.NewChatMember.Username, re.Message.Chat.Title);
+                            var msg = String.Format($"{Th.HelloMessage}", re.Message.NewChatMembers.First().Username, re.Message.Chat.Title);
                             Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, msg);
                         }
                         else if (re.Message.LeftChatMember != null)

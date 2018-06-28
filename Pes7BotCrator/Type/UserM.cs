@@ -39,12 +39,15 @@ namespace Pes7BotCrator.Type
                 {
                     if (!Directory.Exists("./UserPhotoes"))
                         Directory.CreateDirectory("./UserPhotoes");
-                    using (var file = System.IO.File.Create($"./UserPhotoes/{this.Id}.jpg", 32 * 8 * 1024, FileOptions.Asynchronous))
+
+                    var file = await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId);
+
+                    var PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
+
+                    using (var saveImageStream = System.IO.File.Open(PhotoPath, FileMode.Create))
                     {
-                        file.Flush(true);
-                        await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId, file);
+                        await Parent.Client.DownloadFileAsync(file.FilePath, saveImageStream);
                     }
-                    PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
                     return true;
                 }
                 else return false;

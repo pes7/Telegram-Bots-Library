@@ -26,9 +26,10 @@ namespace Pes7BotCrator
             }
             int index = Parent.Rand.Next(0, Webms.Count);
             GetPreViewOfFile(Webms[index], Parent);
-            await Parent.Client.SendPhotoAsync(chatid, new FileToSend($"{Path.GetFileName(Webms[index])}.jpg",
-                System.IO.File.Open($"{Parent.PreViewDir}{Path.GetFileName(Webms[index])}.jpg", FileMode.Open)));
-            await Parent.Client.SendDocumentAsync(chatid, new FileToSend(Path.GetFileName(Webms[index]), System.IO.File.Open(Webms[index], FileMode.Open)));
+            await Parent.Client.SendPhotoAsync(chatid, new Telegram.Bot.Types.InputFiles.InputOnlineFile(
+                System.IO.File.Open($"{Parent.PreViewDir}{Path.GetFileName(Webms[index])}.jpg", FileMode.Open),
+                $"{Path.GetFileName(Webms[index])}.jpg"));
+            await Parent.Client.SendDocumentAsync(chatid, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(Webms[index], FileMode.Open), Path.GetFileName(Webms[index])));
             WebmTrigger = false;
         }
 

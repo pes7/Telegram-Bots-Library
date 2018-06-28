@@ -58,7 +58,7 @@ namespace Pes7BotCrator.Modules
                             }
                             using (var iostr = System.IO.File.Open(path, FileMode.Open))
                             {
-                                await Parent.Client.SendDocumentAsync(re.Chat.Id, new FileToSend(Path.GetFileName(path), iostr));
+                                await Parent.Client.SendDocumentAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(iostr, Path.GetFileName(path)));
                             }
                         });
                         th.Start();

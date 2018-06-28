@@ -22,11 +22,16 @@ namespace Pes7BotCrator.Commands
                 foreach (SynkCommand sn in Parent.SynkCommands.Where(fn => fn.Type == TypeOfCommand.Standart && fn.TypeOfAccess == TypeOfAccess.Public && fn.CommandLine.First() != "Default"))
                 {
                     if (sn.Description != null)
-                        coms += $"\n{sn.CommandLine.First()} - {sn.Description}";
+                    {
+                        if (sn.CommandName != null)
+                            coms += $"\n{sn.CommandLine.First()}[{sn.CommandName}] - {sn.Description}";
+                        else
+                            coms += $"\n{sn.CommandLine.First()} - {sn.Description}";
+                    }
                     else
                         coms += $"\n{sn.CommandLine.First()}";
                 }
-                Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Commands: {coms}");
+                Parent.Client.SendTextMessageAsync(re.Chat.Id, $"/Команда[Строковое имя]-[Описание]: {coms}\nВводить команды двумя способами:\n/Команда -параметер:значение\nгачи Строковое имя ПАРАМЕТЕР 1 или/и ПАРАМЕТЕР 2\nКоманды могут быть вызваны без параметров.");
             }
             else
             {

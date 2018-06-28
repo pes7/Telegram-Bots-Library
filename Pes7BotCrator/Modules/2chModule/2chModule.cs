@@ -69,7 +69,7 @@ namespace Pes7BotCrator.Modules
                                     if (format == "webm")
                                     {
                                         Console.WriteLine($"{format}|{file.fullname}|{file.path}|{file.thumbnail}");
-                                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(file.thumbnail), file.path);
+                                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(file.thumbnail), file.path);
                                     }
                                 }
                             }
@@ -214,7 +214,7 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.LikeDislikeModule.getKeyBoard(webm.Path));
+                        await Parent.Client.SendPhotoAsync(id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(webm.Thumbnail), webm.Path, Telegram.Bot.Types.Enums.ParseMode.Default, false, 0, LikeDislikeModule.LikeDislikeModule.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)

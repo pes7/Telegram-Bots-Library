@@ -120,7 +120,7 @@ namespace Pes7BotCrator
                 return new FileStream($"./DownloadFiles/{filename}",FileMode.Open);
             var file = new FileStream($"./DownloadFiles/{filename}",FileMode.Create);
             var down = Client.GetFileAsync(id);
-            await down.Result.FileStream.CopyToAsync(file);
+            //await down.Result.FileStream.CopyToAsync(file); //ВАЖНО БЕЗ ЭТОГО НЕ БУДЕТ СОХРАНЯТЬ
             return file;
         }
         public virtual void Dispose()

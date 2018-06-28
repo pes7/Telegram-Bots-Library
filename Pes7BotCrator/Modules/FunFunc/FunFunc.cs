@@ -54,7 +54,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class InfTrue : SynkCommand
         {
-            public InfTrue() : base(ActInf, new List<string>() { "/inf" }, commandName: "инфа", descr: "Проверить правдивость инфы. `-w` инфа") { }
+            public InfTrue() : base(ActInf, new List<string>() { "/inf" }, commandName: "инфа", descr: "Проверить правдивость инфы. `-w` инфа", clearcommand:false) { }
         }
         public class GuchiName : SynkCommand
         {
@@ -78,7 +78,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class TrueFalse : SynkCommand
         {
-            public TrueFalse() : base(ActTrueFalse, new List<string>() { "/tf" }, commandName: "правда", descr: "Проверяет инфу на правду или лошь") { }
+            public TrueFalse() : base(ActTrueFalse, new List<string>() { "/tf" }, commandName: "правда", descr: "Проверяет инфу на правду или лошь", clearcommand:false) { }
         }
         public class DvachRoll : SynkCommand
         {
@@ -91,7 +91,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         //https://www.google.com/imghp?source=lnms&tbm=isch
         public class ChtoEto : SynkCommand
         {
-            public ChtoEto() : base(ChtoAct, new List<string>() { "/chto" }, commandName: "росскажи", descr: "Гачи найдёт информацию в гугле. Параметры: text, photo или video") { }
+            public ChtoEto() : base(ChtoAct, new List<string>() { "/chto" }, commandName: "расскажи", descr: "Гачи найдёт информацию в гугле. Параметры: text, photo или video", clearcommand:false) { }
         }
 
         public static void ActTrig(Update up, IBot Parent, List<ArgC> args)
@@ -119,10 +119,10 @@ namespace Pes7BotCrator.Modules.FunFunc
                 if(addition == null)
                     addition = ArgC.GetArg(args, "video", "1");
                 var web = new HtmlWeb();
-                if (what != null && addition == null)
+                //lnms&tbm=isch - photo
+                try
                 {
-                    //lnms&tbm=isch - photo
-                    try
+                    if (what != null && addition == null)
                     {
                         HtmlDocument html = web.Load($"https://www.google.com/search?biw=1920&bih=525&ei=hEcyW7WVLs6LmgXuu6agDA&q={what.Arg}&oq={what.Arg}&gs_l=psy-ab.12...0.0.0.598.0.0.0.0.0.0.0.0..0.0....0...1c..64.psy-ab..0.0.0....0.qKc87Pgh1a4");
                         var d = html.GetElementbyId("search");
@@ -147,11 +147,23 @@ namespace Pes7BotCrator.Modules.FunFunc
                         var h = g.Where(sb => sb.Name == "a");
                         var e = h.First().InnerText;
                         */
-                        int gs = 0;
+                    } else if (what != null && addition != null)
+                    {
+                        //недоделано
+                        if (addition.Arg.Contains("фото") || addition.Name.Contains("photo"))
+                        {
+                            HtmlDocument html = web.Load($"https://www.google.com/search?q={what.Arg}&source=lnms&tbm=isch&sa=X&ved=0ahUKEwj75PLKivbbAhXGWywKHbukCQoQ_AUICigB&biw=1920&bih=974");
+                            var d = html.GetElementbyId("ires");
+                            var f = d.ChildNodes.Where(gn => gn.Name == "table").First().ChildNodes.Where(gn => gn.Name == "tr").First().ChildNodes.Where(gn => gn.Name == "td").First();
+                            var c = f.ChildNodes.First().Attributes.Where(fb => fb.Name == "href").First().Value;
+                            var sf = $"https://www.google.com{c}";
+                            Parent.Client.SendTextMessageAsync(re.Chat.Id, $"{sf}", Telegram.Bot.Types.Enums.ParseMode.Html);
+                        } else {
+
+                        }
                     }
-                    catch { }
-                    int i = 0;
                 }
+                catch { }
             }
         }
 
@@ -230,7 +242,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             {
                 var th = Parent.GetModule<FunFunc>();
                 var files = "*.png|*.jpg|*.bmp".Split('|').SelectMany(filter => System.IO.Directory.GetFiles(th.Triggers, filter, SearchOption.AllDirectories)).ToArray();
-                Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("trigger", System.IO.File.Open($"{files[th.Rand.Next(0, files.Length)]}", FileMode.Open)));
+                Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open($"{files[th.Rand.Next(0, files.Length)]}", FileMode.Open), "trigger"));
             }
         }
 
@@ -357,7 +369,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                             }
                         }
                         string dir = SaveIt(re.From.Id, "test", bmp, th);
-                        Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
+                        Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(dir, FileMode.Open), "ochincin"));
                     }
                     else
                     {
@@ -399,7 +411,7 @@ namespace Pes7BotCrator.Modules.FunFunc
 
                         }
                         string dir = SaveIt(re.From.Id,"guchi", bmp, th);
-                        Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
+                        Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(dir, FileMode.Open), "ochincin"));
                     }
                 }
             }
@@ -440,7 +452,7 @@ namespace Pes7BotCrator.Modules.FunFunc
                         graphics.Save();
                     }
                     string dir = SaveIt(re.From.Id,"who",bmp,th);
-                    await Parent.Client.SendPhotoAsync(re.Chat.Id, new FileToSend("ochincin", System.IO.File.Open(dir, FileMode.Open)));
+                    await Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(dir, FileMode.Open), "ochincin"));
                 });
                 ther.Start();
             }

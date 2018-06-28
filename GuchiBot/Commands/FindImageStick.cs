@@ -20,12 +20,11 @@ namespace GuchiBot.Commands
                 var image = query.Query.Split('b').Last();
                 if (image != null)
                 {
-                    Telegram.Bot.Types.InlineQueryResults.InlineQueryResult[] results = {
-                            new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultPhoto{
-                                Id = rand.Next(0,1488).ToString(),
-                                Url = $"http://botimages.kl.com.ua/{image}.png",
-                                ThumbUrl = $"http://botimages.kl.com.ua/{image}.png"
-                            }
+                    Telegram.Bot.Types.InlineQueryResults.InlineQueryResultPhoto[] results = {
+                        new Telegram.Bot.Types.InlineQueryResults.InlineQueryResultPhoto(
+                            rand.Next(0,1488).ToString(),
+                            $"http://botimages.kl.com.ua/{image}.png",
+                            $"http://botimages.kl.com.ua/{image}.png")
                     };
                     Parent.Client.AnswerInlineQueryAsync(query.Id, results);
                 }

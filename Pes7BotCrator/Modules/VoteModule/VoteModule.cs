@@ -95,22 +95,22 @@ namespace Pes7BotCrator.Modules
             InlineKeyboardMarkup keyboard = null;
             if (query == null)
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.First} 0",$"id:{opr.Id}:type:v1"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.Second} 0",$"id:{opr.Id}:type:v0")
+                        new InlineKeyboardButton(){Text = $"{opr.First} 0",CallbackData = $"id:{opr.Id}:type:v1"},
+                        new InlineKeyboardButton(){Text = $"{opr.Second} 0",CallbackData = $"id:{opr.Id}:type:v0"},
                     }
                 });
             }
             else
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.First} 0",$"id:{opr.Id}:type:v1"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.Second} 0",$"id:{opr.Id}:type:v0")
+                        new InlineKeyboardButton(){Text = $"{opr.First} 0",CallbackData = $"id:{opr.Id}:type:v1"},
+                        new InlineKeyboardButton(){Text = $"{opr.Second} 0",CallbackData = $"id:{opr.Id}:type:v0"},
                     },
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                        new InlineKeyboardButton(){Text = "Share", SwitchInlineQuery = query}
                     }
                 });
             }
@@ -122,22 +122,22 @@ namespace Pes7BotCrator.Modules
             InlineKeyboardMarkup keyboard = null;
             if (query == null)
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.First} {l}",$"id:{opr.Id}:type:v1"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.Second} {d}",$"id:{opr.Id}:type:v0")
+                        new InlineKeyboardButton(){Text = $"{opr.First} {l}",CallbackData = $"id:{opr.Id}:type:v1"},
+                        new InlineKeyboardButton(){Text = $"{opr.Second} {d}",CallbackData = $"id:{opr.Id}:type:v0"}
                     }
                 });
             }
             else
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.First} {l}",$"id:{opr.Id}:type:v1"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"{opr.Second} {d}",$"id:{opr.Id}:type:v0")
+                        new InlineKeyboardButton(){Text = $"{opr.First} {l}",CallbackData = $"id:{opr.Id}:type:v1"},
+                        new InlineKeyboardButton(){Text = $"{opr.Second} {d}",CallbackData = $"id:{opr.Id}:type:v0"}
                     },
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                        new InlineKeyboardButton(){Text = "Share", SwitchInlineQuery = query}
                     }
                 });
             }
@@ -229,7 +229,7 @@ namespace Pes7BotCrator.Modules
                     if(re.Message != null)
                         await Parent.Client.EditMessageReplyMarkupAsync(ms.Chat.Id, ms.MessageId, keyboard);
                     else
-                        await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
+                        await Parent.Client.EditMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
                 }
                 catch { };
             });

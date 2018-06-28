@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.InputFiles;
 
 namespace Pes7BotCrator.Modules
 {
@@ -54,21 +55,21 @@ namespace Pes7BotCrator.Modules
             return ms;
         }
 
-        public async Task<Message> SendTimeRelayMessageAsynkAsync(ChatId id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        public async Task<Message> SendTimeRelayMessageAsynkAsync(ChatId id, InputOnlineFile photo, int time, string caption, int relayToMessageId = 0)
         {
             var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
             TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
             return ms;
         }
 
-        public async Task<Message> SendTimeRelayPhotoAsynkAsync(long id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        public async Task<Message> SendTimeRelayPhotoAsynkAsync(long id, InputOnlineFile photo, int time, string caption, int relayToMessageId = 0)
         {
             var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
             TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));
             return ms;
         }
 
-        public async Task<Message> SendTimeRelayPhotoAsynkAsync(string id, FileToSend photo, int time, string caption, int relayToMessageId = 0)
+        public async Task<Message> SendTimeRelayPhotoAsynkAsync(string id, InputOnlineFile photo, int time, string caption, int relayToMessageId = 0)
         {
             var ms = await Parent.Client.SendPhotoAsync(id, photo, caption, replyToMessageId: relayToMessageId);
             TimeRelayMessages.Add(new TimeRelayMessage(Parent, ms, TypeOfTimeRealyMessage.AutoDel, time));

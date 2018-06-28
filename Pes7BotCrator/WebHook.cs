@@ -15,7 +15,11 @@ namespace Pes7BotCrator
         public WebHook(IBot parent)
         {
             Parent = parent;
-            Parent.Client.SetWebhookAsync("");
+            try
+            {
+                Parent.Client.SetWebhookAsync("");
+            }
+            catch { }
             PreDefineAllwaysInWebHook();
         }
         private int time_noConnect = 0;
@@ -40,7 +44,7 @@ namespace Pes7BotCrator
                         }).Start();
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
                     Parent.Exceptions.Add(new Exception($"NOPE of Internet Acess {{{time_noConnect}}} sec."));
                     time_noConnect += 10;
@@ -59,9 +63,9 @@ namespace Pes7BotCrator
             var com = tryToParseNameBotCommand(ms?.Text);
             switch (Up.Type)
             {
-                case Telegram.Bot.Types.Enums.UpdateType.MessageUpdate:
+                case Telegram.Bot.Types.Enums.UpdateType.Message:
                     switch (Up.Message.Type) {
-                        case Telegram.Bot.Types.Enums.MessageType.VoiceMessage:
+                        case Telegram.Bot.Types.Enums.MessageType.Voice:
                             /* Скачует хорошо, но вот роспознать проблема.
                             var voice = Up.Message.Voice;
                             var file = await Parent.Client.GetFileAsync(voice.FileId);
@@ -99,7 +103,7 @@ namespace Pes7BotCrator
                              */
                             //} catch (Exception ex) { Parent.Exceptions.Add(ex); }
                             break;
-                        case Telegram.Bot.Types.Enums.MessageType.PhotoMessage:
+                        case Telegram.Bot.Types.Enums.MessageType.Photo:
                             SimpleMessageHere(ms);
                             foreach (SynkCommand sy in Photo_commands.Where(
                                 fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
@@ -128,7 +132,7 @@ namespace Pes7BotCrator
                                 break;
                             }
                             break;
-                        case Telegram.Bot.Types.Enums.MessageType.TextMessage:
+                        case Telegram.Bot.Types.Enums.MessageType.Text:
                             SimpleMessageHere(ms);
                             foreach (SynkCommand sy in Standart_commands.Where(
                                 fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
@@ -152,7 +156,8 @@ namespace Pes7BotCrator
                                         break;
                                     }
                                 }
-                                await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
+                                if(sy.ClearCommand)
+                                    await BotBase.ClearCommandAsync(ms.Chat.Id, ms.MessageId, Parent);
                                 sy.doFunc.DynamicInvoke(ms, Parent, args);
                                 break;
                             }
@@ -162,10 +167,10 @@ namespace Pes7BotCrator
                             } catch { }
                             cc++;
                             break;
-                        case Telegram.Bot.Types.Enums.MessageType.StickerMessage:
+                        case Telegram.Bot.Types.Enums.MessageType.Sticker:
 
                             break;
-                        case Telegram.Bot.Types.Enums.MessageType.ServiceMessage:
+                        default:
                             foreach (SynkCommand sy in Service_commands)
                             {
                                 doInNewThread(() =>
@@ -176,7 +181,7 @@ namespace Pes7BotCrator
                             break;
                     }
                     break;
-                case Telegram.Bot.Types.Enums.UpdateType.CallbackQueryUpdate:
+                case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
                     CallbackQuery qq = Up.CallbackQuery;
                     foreach (SynkCommand sy in Query_commands.Where(fn => fn.CommandLine.Exists(nf => Up.CallbackQuery.Data.Contains(nf))))
                     {
@@ -184,7 +189,7 @@ namespace Pes7BotCrator
                         break;
                     }
                     break;
-                case Telegram.Bot.Types.Enums.UpdateType.InlineQueryUpdate:
+                case Telegram.Bot.Types.Enums.UpdateType.InlineQuery:
                     var query = Up.InlineQuery;
                     foreach (SynkCommand sy in InlineQuery_commands)
                     {
