@@ -17,6 +17,8 @@ namespace GuchiBot.Modules
         public GuchiVoice() : base("GuchiSound", typeof(GuchiVoice))
         {
             _GVoice = new GVoice();
+            if (!Directory.Exists("FunFunc/GuchiVoice"))
+                Directory.CreateDirectory("FunFunc/GuchiVoice");
             Files = new List<string>();
             Files.AddRange(Directory.GetFiles("FunFunc/GuchiVoice","*.mp3"));
         }
@@ -26,13 +28,16 @@ namespace GuchiBot.Modules
         }
         public static void Act(Message re, IBot Parent, List<ArgC> args)
         {
-            var th = new Thread(async () =>
+            if (Files.Count > 0)
             {
-                var file = System.IO.File.Open(Files[Parent.Rand.Next(0, Files.Count)], FileMode.Open);
-                await Parent.Client.SendVoiceAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(file));
-                file.Close();
-            });
-            th.Start();
+                var th = new Thread(async () =>
+                {
+                    var file = System.IO.File.Open(Files[Parent.Rand.Next(0, Files.Count)], FileMode.Open);
+                    await Parent.Client.SendVoiceAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(file));
+                    file.Close();
+                });
+                th.Start();
+            }
         }
     }
 }
