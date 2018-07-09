@@ -96,6 +96,7 @@
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Lua\OLua.cs" />
+    <Compile Include="Modules\GuchiVoice.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Bot\Logic\WebmModule.cs" />

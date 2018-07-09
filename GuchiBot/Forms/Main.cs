@@ -15,6 +15,7 @@ using GuchiBot.Interface;
 using GuchiBot.Commands;
 using Pes7BotCrator.Modules.FunFunc;
 using Pes7BotCrator.Modules.LikeDislikeModule;
+using GuchiBot.Modules;
 
 namespace GuchiBot
 {
@@ -58,7 +59,8 @@ namespace GuchiBot
                     new TransitFileModule("./Downloads"),
                     new Statistic(),
                     new TRM(),
-                    new FunFunc("FunFunc/FaceYouZerro","FunFunc/Who/WhoTitles","FunFunc/Who/WhoAnswers","FunFunc/Trigger")
+                    new FunFunc("FunFunc/FaceYouZerro","FunFunc/Who/WhoTitles","FunFunc/Who/WhoAnswers","FunFunc/Trigger"),
+                    new GuchiVoice()
                 }
             );
 
@@ -84,6 +86,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ChtoEto);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Otvetka);
             Bot.SynkCommands.Add(Bot.GetModule<TRM>()._SayAfterMe);
+            Bot.SynkCommands.Add(Bot.GetModule<GuchiVoice>()._GVoice);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
