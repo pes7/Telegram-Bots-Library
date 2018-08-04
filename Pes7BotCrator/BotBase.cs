@@ -104,25 +104,24 @@ namespace Pes7BotCrator
         /*Нужна Сильная доработка*/
         public async Task<FileStream> getFileFrom(string id, string name = null)
         {
-            if (name != null)
-            {
-                if (System.IO.File.Exists($"./DownloadFiles/{name}"))
-                {
-                    string filePath = $"./DownloadFiles/{name}";
-                    return new FileStream(filePath,FileMode.Open);
-                }
-            }
-            var photo = Client.GetFileAsync(id).Result;
-            string filename = photo.FilePath.Split('/')[1];
             if (!Directory.Exists("./DownloadFiles"))
                 Directory.CreateDirectory("./DownloadFiles");
-            if (System.IO.File.Exists($"./DownloadFiles{filename}"))
-                return new FileStream($"./DownloadFiles/{filename}",FileMode.Open);
-            var file = new FileStream($"./DownloadFiles/{filename}",FileMode.Create);
-            var down = Client.GetFileAsync(id);
-            //await down.Result.FileStream.CopyToAsync(file); //ВАЖНО БЕЗ ЭТОГО НЕ БУДЕТ СОХРАНЯТЬ
-            return file;
+            //var down = Client.GetFileAsync(id);
+            var file = await Client.GetFileAsync(id);
+
+            var filename = file.FileId + "." + file.FilePath.Split('.').Last();
+
+            if (System.IO.File.Exists($"./DownloadFiles/{filename}"))
+                return new FileStream($"./DownloadFiles/{filename}", FileMode.Open);
+
+            var realPath = $"./DownloadFiles/{filename}";
+            using (var saveImageStream = System.IO.File.Open(realPath, FileMode.Create))
+            {
+                await Client.DownloadFileAsync(file.FilePath, saveImageStream);
+                return System.IO.File.Open(realPath,FileMode.Open);
+            }
         }
+
         public virtual void Dispose()
         {
             WebThread.Abort();

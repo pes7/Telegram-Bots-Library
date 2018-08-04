@@ -68,7 +68,7 @@ namespace GuchiBot
             lua = new OLua(Bot);
 
             Bot.SynkCommands.Add(Bot.GetModule<LikeDislikeModule>().Command);
-            Bot.SynkCommands.Add(new Pes7BotCrator.Commands.Help(Bot));
+            Bot.SynkCommands.Add(new Pes7BotCrator.Commands.Help());
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandHelp);
             Bot.SynkCommands.Add(Bot.GetModule<Statistic>().CommandRuntime);
             Bot.SynkCommands.Add(new LogUlog(Bot,LogUlog.TypeOf.MessageWithNameAndChannelName,"Приветсвую тебя @{0} в нашем {1}!","Увы, наши пути расходятся..."));

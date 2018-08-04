@@ -107,7 +107,7 @@ namespace Pes7BotCrator
                             SimpleMessageHere(ms);
                             foreach (SynkCommand sy in Photo_commands.Where(
                                 fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
-                                fn.CommandName.ToUpper() == args?.ElementAt(0)?.Name.ToUpper() && fn.CommandName != null)
+                                fn.CommandName?.ToUpper() == args?.ElementAt(0)?.Name.ToUpper() && fn.CommandName != null)
                                 ))
                             {
                                 if (sy.TypeOfAccess == TypeOfAccess.Admin && ms.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Private)

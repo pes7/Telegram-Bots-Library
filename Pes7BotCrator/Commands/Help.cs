@@ -11,8 +11,7 @@ namespace Pes7BotCrator.Commands
 {
     public class Help : SynkCommand
     {
-        public BotBase Parent { get; set; }
-        public Help(BotBase bot) : base(Act, new List<string>() { "/help" }, commandName: "помощь", descr:"Список команд.") { Parent = bot; }
+        public Help() : base(Act, new List<string>() { "/help" }, commandName: "хелп", descr:"Список команд.") { }
         public static void Act(Message re, IBot Parent, List<ArgC> args)
         {
             Parent.Client.SendTextMessageAsync(re.Chat.Id,$"This bot[{Parent.Name}] was created with pes7's Bot Creator.");

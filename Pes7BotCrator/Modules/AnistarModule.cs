@@ -20,6 +20,7 @@ namespace Pes7BotCrator.Modules
             Command = new SynkCommand(ParseAsync,new List<string>() { "/animetoday" },descr:"Отображает ангоинги аниме.");
         }
 
+        int i = 0;
         public void ParseAsync(Message message, IBot Parent, List<ArgC> args)
         {
             var web = new HtmlWeb()

@@ -24,7 +24,7 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm = null, TypeOfAccess access = TypeOfAccess.Public, string commandName = null, string descr = null, bool clearcommand = true)
+        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm, TypeOfAccess access = TypeOfAccess.Public, string commandName = null, string descr = null, bool clearcommand = true)
         {
             Description = descr;
             TypeOfAccess = access;
