@@ -25,6 +25,10 @@ You can find me on discord https://discord.gg/VfhRvdW and ask about something
 ### Pes7BotCrator - main Library
 ### GuchiBot - example
 # Main:
+## Install:
+Include: Pes7BotCrator.dll (Compile or find on example)<br>
+Include: Telegram.Bot.dll (Finsd on Library Bin)<br>
+Set 7.0 version of project
 ## Creating a Bot:
 ``` c#
 Bot = new Bot(
