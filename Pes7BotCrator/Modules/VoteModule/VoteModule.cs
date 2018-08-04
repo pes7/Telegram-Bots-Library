@@ -53,12 +53,12 @@ namespace Pes7BotCrator.Modules
             public VoteCreateSynkCommand() : base((Message ms, IBot Parent, List<ArgC> arg) => {
                 if (arg != null)
                 {
-                    ArgC text = arg.Where(fn => fn.Name.Contains("text")).First();
+                    var text = ArgC.GetArg(arg, "text", "0");
                     ArgC first = null, second = null;
                     if (arg.Count > 2)
                     {
-                        first = arg.Where(fn => fn.Name.Contains("answ1")).First();
-                        second = arg.Where(fn => fn.Name.Contains("answ2")).First();
+                        first = ArgC.GetArg(arg, "answ1", "1");
+                        second = ArgC.GetArg(arg, "answ2", "2");
                     }
                     if (text != null) {
                         Opros op;
