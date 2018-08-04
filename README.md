@@ -27,7 +27,7 @@ You can find me on discord https://discord.gg/VfhRvdW and ask about something
 # Main:
 ## Install:
 Include: Pes7BotCrator.dll (Compile or find on example)<br>
-Include: <a href = "https://github.com/TelegramBots/telegram.bot">.NET Client for Telegram Bot API</a><br>
+Include: Telegram.Bot.dll (Finsd on Library Bin)<br>
 Set 7.0 version of project
 ## Creating a Bot:
 ``` c#
