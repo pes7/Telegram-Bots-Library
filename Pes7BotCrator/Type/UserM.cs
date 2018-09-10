@@ -14,8 +14,10 @@ namespace Pes7BotCrator.Type
     {
         public string PhotoPath { get; set; } = null;
         public int MessageCount { get; set; }
+        public List<long> FromChat { get; set; }
         public UserM(User us, int i = 0) : base()
         {
+            this.FromChat = new List<long>();
             this.Username = us.Username;
             this.LastName = us.LastName;
             this.Id = us.Id;
@@ -60,7 +62,9 @@ namespace Pes7BotCrator.Type
         }
         public static string usernameGet(User us)
         {
-            return us.Username != null ? us.Username : $"{us.FirstName} {us.LastName}";
+            if(us!= null)
+                return us?.Username != null ? us.Username : $"{us.FirstName} {us.LastName}";
+            return null;
         }
     }
 }

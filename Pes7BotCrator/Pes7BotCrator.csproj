@@ -101,6 +101,7 @@
     <Compile Include="Type\SynkCommand.cs" />
     <Compile Include="Modules\2chModule\Types\ThBoard.cs" />
     <Compile Include="Type\UserM.cs" />
+    <Compile Include="Type\UserSerializable.cs" />
     <Compile Include="WebHook.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Resources\bomg.jpg" />
+    <Content Include="Resources\boss.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

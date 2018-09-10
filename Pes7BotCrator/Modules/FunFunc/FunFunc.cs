@@ -17,6 +17,7 @@ namespace Pes7BotCrator.Modules.FunFunc
 {
     public class FunFunc : Module
     {
+        public List<UserSerializable> Bosses { get; set; }
         public InfTrue _CommandInf { set; get; }
         public ElseElse _CommandElse { get; set; }
         public GuchiName _CommandGuchi { get; set; }
@@ -28,10 +29,13 @@ namespace Pes7BotCrator.Modules.FunFunc
         public Otvetka _Otvetka { get; set; }
         public ActiveUsersMosaic _ActiveUsersMosaic { get; set; }
         public Random Rand { get; set; }
+        public BossOfTheGym _BossOfTheGym { get; set; }
+        public BossOfTheGymSide _BossOfTheGymSide { get; set; }
         public string FaceImageDir { get; set; }
         public string WhoTitles { get; set; }
         public string WhoAnswers { get; set; }
         public string Triggers { get; set; }
+        public string FileNameBoss = "Bosses.bot";
         public FunFunc(string imageDir = null, string whoTitles = null, string whoAnswers = null, string trigger = null) : base("FunFunc", typeof(FunFunc))
         {
             _CommandInf = new InfTrue();
@@ -44,6 +48,8 @@ namespace Pes7BotCrator.Modules.FunFunc
             _DvachRoll = new DvachRoll();
             _ChtoEto = new ChtoEto();
             _Otvetka = new Otvetka();
+            _BossOfTheGym = new BossOfTheGym();
+            _BossOfTheGymSide = new BossOfTheGymSide();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -51,6 +57,10 @@ namespace Pes7BotCrator.Modules.FunFunc
             if (Directory.Exists("FunPics"))
                 Directory.CreateDirectory("FunPics");
             Rand = new Random();
+            if (System.IO.File.Exists(FileNameBoss))
+                Bosses = LoadBosses();
+            else
+                Bosses = new List<UserSerializable>();
         }
         public class InfTrue : SynkCommand
         {
@@ -92,6 +102,104 @@ namespace Pes7BotCrator.Modules.FunFunc
         public class ChtoEto : SynkCommand
         {
             public ChtoEto() : base(ChtoAct, new List<string>() { "/chto" }, commandName: "расскажи", descr: "Гачи найдёт информацию в гугле. Параметры: text, photo или video", clearcommand:false) { }
+        }
+        public class BossOfTheGym : SynkCommand
+        {
+            public BossOfTheGym() : base(BossOfTheGymAct, new List<string>() { "/bossclaim" }, commandName: "захват", descr: "Кто же бос этой качалки?", clearcommand: false) { }
+        }
+        public class BossOfTheGymSide : SynkCommand
+        {
+            public BossOfTheGymSide() : base(BossOfTheGymActRegistration, new List<string>() { "/boss" }, commandName: "босс", descr: "Сражаться за ринг.", clearcommand: false) { }
+        }
+
+        private List<UserSerializable> LoadBosses()
+        {
+            return SaveLoadModule.LoadSomething<List<UserSerializable>>(FileNameBoss);
+        }
+
+        public void SaveBosses()
+        {
+            var ls = Bosses;
+            SaveLoadModule.SaveSomething(ls, FileNameBoss);
+        }
+
+        public static void BossOfTheGymActRegistration(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                var fun = Parent.GetModule<FunFunc>();
+                var u = fun.Bosses.Find(fn => UserM.usernameGet(fn.GetUser()).Equals(UserM.usernameGet(re.From)));
+                if (u != null)
+                {
+                    if (u.FromChat.Exists(f => f == re.Chat.Id))
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Ты уже и так не ринге @{UserM.usernameGet(re.From)}!");
+                    else
+                    {
+                        u.FromChat.Add(re.Chat.Id);
+                        Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Добро пожаловать на ринг @{UserM.usernameGet(re.From)}!");
+                    }
+                }
+                else
+                {
+                    Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Добро пожаловать на ринг @{UserM.usernameGet(re.From)}!");
+                    var us = new UserM(re.From);
+                    us.FromChat.Add(re.Chat.Id);
+                    fun.Bosses.Add(new UserSerializable(us));
+                    fun.SaveBosses();
+                }
+            }
+        }
+
+        public static void BossOfTheGymAct(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                string path = $"Boss_{re.Chat.Id}.bot";
+                TimeSpan timeLoss = new TimeSpan(24);
+                string name = null;
+                var fun = Parent.GetModule<FunFunc>();
+                var now_Time = DateTime.Now;
+                var id = re.Chat.Id;
+                bool AssWeCan = false;
+                if (System.IO.File.Exists(path))
+                {
+                    var strings = System.IO.File.ReadAllText(path);
+                    var split = strings.Split('|');
+                    name = split[0];
+                    string time = split[1];
+                    var old = DateTime.Parse(time);
+                    var timeLosser = now_Time - old;
+                    timeLoss = new TimeSpan(24, 0, 0) - timeLosser;
+                    if (timeLoss.TotalMinutes < 0)
+                        AssWeCan = true;
+                }
+                else AssWeCan = true;
+                var usersFromThisChat = fun.Bosses.FindAll(fn => fn.FromChat.Any(g => g == id));
+                if (AssWeCan && usersFromThisChat.Count > 0)
+                {
+                    
+                    System.IO.File.Delete(path);
+                    Parent.Client.SendTextMessageAsync(id,"Ринг разрывется бурными овациями");
+                    Thread.Sleep(1000);
+                    Parent.Client.SendTextMessageAsync(id, "Все гачимены выходят на ринг");
+                    Thread.Sleep(1000);
+                    Parent.Client.SendTextMessageAsync(id, "Кто же на этот раз останеться с порваным очком");
+                    Thread.Sleep(1000);
+                    Parent.Client.SendTextMessageAsync(id, "БОЙ!!!");
+                    Thread.Sleep(2000);
+                    var winner = usersFromThisChat[Parent.Rand.Next(0, usersFromThisChat.Count)];
+                    Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open("boss.png", FileMode.Open), "boss"));
+                    Thread.Sleep(500);
+                    Parent.Client.SendTextMessageAsync(id, $"Поздравте этого LezerBOY: @{UserM.usernameGet(winner.GetUser())}, теперь он обладатель титула \"Бездонная Дыра\" и абсолютный чемпион качалки на сегодняшний день.");
+                    var file = System.IO.File.Create(path);
+                    file.Close();
+                    System.IO.File.WriteAllText(path, $"{UserM.nameGet(winner.GetUser())}|{now_Time}");
+                }
+                else
+                {
+                    Parent.Client.SendTextMessageAsync(re.Chat.Id, $"Энене, Босс качалки уже предопределён: {name} и будет им на протяжении {timeLoss.TotalHours} часов и {timeLoss.Minutes} минут.");
+                }
+            }
         }
 
         public static void ActTrig(Update up, IBot Parent, List<ArgC> args)

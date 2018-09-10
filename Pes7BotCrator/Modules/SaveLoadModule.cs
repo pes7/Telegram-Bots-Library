@@ -67,12 +67,17 @@ namespace Pes7BotCrator.Modules
                 var i = DateTime.UtcNow.ToString().Split(' ');
                 var j = Path.GetFileName(file);
                 var k = $"./BackUp/{String.Join("_",i[0].Split('.'))}_{String.Join("_", i[1].Split(':'))}_{j}";
-                File.Copy(file,$"{k}");
+                try
+                {
+                    File.Copy(file, $"{k}");
+                }
+                catch { }
             }
         }
 
         public void saveIt()
         {
+            backupIt();
             foreach (var act in SaveActions)
             {
                 act.DynamicInvoke();

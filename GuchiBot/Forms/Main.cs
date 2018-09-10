@@ -87,6 +87,8 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._Otvetka);
             Bot.SynkCommands.Add(Bot.GetModule<TRM>()._SayAfterMe);
             Bot.SynkCommands.Add(Bot.GetModule<GuchiVoice>()._GVoice);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGym);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGymSide);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
@@ -159,6 +161,7 @@ namespace GuchiBot
 
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<LikeDislikeModule>().Save);
             Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<VoteModule>().Save);
+            Bot.GetModule<SaveLoadModule>().SaveActions.Add(Bot.GetModule<FunFunc>().SaveBosses);
             Bot.Start();
         }
 
