@@ -10,7 +10,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Pes7BotCrator.Modules.Types;
 using Pes7BotCrator.Modules.Types.LikeDislike;
 
-namespace Pes7BotCrator.Modules
+namespace Pes7BotCrator.Modules.LikeDislikeModule
 {
     public class LikeDislikeModule : Module
     {
@@ -45,22 +45,22 @@ namespace Pes7BotCrator.Modules
             InlineKeyboardMarkup keyboard = null;
             if (query == null)
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0","t:f:type:like"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0","t:f:type:dislike")
+                        new InlineKeyboardButton(){Text = "👍 0",CallbackData = "t:f:type:like"},
+                        new InlineKeyboardButton(){Text = "👎 0",CallbackData = "t:f:type:dislike"}
                     }
                 });
             }
             else
             {
-                keyboard = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👍 0",$"t:f:type:like"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton("👎 0",$"t:f:type:dislike")
+                        new InlineKeyboardButton(){Text = "👍 0",CallbackData = "t:f:type:like"},
+                        new InlineKeyboardButton(){Text = "👎 0",CallbackData = "t:f:type:dislike"}
                     },
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                        new InlineKeyboardButton(){Text="Share",SwitchInlineQuery = query}
                     }
                 });
             }
@@ -72,22 +72,22 @@ namespace Pes7BotCrator.Modules
             InlineKeyboardMarkup keyboard = null;
             if (query == null)
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {l}",$"t:f:type:like"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {d}",$"t:f:type:dislike")
+                        new InlineKeyboardButton(){Text = $"👍 {l}",CallbackData = "t:f:type:like"},
+                        new InlineKeyboardButton(){Text = $"👎 {d}",CallbackData = "t:f:type:dislike"}
                     }
                 });
             }
             else
             {
-                keyboard = new InlineKeyboardMarkup(new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardButton[][] {
+                keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[][] {
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👍 {l}",$"t:f:type:like"),
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardCallbackButton($"👎 {d}",$"t:f:type:dislike")
+                        new InlineKeyboardButton(){Text = $"👍 {l}",CallbackData = "t:f:type:like"},
+                        new InlineKeyboardButton(){Text = $"👎 {d}",CallbackData = "t:f:type:dislike"}
                     },
                     new [] {
-                        new Telegram.Bot.Types.InlineKeyboardButtons.InlineKeyboardSwitchInlineQueryButton("Share",query)
+                        new InlineKeyboardButton(){Text="Share",SwitchInlineQuery = query}
                     }
                 });
             }
@@ -104,8 +104,7 @@ namespace Pes7BotCrator.Modules
                 query = re.Message.Caption;
                 id = re.Message.MessageId;
             }
-            else
-                id = long.Parse(re.Id);
+            else id = long.Parse(re.Id);
             LikeDislikeModule LDModule = Parent.GetModule<LikeDislikeModule>();
             Likes ll;
             if(ms!=null)
@@ -177,7 +176,7 @@ namespace Pes7BotCrator.Modules
                     else {
                         if (FullShow)
                         {
-                            await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
+                            await Parent.Client.EditMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
                             //string text = ll;
                             //foreach(long fid in ll.LikeId)
                             //    text = 
@@ -185,7 +184,7 @@ namespace Pes7BotCrator.Modules
                         }
                         else
                         {
-                            await Parent.Client.EditInlineMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
+                            await Parent.Client.EditMessageReplyMarkupAsync(re.InlineMessageId, keyboard);
                         }
                     }     
                 }
@@ -209,8 +208,7 @@ namespace Pes7BotCrator.Modules
 
         public void Load()
         {
-            var d = SaveLoadModule.LoadSomething<List<Likes>>(FileName);
-            LLikes.AddRange(d);
+            LLikes.AddRange(SaveLoadModule.LoadSomething<List<Likes>>(FileName));
         }
     }
 }

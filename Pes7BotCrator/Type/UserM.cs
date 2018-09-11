@@ -14,8 +14,10 @@ namespace Pes7BotCrator.Type
     {
         public string PhotoPath { get; set; } = null;
         public int MessageCount { get; set; }
+        public List<long> FromChat { get; set; }
         public UserM(User us, int i = 0) : base()
         {
+            this.FromChat = new List<long>();
             this.Username = us.Username;
             this.LastName = us.LastName;
             this.Id = us.Id;
@@ -33,17 +35,24 @@ namespace Pes7BotCrator.Type
                 }
             }
             var photo = await Parent.Client.GetUserProfilePhotosAsync(this.Id, 0, 1);
-            if (photo?.Photos.First() != null)
+            if (photo?.Photos.Length > 0)
             {
-                if (!Directory.Exists("./UserPhotoes"))
-                Directory.CreateDirectory("./UserPhotoes");
-                using (var file = System.IO.File.Create($"./UserPhotoes/{this.Id}.jpg", 32 * 8 * 1024, FileOptions.Asynchronous))
+                if (photo.Photos.First() != null)
                 {
-                    file.Flush(true);
-                    await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId, file);
+                    if (!Directory.Exists("./UserPhotoes"))
+                        Directory.CreateDirectory("./UserPhotoes");
+
+                    var file = await Parent.Client.GetFileAsync(photo.Photos.First().First().FileId);
+
+                    var PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
+
+                    using (var saveImageStream = System.IO.File.Open(PhotoPath, FileMode.Create))
+                    {
+                        await Parent.Client.DownloadFileAsync(file.FilePath, saveImageStream);
+                    }
+                    return true;
                 }
-                PhotoPath = $"./UserPhotoes/{this.Id}.jpg";
-                return true;
+                else return false;
             }
             else return false;
         }
@@ -53,7 +62,9 @@ namespace Pes7BotCrator.Type
         }
         public static string usernameGet(User us)
         {
-            return us.Username != null ? us.Username : $"{us.FirstName} {us.LastName}";
+            if(us!= null)
+                return us?.Username != null ? us.Username : $"{us.FirstName} {us.LastName}";
+            return null;
         }
     }
 }

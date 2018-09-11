@@ -45,8 +45,7 @@ namespace Pes7BotCrator.Modules
         }
         public static void ActAll(Update up, IBot Parent, List<ArgC> args)
         {
-            int i = 0;
-            if (up.Message != null && up?.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage && args != null)
+            if (up.Message != null && up?.Message.Type == Telegram.Bot.Types.Enums.MessageType.Text && args != null)
             {
                 var CommandStat = Parent.GetModule<Statistic>().CommandStat;
                 string command = null;

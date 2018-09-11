@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 .vs/TelegramBots/v14/.suo
 GuchiBot/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.txt
@@ -6,4 +7,29 @@ GuchiBot/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 Pic_finder/bin/Debug/Pic_finder.vshost.exe
 .vs/TelegramBots/v14/.suo
 .vs/TelegramBots/v15/.suo
+*.cache
+=======
+*.bot
+*.bot
+*.bot
+*.mp3
+*.waw
+*.mp4
+GuchiBot/bin/Debug/FunPics/
+GuchiBot/bin/Debug/UserPhotoes
+/
+GuchiBot/bin/Debug/previews/
+GuchiBot/bin/Debug/olduserph/
+*.psess
+*.ide-wal
+*.ide
+*.lock
+*.ide-shm
+*.vspx
+*.txt
+GuchiBot/bin/Debug/voteslike.bot
+*.bot
+GuchiBot/bin/Debug/kek.jpg
+>>>>>>> master
+GuchiBot/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.cache

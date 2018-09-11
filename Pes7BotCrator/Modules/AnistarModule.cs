@@ -20,6 +20,7 @@ namespace Pes7BotCrator.Modules
             Command = new SynkCommand(ParseAsync,new List<string>() { "/animetoday" },descr:"Отображает ангоинги аниме.");
         }
 
+        int i = 0;
         public void ParseAsync(Message message, IBot Parent, List<ArgC> args)
         {
             var web = new HtmlWeb()
@@ -28,7 +29,7 @@ namespace Pes7BotCrator.Modules
                 OverrideEncoding = Encoding.GetEncoding("windows-1251")
             };
             HtmlDocument html = web.Load("https://anistar.me/raspisanie-vyhoda-seriy-ongoingov.html");
-            var dle = html.GetElementbyId("dle-content");
+            var dle = html.GetElementbyId("dle-content").ChildNodes.Where(fs => fs.Name == "small").First();
             var news = dle.ChildNodes.Where(fn => fn.HasClass("news-top"));
             var animenow = news.ElementAt(0).ChildNodes.Where(fn => fn.HasClass("top-new")).First().ChildNodes.Where(sn => sn.Name == "div");
             foreach (var an in animenow)
@@ -37,7 +38,7 @@ namespace Pes7BotCrator.Modules
                 var t = anime.ChildNodes.Where(sf => sf.HasClass("timer_cal")).First();
                 string picHref = anime.Attributes["style"].Value.Split('\'').Where(fn => fn.Contains("uploads")).First();
                 string time = t.ChildNodes.Where(fs => fs.Name == "smal" || fs.Name == "span").First().InnerText;
-                Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(new Uri($"https://anistar.me{picHref}")), time);
+                //Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(new Uri($"https://anistar.me{picHref}").), time); //Нужно исправить
             }
         }
 

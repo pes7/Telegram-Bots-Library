@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Pes7BotCrator</RootNamespace>
     <AssemblyName>Pes7BotCrator</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -34,19 +34,22 @@
     <Reference Include="HtmlAgilityPack, Version=1.6.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.6.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NReco, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\NReco.dll</HintPath>
     </Reference>
-    <Reference Include="NReco.VideoConverter">
+    <Reference Include="NReco.VideoConverter, Version=1.1.2.0, Culture=neutral, PublicKeyToken=395ccb334978a0cd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\NReco.VideoConverter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,20 +57,32 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Telegram.Bot">
-      <HintPath>..\GuchiBot\bin\Debug\Telegram.Bot.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
+    <Reference Include="Telegram.Bot, Version=13.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Telegram.Bot.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotBase.cs" />
     <Compile Include="Commands\LogUlog.cs" />
+    <Compile Include="CrushReloader.cs" />
+    <Compile Include="Modules\FunFunc\FunFunc.cs" />
+    <Compile Include="Modules\FunFunc\FunRes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FunRes.resx</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Modules\LikeDislikeModule\LikeMe.cs" />
+    <Compile Include="Modules\SpeechRecognationModule.cs" />
+    <Compile Include="Modules\TransitFileModule.cs" />
     <Compile Include="Modules\TRM\TRM.cs" />
     <Compile Include="Modules\TRM\Types\TimeRelayMessage.cs" />
     <Compile Include="Modules\VoteModule\Types\Likes.cs" />
     <Compile Include="Modules\VoteModule\Types\Opros.cs" />
     <Compile Include="Modules\VoteModule\Types\VoteMessage.cs" />
     <Compile Include="Modules\VoteModule\VoteModule.cs" />
+    <Compile Include="Type\GList.cs" />
     <Compile Include="Type\IBot.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Modules\Statistic.cs" />
@@ -85,15 +100,25 @@
     <Compile Include="Type\IModule.cs" />
     <Compile Include="Type\SynkCommand.cs" />
     <Compile Include="Modules\2chModule\Types\ThBoard.cs" />
-    <Compile Include="Type\TimedSynkCommand.cs" />
     <Compile Include="Type\UserM.cs" />
+    <Compile Include="Type\UserSerializable.cs" />
     <Compile Include="WebHook.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Systems\" />
+    <EmbeddedResource Include="Modules\FunFunc\FunRes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FunRes.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\bomg.jpg" />
+    <Content Include="Resources\boss.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

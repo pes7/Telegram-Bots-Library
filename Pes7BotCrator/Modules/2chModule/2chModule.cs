@@ -9,6 +9,7 @@ using System.Threading;
 using System.Diagnostics;
 using Pes7BotCrator.Commands;
 using Pes7BotCrator.Modules.Types;
+using Pes7BotCrator.Modules.LikeDislikeModule;
 
 namespace Pes7BotCrator.Modules
 {
@@ -68,7 +69,7 @@ namespace Pes7BotCrator.Modules
                                     if (format == "webm")
                                     {
                                         Console.WriteLine($"{format}|{file.fullname}|{file.path}|{file.thumbnail}");
-                                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(file.thumbnail), file.path);
+                                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(file.thumbnail), file.path);
                                     }
                                 }
                             }
@@ -123,7 +124,10 @@ namespace Pes7BotCrator.Modules
                                     {
                                         foreach (dynamic f in c.files)
                                         {
-                                            Webm file = new Webm($"https://2ch.hk{f.path}", $"https://2ch.hk{f.thumbnail}", $"{f.fullname}");
+                                            var sec = 0;
+                                            if (f.duration_secs != null)
+                                                sec = int.Parse((string)f.duration_secs);
+                                            Webm file = new Webm($"https://2ch.hk{f.path}", $"https://2ch.hk{f.thumbnail}", $"{f.fullname}", sec);
                                             string format = ((string)file.Path).Split('.')[2];
                                             if (format == "webm" || format == "mp4")
                                             {
@@ -132,11 +136,12 @@ namespace Pes7BotCrator.Modules
                                         }
                                     }
                                 }
-                            } catch (Exception ex) { Parent.Exceptions.Add(ex); return null; }
+                            }
+                            catch (Exception ex) { Parent.Exceptions.Add(ex); return null; }
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     //Parent.Exceptions.Add(ex);
                 }
@@ -150,19 +155,15 @@ namespace Pes7BotCrator.Modules
         public List<Webm> WebmsA = new List<Webm>();
         public void Ragenerated(Message ms, IBot Parent, List<ArgC> args)
         {
-            if (ms.From.Username == "nazarpes7")
-            {
-                if (WebmsA != null)
-                    WebmsA.Clear();
-                if (WebmsW != null)
-                    WebmsW.Clear();
-                WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
-                WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
-                WebmCountW = WebmsW.Count;
-                WebmCountA = WebmsA.Count;
-                Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
-            }
-            else Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"You'r not owner of this chat.");
+            if (WebmsA != null)
+                WebmsA.Clear();
+            if (WebmsW != null)
+                WebmsW.Clear();
+            WebmsW = getWebms(Parent, "http://2ch.hk/b/catalog_num.json");
+            WebmsA = getWebms(Parent, "http://2ch.hk/a/catalog_num.json");
+            WebmCountW = WebmsW.Count;
+            WebmCountA = WebmsA.Count;
+            Parent.Client.SendTextMessageAsync(ms.Chat.Id, $"Webms loaded: {WebmsW.Count} normal webms.\nWebms loaded: {WebmsA.Count} anime webms.");
         }
 
         public void get2chSmartRandWebm(Message ms,IBot Parent, List<ArgC> args)
@@ -170,7 +171,7 @@ namespace Pes7BotCrator.Modules
             List<Webm> Webms = null;
             if (args != null)
             {
-                if (args.Find(fn => fn.Name == "a" || fn.Name == "a" || fn.Name == "а") != null)
+                if (args.Find(fn => fn.Name.Trim() == "a" || fn.Name.Trim() == "a" || fn.Name.Trim() == "а") != null)
                     Webms = WebmsA;
                 else Webms = WebmsW;
             }
@@ -179,7 +180,7 @@ namespace Pes7BotCrator.Modules
             if (Webms != null && Webms?.Count > 0)
             {
                 Webm webm;
-                ArgC Count = args?.Find(sn => sn.Name == "c");
+                ArgC Count = args?.Find(sn => sn.Name.Trim() == "c");
                 if (Count != null)
                 {
                     try
@@ -188,7 +189,7 @@ namespace Pes7BotCrator.Modules
                         {
                             webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                             Webms.Remove(webm);
-                            SendWebm(Parent, webm);
+                            SendWebm(Parent, webm, ms.Chat.Id.ToString());
                         }
                     }
                     catch {}
@@ -197,7 +198,7 @@ namespace Pes7BotCrator.Modules
                 {
                     webm = Webms[Parent.Rand.Next(0, Webms.Count)];
                     Webms.Remove(webm);
-                    SendWebm(Parent, webm);
+                    SendWebm(Parent, webm, ms.Chat.Id.ToString());
                 }
             }
             else
@@ -205,7 +206,7 @@ namespace Pes7BotCrator.Modules
         }
 
         /*Be wery careful because we have there unless send if webm is not valid*/
-        public void SendWebm(IBot Parent, Webm webm)
+        public void SendWebm(IBot Parent, Webm webm, string id)
         {
             if (webm != null)
             {
@@ -213,13 +214,17 @@ namespace Pes7BotCrator.Modules
                 {
                     try
                     {
-                        await Parent.Client.SendPhotoAsync(Parent.MessagesLast.Last().Chat.Id, new FileToSend(webm.Thumbnail), webm.Path, false, 0, LikeDislikeModule.getKeyBoard(webm.Path));
+                        await Parent.Client.SendPhotoAsync(id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(webm.Thumbnail), webm.Path, Telegram.Bot.Types.Enums.ParseMode.Default, false, 0, LikeDislikeModule.LikeDislikeModule.getKeyBoard(webm.Path));
                         WebmsSent.Add(webm);
                     }
                     catch (Exception ex)
                     {
                         Parent.Exceptions.Add(ex);
-                        await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(Parent.MessagesLast.Last().Chat.Id,"Sorry, but something went wrong.",10);
+                        try
+                        {
+                            await Parent.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(id, "Sorry, but something went wrong.", 10);
+                        }
+                        catch { }
                         return;
                     }
                 });

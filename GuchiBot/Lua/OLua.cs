@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Pes7BotCrator.Type;
+using Pes7BotCrator.Modules;
+using GuchiBot;
 
 namespace LuaAble
 {
@@ -28,6 +30,8 @@ namespace LuaAble
             Lua.RegisterFunction("sendML", this, typeof(OLua).GetMethod("sendML"));
             Lua.RegisterFunction("sendStI", this, typeof(OLua).GetMethod("sendStI"));
             Lua.RegisterFunction("sendStS", this, typeof(OLua).GetMethod("sendStS"));
+            Lua.RegisterFunction("sendTR", this, typeof(OLua).GetMethod("sendTR"));
+            Lua.RegisterFunction("changeTraficTo", this, typeof(OLua).GetMethod("changeTraficTo"));
         }
         public void sendM(string id, string message)
         {
@@ -44,6 +48,14 @@ namespace LuaAble
         public void sendStS(string id, string st)
         {
             Bot.Client.SendTextMessageAsync(id, st);
+        }
+        public void sendTR(string id,string text,int time)
+        {
+            Bot.GetModule<TRM>().SendTimeRelayMessageAsynkAsync(id,text,time);
+        }
+        public void changeTraficTo(string str)
+        {
+            Main.PostToId = str;
         }
 
         public void LoadScriptsFromDirectory(string path = "/Scripts")

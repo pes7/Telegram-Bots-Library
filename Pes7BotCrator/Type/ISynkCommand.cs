@@ -9,17 +9,27 @@ namespace Pes7BotCrator.Type
     public interface ISynkCommand
     {
         TypeOfCommand Type { get; set; }
+        TypeOfAccess TypeOfAccess { get; set; }
         List<string> CommandLine { get; set; }
+        string CommandName { get; set; }
         Delegate doFunc { get; set; }
         string Description { get; set; }
+    }
+
+    public enum TypeOfAccess
+    {
+        Public,
+        Hide,
+        Admin,
+        Named
     }
 
     public enum TypeOfCommand {
         Standart,
         Query,
         InlineQuery,
-        TimeReley,
         AllwaysInWebHook,
-        Service
+        Service,
+        Photo
     }
 }

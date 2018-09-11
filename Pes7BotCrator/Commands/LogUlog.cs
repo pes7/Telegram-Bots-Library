@@ -13,29 +13,61 @@ namespace Pes7BotCrator.Commands
         public BotBase Parent { get; set; }
         public string HelloMessage { get; set; }
         public string BueMessage { get; set; }
-        public LogUlog(BotBase bot, string helloMassage = null, string bueMessage = null, bool showCountOfPeople = false) : base(Act,descr: "hlbe") {
+        public string AdditionEndText { get; set;}
+        public enum TypeOf { OnlyMessage, MessageWithChanellName, MessageWithNameAndChannelName}
+        public TypeOf TypeOfMessage { get; set; }
+        public LogUlog(BotBase bot, TypeOf type = TypeOf.OnlyMessage, string helloMassage = null, string bueMessage = null, bool showCountOfPeople = false) : base(Act,descr: "hlbe") {
             Parent = bot;
+            TypeOfMessage = type;
             if (bueMessage != null) BueMessage = bueMessage;
             else BueMessage = "Bue, my dear friend...";
             if (helloMassage != null) HelloMessage = helloMassage;
             else HelloMessage = "Hello, my friend. Nice to meet u in our chanel.";
         }
         public static void Act(Update re, IBot Parent)
-        { 
+        {
             LogUlog Th = null;
             try
             {
                 Th = Parent.SynkCommands.Find(fn => fn.Type == TypeOfCommand.Service && fn.Description == "hlbe") as LogUlog;
             }
             catch { }
-            if(re.Message != null && Th != null)
+            if (re.Message != null && Th != null)
             {
-                if(re.Message.NewChatMember != null)
+                switch (Th.TypeOfMessage)
                 {
-                    Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.HelloMessage);
-                }else if(re.Message.LeftChatMember != null)
-                {
-                    Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.BueMessage);
+                    case TypeOf.OnlyMessage:
+                        if (re.Message.NewChatMembers != null)
+                        {
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.HelloMessage);
+                        }
+                        else if (re.Message.LeftChatMember != null)
+                        {
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.BueMessage);
+                        }
+                        break;
+                    case TypeOf.MessageWithChanellName:
+                        if (re.Message.NewChatMembers != null)
+                        {
+                            var msg = String.Format($"{Th.HelloMessage}",re.Message.Chat.FirstName);
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, msg);
+                        }
+                        else if (re.Message.LeftChatMember != null)
+                        {
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.BueMessage);
+                        }
+                        break;
+                    case TypeOf.MessageWithNameAndChannelName:
+                        if (re.Message.NewChatMembers != null)
+                        {
+                            var msg = String.Format($"{Th.HelloMessage}", re.Message.NewChatMembers.First().Username, re.Message.Chat.Title);
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, msg);
+                        }
+                        else if (re.Message.LeftChatMember != null)
+                        {
+                            Parent.Client.SendTextMessageAsync(re.Message.Chat.Id, Th.BueMessage);
+                        }
+                        break;
                 }
             }
         }

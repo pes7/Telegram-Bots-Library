@@ -14,10 +14,11 @@ namespace Pes7BotCrator
     {
         public string Key { get; set; }
         public string Name { get; set; }
+        public string NameString { get; set; }
+        public string UserNameOfCreator { get; set; }
         public Random Rand { get; set; } = new Random();
         public Telegram.Bot.TelegramBotClient Client { get; set; }
         public Thread WebThread { get; set; }
-        public Thread TMessageQueueSynk { get; set; }
         public Thread TimeSynk { get; set; }
         public WebHook WebHook { get; set; }
         public List<Message> MessagesLast { get; set; }
@@ -26,7 +27,7 @@ namespace Pes7BotCrator
         public List<UserM> ActiveUsers { get; set; }
         public List<Exception> Exceptions { get; set; }
 
-        public Action OnWebHoockUpdated { get; set; } = ()=> { };
+        public Action OnWebHoockUpdated { get; set; } = null;
 
         public List<IModule> Modules { get; set; }
         public T GetModule<T>() where T : IModule
@@ -46,36 +47,39 @@ namespace Pes7BotCrator
             catch { throw new Exception("There is no this Module."); }
         }
 
-        public List<SynkCommand> SynkCommands { get; set; }
-        public int CountOfAvailableMessages { get; set; } = 20; // Availble messages for 60 secs
+        public GList<SynkCommand> SynkCommands { get; set; }
+
         public int RunTime { get; set; } = 0;
 
-        public BotBase(string key, string name, List<IModule> modules = null)
+        public CrushReloader Reload { get; set; }
+        public BotBase(string key, string name, string nameString, string usernameofcreator = null, List<IModule> modules = null)
         {
             Client = new Telegram.Bot.TelegramBotClient(key);
             Name = name;
+            NameString = nameString;
             Modules = modules;
+            UserNameOfCreator = usernameofcreator;
             ActionCommands = new List<Command>();
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
             ActiveUsers = new List<UserM>();
-            SynkCommands = new List<SynkCommand>();
+            SynkCommands = new GList<SynkCommand>(this);
             Exceptions = new List<Exception>();
-            WebHook = new WebHook(this);
             setModulesParent();
+            TimeSynk = new Thread(TimeT);
+            TimeSynk.Start();
+            SynkModules();
+            Reload = new CrushReloader();
+        }
+
+        public void Start()
+        {
+            WebHook = new WebHook(this);
             WebThread = new Thread(() =>
             {
                 WebHook.Start();
             });
             WebThread.Start();
-            TMessageQueueSynk = new Thread(async () =>
-            {
-                await MessageQueueSynkAsync();
-            });
-            TMessageQueueSynk.Start();
-            TimeSynk = new Thread(TimeT);
-            TimeSynk.Start();
-            SynkModules();
         }
 
         private void SynkModules()
@@ -97,54 +101,36 @@ namespace Pes7BotCrator
         {
             MessagesQueue.Add(new { id = ChatId, text = text });
         }
-        public async Task MessageQueueSynkAsync()
-        {
-            while (true)
-            {
-                while (MessagesQueue.Count > 0 && CountOfAvailableMessages > 0)
-                {
-                    CountOfAvailableMessages--;
-                    dynamic ms = MessagesQueue.First();
-                    try
-                    {
-                        await Client.SendTextMessageAsync(ms.id, ms.text);
-                    }
-                    catch (Exception ex) { Exceptions.Add(ex); }
-                    MessagesQueue.RemoveAt(0);
-                }
-            }
-        }
         /*Нужна Сильная доработка*/
         public async Task<FileStream> getFileFrom(string id, string name = null)
         {
-            if (name != null)
-            {
-                if (System.IO.File.Exists($"./DownloadFiles/{name}"))
-                {
-                    string filePath = $"./DownloadFiles/{name}";
-                    return new FileStream(filePath,FileMode.Open);
-                }
-            }
-            var photo = Client.GetFileAsync(id).Result;
-            string filename = photo.FilePath.Split('/')[1];
             if (!Directory.Exists("./DownloadFiles"))
                 Directory.CreateDirectory("./DownloadFiles");
-            if (System.IO.File.Exists($"./DownloadFiles{filename}"))
-                return new FileStream($"./DownloadFiles/{filename}",FileMode.Open);
-            var file = new FileStream($"./DownloadFiles/{filename}",FileMode.Create);
-            var down = Client.GetFileAsync(id);
-            await down.Result.FileStream.CopyToAsync(file);
-            return file;
+            //var down = Client.GetFileAsync(id);
+            var file = await Client.GetFileAsync(id);
+
+            var filename = file.FileId + "." + file.FilePath.Split('.').Last();
+
+            if (System.IO.File.Exists($"./DownloadFiles/{filename}"))
+                return new FileStream($"./DownloadFiles/{filename}", FileMode.Open);
+
+            var realPath = $"./DownloadFiles/{filename}";
+            using (var saveImageStream = System.IO.File.Open(realPath, FileMode.Create))
+            {
+                await Client.DownloadFileAsync(file.FilePath, saveImageStream);
+                return System.IO.File.Open(realPath,FileMode.Open);
+            }
         }
+
         public virtual void Dispose()
         {
             WebThread.Abort();
-            TMessageQueueSynk.Abort();
             TimeSynk.Abort();
             foreach (IModule md in Modules)
             {
                 md.AbortThread();
             }
+            Reload.MainTh.Abort();
         }
 
         private  void TimeT()
@@ -153,16 +139,7 @@ namespace Pes7BotCrator
             {
                 RunTime++;
                 Thread.Sleep(1000);
-                BotSynk();
                 ShowInf();
-            }
-        }
-
-        public void BotSynk()
-        {
-            if (RunTime % 60 == 0)
-            {
-                CountOfAvailableMessages = 20;
             }
         }
 
@@ -192,9 +169,9 @@ namespace Pes7BotCrator
             Console.WriteLine($"    Messages count: {MessagesLast.Count} msgs.\n    RunTime: {TimeToString(RunTime)}\n");
             Console.WriteLine("}");
             Console.WriteLine("Active Users: {");
-            var a = ActiveUsers;
-            foreach (UserM um in a)
+            for(int i = 0; i < ActiveUsers.Count; i++)
             {
+                var um = ActiveUsers[i];
                 Console.WriteLine($"    {um.Username} {um.MessageCount} messages.");
             }
             Console.WriteLine("}\nLast 10 Messages: {");
@@ -209,9 +186,9 @@ namespace Pes7BotCrator
             }
             else
             {
-                var m = MessagesLast;
-                foreach (Message ms in m)
+                for (int i =0; i< MessagesLast.Count;i++)
                 {
+                    var ms = MessagesLast[i];
                     Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
                 }
             }
@@ -226,10 +203,10 @@ namespace Pes7BotCrator
             }
             else
             {
-                var s = Exceptions;
-                foreach (Exception ms in s)
+                for (int i = 0; i < Exceptions.Count; i++)
                 {
-                    Console.WriteLine($"    {ms}");
+                    var ex = Exceptions[i];
+                    Console.WriteLine($"    {ex}");
                 }
             }
             Console.WriteLine("}");

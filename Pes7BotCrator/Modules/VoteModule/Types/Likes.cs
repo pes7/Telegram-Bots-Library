@@ -9,18 +9,16 @@ namespace Pes7BotCrator.Modules.Types.VoteModule
     [Serializable]
     public class Likes
     {
-        public string MessageId { get; set; }
+        public List<string> MessageId { get; set; }
         public long ChatId { get; set; }
         public List<long> LikeId { get; set; }
         public List<long> DisLikeId { get; set; }
-        public enum TypeOfLike { Common, Instant };
-        public TypeOfLike Type { get; set; }
         public Opros ParentO { get; set; }
         public Likes(Opros op, long messageid, long chatid)
         {
             ChatId = chatid;
-            MessageId = messageid.ToString();
-            Type = TypeOfLike.Common;
+            MessageId = new List<string>();
+            MessageId.Add(messageid.ToString());
             LikeId = new List<long>();
             DisLikeId = new List<long>();
             ParentO = op;
@@ -28,8 +26,8 @@ namespace Pes7BotCrator.Modules.Types.VoteModule
         public Likes(Opros op, string chatinstantid, long instid)
         {
             ChatId = instid;
-            MessageId = chatinstantid;
-            Type = TypeOfLike.Instant;
+            MessageId = new List<string>();
+            MessageId.Add(chatinstantid);
             LikeId = new List<long>();
             DisLikeId = new List<long>();
             ParentO = op;
