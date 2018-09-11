@@ -1,4 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pes7/TelegramBots/blob/master/LICENSE)
+![](https://img.shields.io/badge/price-free-blue.svg)
+![Tweet](https://img.shields.io/twitter/url/https/github.com/pes7/Telegram-Bots-Library.svg?style=social
+)
 # TelegramBots
 This <b>Library</b> of creating <b>Telegram Bots</b> provides you with easy way of developing your own Bot.<br>
 You can easy add your commands, modules, etc. to Bot and don't thinking about how it works)<br>
