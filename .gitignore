@@ -33,3 +33,5 @@ GuchiBot/bin/Debug/kek.jpg
 >>>>>>> master
 GuchiBot/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.cache
+Pic_finder/bin/Release/robot.ini
+Pic_finder/bin/x64/Debug/robot.ini

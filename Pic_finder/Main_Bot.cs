@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +28,19 @@ namespace Pic_finder
 
     public class Main_Bot:BotBase
     {
-        public Main_Bot(System.String api_key, List<IModule> mods=null):base(api_key, "", modules:mods){}
+        public ObservableCollection<Message> messages;
+
+        public Main_Bot(
+            System.String api_key,
+            System.String name,
+            System.String shortName,
+            System.String creatorName,
+            List<IModule> mods = null
+            ) : base(
+                api_key,
+                name,
+                shortName,
+                modules: mods,
+                usernameofcreator: creatorName) { }
     }
 }

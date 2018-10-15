@@ -49,3 +49,19 @@ C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\o
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.CopyComplete
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\bin\Debug\Newtonsoft.Json.dll
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojAssemblyReference.cache
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.resx
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Pes7BotCrator.pdb
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\HtmlAgilityPack.dll
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Newtonsoft.Json.dll
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\Telegram.Bot.dll
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\bin\Debug\HtmlAgilityPack.xml
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.csprojAssemblyReference.cache
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.Modules.FunFunc.FunRes.resources
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.GenerateResource.cache
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.CoreCompileInputs.cache
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.csproj.CopyComplete
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.dll
+C:\Users\hoodi\Documents\GitHub\Telegram-Bots-Library\Pes7BotCrator\obj\Debug\Pes7BotCrator.pdb

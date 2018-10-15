@@ -15,6 +15,7 @@ namespace Pic_finder
                 Ctr_panel mn = new Pic_finder.Ctr_panel();
                 mn.ShowDialog();
             });
+            th.SetApartmentState(ApartmentState.STA);
             th.Start();
         }
     }
