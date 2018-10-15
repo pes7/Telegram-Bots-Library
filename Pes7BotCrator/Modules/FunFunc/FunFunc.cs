@@ -72,7 +72,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         }
         public class ElseElse : SynkCommand
         {
-            public ElseElse() : base(ActElse, new List<string>() { "/else" }, commandName: "сравни", descr: "То или другое `-t1` первое `t2` второе") { }
+            public ElseElse() : base(ActElse, new List<string>() { "/else" }, commandName: "сравни", descr: "То или другое `-t1` первое `-t2` второе, (не обязательно)`-t3` спец режим (1 или 0)") { }
         }
         public class WhoAreYou : SynkCommand
         {
@@ -443,19 +443,57 @@ namespace Pes7BotCrator.Modules.FunFunc
                 }
             }
         }
+        struct mem
+        {
+            public Bitmap bmp;
+            public int x1, x2, y1, y2;
+            public Font font;
+        }
         public static void ActElse(Message re, IBot Parent, List<ArgC> args)
         {
             if (re != null && args != null)
             {
                 var arg1 = ArgC.GetArg(args, "t1", "0");
                 var arg2 = ArgC.GetArg(args, "t2", "1");
+                var arg3 = ArgC.GetArg(args, "t3", "2");
                 if (arg1?.Arg != null && arg2?.Arg != null)
                 {
                     if (arg1.Arg.Trim().ToUpper() != arg2.Arg.Trim().ToUpper())
                     {
-                        var bmp = new Bitmap(FunRes.bomg);
+                        if (arg3 == null)
+                            arg3 = new ArgC("type","0");
+
+                        var obj = new mem () { 
+                            bmp = new Bitmap(FunRes.bomg),
+                            x1=0,
+                            x2=0,
+                            y1=0,
+                            y2=0,
+                            font = new Font(FontFamily.Families[0], 20f, FontStyle.Regular)
+                    };
+
+                        switch (arg3.Arg)
+                        {
+                            case "1":
+                                obj.bmp = new Bitmap(FunRes.elseDefci);
+                                obj.x1 = 270;
+                                obj.y1 = 20;
+                                obj.x2 = 1000;
+                                obj.y2 = 70;
+                                obj.font = new Font(FontFamily.Families[0], 45f, FontStyle.Regular);
+                                break;
+                            default:
+                                obj.bmp = new Bitmap(FunRes.bomg);
+                                obj.x1 = 30;
+                                obj.y1 = 20;
+                                obj.x2 = 350;
+                                obj.y2 = 20;
+                                obj.font = new Font(FontFamily.Families[0], 20f, FontStyle.Regular);
+                                break;
+                        }
+                        
                         var th = Parent.GetModule<FunFunc>();
-                        using (Graphics graphics = Graphics.FromImage(bmp))
+                        using (Graphics graphics = Graphics.FromImage(obj.bmp))
                         {
                             using (Font arialFont = new Font("Arial", 10))
                             {
@@ -470,13 +508,12 @@ namespace Pes7BotCrator.Modules.FunFunc
                                     text1 = arg2.Arg;
                                     text2 = arg1.Arg;
                                 }
-                                var d = new Font(FontFamily.Families[0], 20f, FontStyle.Regular);
-                                graphics.DrawString(text1, d, Brushes.Blue, 30, 20);
-                                graphics.DrawString(text2, d, Brushes.Red, 350, 20);
+                                graphics.DrawString(text1, obj.font, Brushes.Blue, obj.x1, obj.y1);
+                                graphics.DrawString(text2, obj.font, Brushes.Red, obj.x2, obj.y2);
                                 graphics.Save();
                             }
                         }
-                        string dir = SaveIt(re.From.Id, "test", bmp, th);
+                        string dir = SaveIt(re.From.Id, "test", obj.bmp, th);
                         Parent.Client.SendPhotoAsync(re.Chat.Id, new Telegram.Bot.Types.InputFiles.InputOnlineFile(System.IO.File.Open(dir, FileMode.Open), "ochincin"));
                     }
                     else
