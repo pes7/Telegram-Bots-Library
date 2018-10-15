@@ -24,12 +24,15 @@ namespace Pes7BotCrator.Type
         /// <param name="act">Action</param>
         /// <param name="cm">Command</param>
         /// <param name="descr">Description</param>
-        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm, TypeOfAccess access = TypeOfAccess.Public, string commandName = null, string descr = null, bool clearcommand = true)
+        public SynkCommand(Action<Telegram.Bot.Types.Message, IBot, List<ArgC>> act, List<string> cm, TypeOfAccess access = TypeOfAccess.Public, string commandName = null, string descr = null, bool clearcommand = true, bool isPhotoCommand = false)
         {
             Description = descr;
             TypeOfAccess = access;
             CommandName = commandName;
-            Type = TypeOfCommand.Standart;
+            if (!isPhotoCommand)
+                Type = TypeOfCommand.Standart;
+            else
+                Type = TypeOfCommand.Photo;
             ClearCommand = clearcommand;
             Incialize(act, cm);
         }
