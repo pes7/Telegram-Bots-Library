@@ -255,7 +255,10 @@ namespace Pic_finder
             await this.DoAStJobTagsAsync("https://danbooru.donmai.us/tags.json?", "Danbooru", prep_args: delegate ()
             {
                 System.String[] serv_tags = { "limit", "page" };
-                foreach (ArgC arg in this.Args) if (arg.Name != null && !serv_tags.Contains(arg.Name)) arg.Name = "search[" + arg.Name + "]";
+                if (this.Args != null)
+                {
+                    foreach (ArgC arg in this.Args) if (arg.Name != null && !serv_tags.Contains(arg.Name)) arg.Name = "search[" + arg.Name + "]";
+                }
             });
         }
 

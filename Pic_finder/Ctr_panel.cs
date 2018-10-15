@@ -103,13 +103,15 @@ namespace Pic_finder
                     "/getgelbooru_tags@anime_pic_finder_bot"
                 },
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
-            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic,
+            SynkCommand sauce_nao_com = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic,
                 new List<string>
                 {
                     "/getsauce"
-                }, descr: "Get\'s source of image that has been sent.", commandName:"sauce"
-                ));
-            Robot.GetModule<SauceNAO_Mod>().Bot = this.Robot;
+                }, descr: "Get\'s source of image that has been sent.", commandName: "sauce"
+                );
+            //sauce_nao_com.Type = TypeOfCommand.Photo;
+            Robot.SynkCommands.Add(sauce_nao_com);
+            //Robot.SynkCommands.ForEach(delegate (SynkCommand command) { if (command.CommandName == "sauce") command.Type = TypeOfCommand.Photo; });
             Robot.Start();
         }
 
