@@ -15,7 +15,9 @@ namespace Pes7BotCrator.Type
         public string PhotoPath { get; set; } = null;
         public int MessageCount { get; set; }
         public List<long> FromChat { get; set; }
-        public UserM(User us, int i = 0) : base()
+        public List<MessageM> Messages { get; set; }
+        public bool Stack { get; set; }
+        public UserM(User us, bool stackMessages = false, int i = 0) : base()
         {
             this.FromChat = new List<long>();
             this.Username = us.Username;
@@ -23,6 +25,9 @@ namespace Pes7BotCrator.Type
             this.Id = us.Id;
             this.FirstName = us.FirstName;
             MessageCount = i;
+            Stack = stackMessages;
+            if (stackMessages)
+                Messages = new List<MessageM>();
         }
         public async Task<bool> DownloadImageToDirectory(IBot Parent, bool isOverride = false)
         {

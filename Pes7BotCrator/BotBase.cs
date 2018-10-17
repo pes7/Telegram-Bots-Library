@@ -24,7 +24,8 @@ namespace Pes7BotCrator
         public List<Message> MessagesLast { get; set; }
         public List<dynamic> MessagesQueue { get; set; }
         public List<Command> ActionCommands { get; set; }
-        public List<UserM> ActiveUsers { get; set; }
+        public List<UserM> ActiveUsers { get; }
+        public Dictionary<int,int> StackUsersId { get; set; }
         public List<Exception> Exceptions { get; set; }
 
         public Action OnWebHoockUpdated { get; set; } = null;
@@ -63,6 +64,7 @@ namespace Pes7BotCrator
             MessagesLast = new List<Message>();
             MessagesQueue = new List<dynamic>();
             ActiveUsers = new List<UserM>();
+            StackUsersId = new Dictionary<int, int>();
             SynkCommands = new GList<SynkCommand>(this);
             Exceptions = new List<Exception>();
             setModulesParent();
@@ -80,6 +82,16 @@ namespace Pes7BotCrator
                 WebHook.Start();
             });
             WebThread.Start();
+        }
+
+        public void AddActiveUser(User us, bool stackMessages = false)
+        {
+            var s = new UserM(us, stackMessages);
+            ActiveUsers.Add(s);
+            if (stackMessages)
+            {
+                StackUsersId.Add(us.Id,ActiveUsers.FindIndex(ds=>ds==ActiveUsers.Find(fn=>fn == s)));
+            }
         }
 
         private void SynkModules()

@@ -134,6 +134,10 @@ namespace Pes7BotCrator
                             break;
                         case Telegram.Bot.Types.Enums.MessageType.Text:
                             SimpleMessageHere(ms);
+                            if(Parent.StackUsersId.Count > 0)
+                            {
+                                Parent.ActiveUsers[Parent.StackUsersId[ms.From.Id]].Messages.Add(new MessageM(ms));
+                            }
                             foreach (SynkCommand sy in Standart_commands.Where(
                                 fn => (fn.CommandLine.Exists(sn => sn == str || (sn == com && com != null)) ||
                                 fn.CommandName?.ToUpper() == args?.ElementAt(0)?.Name?.ToUpper() && fn.CommandName != null)
@@ -242,7 +246,7 @@ namespace Pes7BotCrator
             UserM mu = Parent.ActiveUsers.Find(f => UserM.usernameGet(f) == UserM.usernameGet(us));
             if (mu == null)
             {
-                Parent.ActiveUsers.Add(new UserM(us, 1));
+                Parent.ActiveUsers.Add(new UserM(us,false, 1));
             } else
             {
                 mu.MessageCount++;

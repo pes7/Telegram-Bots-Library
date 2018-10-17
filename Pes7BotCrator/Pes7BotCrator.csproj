@@ -71,7 +71,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>FunRes.resx</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Modules\LikeDislikeModule\LikeMe.cs" />
     <Compile Include="Modules\SpeechRecognationModule.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Type\ISynkCommand.cs" />
     <Compile Include="Modules\LikeDislikeModule\Types\Likes.cs" />
+    <Compile Include="Type\MessageM.cs" />
     <Compile Include="Type\Module.cs" />
     <Compile Include="Type\IModule.cs" />
     <Compile Include="Type\SynkCommand.cs" />
@@ -110,9 +110,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Modules\FunFunc\FunRes.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>FunRes.Designer.cs</LastGenOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+      <LastGenOutput>FunRes.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
