@@ -89,6 +89,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<GuchiVoice>()._GVoice);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGym);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGymSide);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._GiznIliMut);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {
