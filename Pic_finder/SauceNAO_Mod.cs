@@ -14,6 +14,8 @@ using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using System.Collections.Specialized;
+using Telegram.Bot.Args;
+using System.Net.Http.Headers;
 
 namespace Pic_finder
 {
@@ -44,7 +46,7 @@ namespace Pic_finder
             this.db_bitmask = Convert.ToInt32(index_yandere + index_nijie + index_drawr + index_danbooru + index_seigaillust + index_anime + index_pixivhistorical + index_pixiv + index_ddbsamples + index_ddbobjects + index_hcg + index_hanime + index_hmags, 2);
         }
 
-        private bool IsSt429(ref HttpResponseMessage resp)
+        private bool IsSt429(HttpResponseMessage resp)
         {
             return resp.StatusCode.ToString().Contains("429");
         }
@@ -57,47 +59,38 @@ namespace Pic_finder
             System.IO.Stream push = new System.IO.MemoryStream();
             to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
             MultipartFormDataContent post_data = new MultipartFormDataContent();
-            post_data.Add(new StreamContent(push), "file", "image.png");
-            return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=1&minsim=" + minsim + "&dbmask=" + Convert.ToString(this.db_bitmask) + "&api_key=" + api_key, post_data);
+            HttpContent content = new StreamContent(push);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+            post_data.Add(content, "file", "image.png");
+            return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=1&minsim=" + minsim + "&dbmask=999" /*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
         }
 
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
             try
             {
-                if (msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo)
+                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.First()?.FileId).Result.FilePath);
+                Task<HttpResponseMessage> th;
+                UInt16 i = 0;
+                do
                 {
-                    System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.LastOrDefault()?.FileId).Result.FilePath);
-                    HttpResponseMessage th;
-                    UInt16 i = 0;
-                    do
-                    {
-                        th = await this.DoASearchAsync(photo, this.Acc_Key);
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
-                        if (th.IsSuccessStatusCode) break;
-                        else if (this.IsSt429(ref th)) System.Threading.Thread.Sleep(10 * 1000);
-                    }
-                    while (i++ < 5 - 1);
-                    if (IsSt429(ref th)) throw new Exception(TooManyReq);
-                    else
-                    {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, await th.Content.ReadAsStringAsync());
-                    }
-
+                    th = this.DoASearchAsync(photo, this.Acc_Key);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
+                    if (th.Result.IsSuccessStatusCode) break;
+                    else if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
                 }
-                else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Please paste a photo and type with it a command \"/getsauce\".", replyToMessageId: msg.MessageId);
+                while (i++ < 5 - 1);
+                if (IsSt429(th.Result)) throw new Exception(TooManyReq);
+                else
+                {
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, await th.Result.Content.ReadAsStringAsync());
+                }
             }
             catch (Exception ex)
             {
                 serving.Exceptions.Add(ex);
                 await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message, replyToMessageId: msg.MessageId);
             }
-        }
-
-        internal void OnNewMessage(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            Message msg = this.Bot.MessagesLast.Last();
-            if (msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && msg.Caption == "sauce") this.SearchPic(msg, this.Bot, null);
         }
     }
 }

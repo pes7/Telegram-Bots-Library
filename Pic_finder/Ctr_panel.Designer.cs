@@ -47,6 +47,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.MsgLog = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.UsersMsgs = new System.Windows.Forms.TextBox();
+            this.RefMsgs = new System.Windows.Forms.Button();
             this.Msg_type_group.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -54,12 +56,11 @@
             // 
             // Msg_type_group
             // 
-            this.Msg_type_group.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Msg_type_group.Controls.Add(this.radioFile);
             this.Msg_type_group.Controls.Add(this.radioVideo);
             this.Msg_type_group.Controls.Add(this.radioPhoto);
             this.Msg_type_group.Controls.Add(this.radioText);
-            this.Msg_type_group.Location = new System.Drawing.Point(520, 12);
+            this.Msg_type_group.Location = new System.Drawing.Point(393, 12);
             this.Msg_type_group.Name = "Msg_type_group";
             this.Msg_type_group.Size = new System.Drawing.Size(92, 117);
             this.Msg_type_group.TabIndex = 0;
@@ -114,8 +115,8 @@
             // MsgText
             // 
             this.MsgText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.MsgText.Location = new System.Drawing.Point(425, 189);
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.MsgText.Location = new System.Drawing.Point(393, 190);
             this.MsgText.Multiline = true;
             this.MsgText.Name = "MsgText";
             this.MsgText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -124,8 +125,8 @@
             // 
             // button1
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(425, 353);
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.Location = new System.Drawing.Point(393, 354);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(187, 25);
             this.button1.TabIndex = 4;
@@ -135,11 +136,10 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.radioDelete);
             this.groupBox1.Controls.Add(this.radioReply);
             this.groupBox1.Controls.Add(this.radioSend);
-            this.groupBox1.Location = new System.Drawing.Point(425, 12);
+            this.groupBox1.Location = new System.Drawing.Point(495, 36);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(89, 93);
             this.groupBox1.TabIndex = 3;
@@ -195,8 +195,7 @@
             // 
             // label1
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 0);
             this.label1.Name = "label1";
@@ -226,12 +225,11 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.ChatIdEdit);
             this.groupBox2.Controls.Add(this.MsgIdText);
-            this.groupBox2.Location = new System.Drawing.Point(425, 135);
+            this.groupBox2.Location = new System.Drawing.Point(393, 136);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(187, 48);
             this.groupBox2.TabIndex = 4;
@@ -239,26 +237,49 @@
             // 
             // MsgLog
             // 
-            this.MsgLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MsgLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.MsgLog.Location = new System.Drawing.Point(13, 13);
             this.MsgLog.Multiline = true;
             this.MsgLog.Name = "MsgLog";
             this.MsgLog.ReadOnly = true;
             this.MsgLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.MsgLog.Size = new System.Drawing.Size(406, 365);
+            this.MsgLog.Size = new System.Drawing.Size(374, 365);
             this.MsgLog.TabIndex = 5;
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.Multiselect = true;
             // 
+            // UsersMsgs
+            // 
+            this.UsersMsgs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.UsersMsgs.Location = new System.Drawing.Point(590, 13);
+            this.UsersMsgs.Multiline = true;
+            this.UsersMsgs.Name = "UsersMsgs";
+            this.UsersMsgs.ReadOnly = true;
+            this.UsersMsgs.Size = new System.Drawing.Size(425, 365);
+            this.UsersMsgs.TabIndex = 6;
+            // 
+            // RefMsgs
+            // 
+            this.RefMsgs.Location = new System.Drawing.Point(495, 6);
+            this.RefMsgs.Name = "RefMsgs";
+            this.RefMsgs.Size = new System.Drawing.Size(85, 24);
+            this.RefMsgs.TabIndex = 7;
+            this.RefMsgs.Text = "Refresh";
+            this.RefMsgs.UseVisualStyleBackColor = true;
+            this.RefMsgs.Click += new System.EventHandler(this.RefMsgs_Click);
+            // 
             // Ctr_panel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(621, 390);
+            this.ClientSize = new System.Drawing.Size(1027, 390);
+            this.Controls.Add(this.RefMsgs);
+            this.Controls.Add(this.UsersMsgs);
             this.Controls.Add(this.MsgLog);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -300,5 +321,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox MsgLog;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.TextBox UsersMsgs;
+        private System.Windows.Forms.Button RefMsgs;
     }
 }

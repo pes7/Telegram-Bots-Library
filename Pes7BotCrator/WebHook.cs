@@ -58,7 +58,7 @@ namespace Pes7BotCrator
         private async void MessageSynk(Update Up) {
             Message ms;
             ms = Up.Message;
-            var args = ArgC.getArgs(ms?.Text, Parent);
+            var args = ArgC.getArgs(ms?.Text == null? ms?.Caption : ms?.Text, Parent);
             var str = (args == null) ? ms?.Text : args.First().Name.Trim();
             var com = tryToParseNameBotCommand(ms?.Text);
             switch (Up.Type)

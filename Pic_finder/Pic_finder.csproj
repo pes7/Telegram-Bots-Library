@@ -48,9 +48,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Pes7BotCrator\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Pes7BotCrator">
-      <HintPath>..\Pes7BotCrator\bin\Debug\Pes7BotCrator.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -87,6 +84,12 @@
     <EmbeddedResource Include="Ctr_panel.resx">
       <DependentUpon>Ctr_panel.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pes7BotCrator\Pes7BotCrator.csproj">
+      <Project>{6e631153-5c32-4327-987d-8085330157f7}</Project>
+      <Name>Pes7BotCrator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

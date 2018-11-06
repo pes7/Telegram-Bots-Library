@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -18,28 +19,41 @@ namespace Pic_finder
     {
         public Main_Bot Robot;
         private IniData RobotInit;
+        public SqlDataAdapter DataAdapter;
+        public DataSet Data;
         public Ctr_panel()
         {
             InitializeComponent();
             FileIniDataParser parser = new FileIniDataParser();
+            SqlConnection sql = null;
             try
             {
                 this.RobotInit = parser.ReadFile("robot.ini");
+                sql = new SqlConnection();
+                SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
+                connBuilder.DataSource = RobotInit["DB"]["DataSource"];
+                //connBuilder.IntegratedSecurity = bool.Parse(RobotInit["DB"]["IntegratedSecurity"]);
+                connBuilder.InitialCatalog = RobotInit["DB"]["InitialCatalog"];
+                connBuilder.UserID = RobotInit["DB"]["user"];
+                connBuilder.Password = RobotInit["DB"]["password"];
+                sql.ConnectionString = connBuilder.ConnectionString;
+                sql.Open();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Can't open INI-file.\n" + ex.Message);
+                MessageBox.Show("Can't connect.\n" + ex.Source + ":" + ex.Message);
                 Application.Exit();
             }
             Robot = new Main_Bot(
                 api_key: RobotInit["Robot"]["api_key"],
                 name: RobotInit["Robot"]["name"],
                 shortName: RobotInit["Robot"]["shortName"],
-                creatorName: RobotInit["Robot"]["tedechan"],
+                creatorName: RobotInit["Robot"]["creatorName"],
+                dbconn: sql,
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                new SauceNAO_Mod("257dedb3b7fe24c2ef1c4c9a7a8ff0f22bd2ad3a")
+                //new SauceNAO_Mod(RobotInit["SauceNAO"]["api_access_key"])
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -50,14 +64,19 @@ namespace Pic_finder
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().EmExit, new List<string>()
             {
                 "/emexit"
-            }, 
-            commandName: "shutdown", access:TypeOfAccess.Named, descr:"Shut\'s down a bot permanently."));
+            },
+            commandName: "shutdown", access: TypeOfAccess.Named, descr: "Shut\'s down a bot permanently.", clearcommand: true));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().Help, new List<string>()
             {
                 "/help"
             },
             commandName: "help", descr: "Display\'s help for a user."));
+
+            /*Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().DeleteMyMessage, new List<string>()
+            {
+                "/delete"
+            }, commandName: "delete", descr: "Delete\'s replyied to the bot message", clearcommand: false));*/
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetYandereAsync, new List<string>()
             {
@@ -92,27 +111,25 @@ namespace Pic_finder
                 Robot.GetModule<danbooru_api_mod>().GetDanbooruTagsAsync,
                 new List<string>()
                 {
-                    "/getdanbooru_tags",
-                    "/getdanbooru_tags@anime_pic_finder_bot"
+                    "/getdanbooru_tags"
                 },
                 commandName: "danbooru_tags", descr: "Get tags from Danbooru."));
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<danbooru_api_mod>().GetGelboorruTagsAsync,
                 new List<string>(){
-                    "/getgelbooru_tags",
-                    "/getgelbooru_tags@anime_pic_finder_bot"
+                    "/getgelbooru_tags"
                 },
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
-            SynkCommand sauce_nao_com = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPic,
-                new List<string>
-                {
-                    "/getsauce"
-                }, descr: "Get\'s source of image that has been sent.", commandName: "sauce"
-                );
-            //sauce_nao_com.Type = TypeOfCommand.Photo;
-            Robot.SynkCommands.Add(sauce_nao_com);
-            //Robot.SynkCommands.ForEach(delegate (SynkCommand command) { if (command.CommandName == "sauce") command.Type = TypeOfCommand.Photo; });
+            /*
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<SauceNAO_Mod>().SearchPic, 
+                new List<string>() { "getsauce" }, 
+                commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
+                */
+
             Robot.Start();
+
+
         }
 
         private void Ctr_panel_Load(object sender, EventArgs e)
@@ -185,6 +202,28 @@ namespace Pic_finder
         private void radioPhoto_CheckedChanged(object sender, EventArgs e)
         {
             if (!radioText.Checked) openFileDialog1.ShowDialog();
+        }
+
+        private void RefMsgs_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.UsersMsgs.Clear();
+            }
+            finally
+            {
+                DataSet dataSet = this.Robot.MsgsData;
+                foreach (DataRow pr_row in dataSet.Tables[1].Rows)
+                {
+                    this.UsersMsgs.AppendText("From " + pr_row["Username"].ToString() + " - " + pr_row["FirstName"].ToString() + ", " + pr_row["LastName"].ToString() + ".\n{");
+                    DataRow[] cd_rows = pr_row.GetChildRows(dataSet.Relations[1]);
+                    foreach (DataRow cd_row in cd_rows)
+                    {
+                        this.UsersMsgs.AppendText("\n   MsgId:" + cd_row["MsgId"].ToString() + "\nChatId:" + cd_row["ChatId"] + "\nText: " + cd_row["MsgText"]?.ToString() + cd_row["Caption"]?.ToString());
+                    }
+                    this.UsersMsgs.AppendText("\n\n}");
+                }
+            }
         }
     }
 }

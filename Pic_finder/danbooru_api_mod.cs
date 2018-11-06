@@ -28,7 +28,6 @@ namespace Pic_finder
         private HttpResponseMessage resp = null;
         private IBot Serving;
         private Message Msg;
-        //public List<Message> Msgs = new List<Message>();
         private List<ArgC> Args = null;
         private bool to_file = false; //Do file must be sent as just file.
         private bool show_a = false; //Do picture`s showing even if they has non-safe rating.
@@ -102,9 +101,9 @@ namespace Pic_finder
             }
             if (this.resp!=null)
             {
-                if (!this.resp.IsSuccessStatusCode)
+                if (!this.resp.IsSuccessStatusCode || this.resp.Content.Headers.ContentLength == 0)
                 {
-                    await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we had error."/*, replyToMessageId: this.Msg.MessageId*/);
+                    await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately, request is unsuccesful."/*, replyToMessageId: this.Msg.MessageId*/);
                 }
                 else return true;
             }
@@ -173,22 +172,28 @@ namespace Pic_finder
                 this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Oops, something got wrong.\n"+ex.Message);
             }
         }
-
+        
         private async Task DoAStJobAsync(System.String req_url, UInt16 max_lim=100, System.String fl_url= "file_url", System.String rt_prop= "rating", System.String e_rate="e", System.String url_prefix = "", Action prep_args=null) //Do a typical job to get art`s.
         {
-            /*this.Msgs.Add(Msg);
-            if (this.Msgs.Count > 100) this.Msgs.RemoveRange(0, this.Msgs.Count - 100);*/
-            this.NormalizeArgs();
-            if (prep_args!=null) prep_args();
-            if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
-            dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
-            foreach (var post in result)
+            try
             {
-                System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop];
-                await this.GetAndSendPicAsync(url, rating, e_rate);
+                this.NormalizeArgs();
+                if (prep_args != null) prep_args();
+                if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
+                dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
+                foreach (var post in result)
+                {
+                    System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop];
+                    await this.GetAndSendPicAsync(url, rating, e_rate);
+                }
+                if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
+                //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
             }
-            if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
-            //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
+            catch(Exception ex)
+            {
+                this.Serving.Exceptions.Add(ex);
+                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Sorry, something got wrong.");
+            }
         }
 
         private async Task DoAStJobTagsAsync(System.String req_url, System.String serv_name, System.String tag_name ="name", System.UInt16 max_lim=100, Action prep_args = null)
@@ -209,7 +214,7 @@ namespace Pic_finder
             }
             catch (Exception ex)
             {
-                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, ex.Message);
+                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Sorry, something got wrong.");
             }
         }
 
