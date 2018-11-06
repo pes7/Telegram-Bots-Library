@@ -53,7 +53,7 @@ namespace Pic_finder
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                //new SauceNAO_Mod(RobotInit["SauceNAO"]["api_access_key"])
+                new SauceNAO_Mod(RobotInit["SauceNAO"]["api_access_key"])
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -120,12 +120,10 @@ namespace Pic_finder
                     "/getgelbooru_tags"
                 },
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
-            /*
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().SearchPic, 
                 new List<string>() { "getsauce" }, 
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
-                */
 
             Robot.Start();
 
@@ -202,28 +200,6 @@ namespace Pic_finder
         private void radioPhoto_CheckedChanged(object sender, EventArgs e)
         {
             if (!radioText.Checked) openFileDialog1.ShowDialog();
-        }
-
-        private void RefMsgs_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                this.UsersMsgs.Clear();
-            }
-            finally
-            {
-                DataSet dataSet = this.Robot.MsgsData;
-                foreach (DataRow pr_row in dataSet.Tables[1].Rows)
-                {
-                    this.UsersMsgs.AppendText("From " + pr_row["Username"].ToString() + " - " + pr_row["FirstName"].ToString() + ", " + pr_row["LastName"].ToString() + ".\n{");
-                    DataRow[] cd_rows = pr_row.GetChildRows(dataSet.Relations[1]);
-                    foreach (DataRow cd_row in cd_rows)
-                    {
-                        this.UsersMsgs.AppendText("\n   MsgId:" + cd_row["MsgId"].ToString() + "\nChatId:" + cd_row["ChatId"] + "\nText: " + cd_row["MsgText"]?.ToString() + cd_row["Caption"]?.ToString());
-                    }
-                    this.UsersMsgs.AppendText("\n\n}");
-                }
-            }
         }
     }
 }

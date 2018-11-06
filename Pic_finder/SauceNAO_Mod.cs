@@ -55,20 +55,24 @@ namespace Pic_finder
         private async Task<HttpResponseMessage> DoASearchAsync(System.IO.Stream take, System.String api_key)
         {
             System.String minsim = "80";
-            Bitmap to_push = new Bitmap(take);
-            System.IO.Stream push = new System.IO.MemoryStream();
-            to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
-            MultipartFormDataContent post_data = new MultipartFormDataContent();
-            HttpContent content = new StreamContent(push);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-            post_data.Add(content, "file", "image.png");
-            return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=1&minsim=" + minsim + "&dbmask=999" /*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+            using (MemoryStream push = new MemoryStream())
+            {
+                Bitmap to_push = new Bitmap(take);
+                to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
+                MultipartFormDataContent post_data = new MultipartFormDataContent();
+                HttpContent content = new ByteArrayContent(push.ToArray());
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+                post_data.Add(content, "file", "image.png");
+                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=1&minsim=" + minsim + "&dbmask=999" /*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+            }
         }
 
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
+            this.Bot = serving;
             try
             {
+                dynamic results = null;
                 System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.First()?.FileId).Result.FilePath);
                 Task<HttpResponseMessage> th;
                 UInt16 i = 0;
@@ -77,19 +81,32 @@ namespace Pic_finder
                     th = this.DoASearchAsync(photo, this.Acc_Key);
                     await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
                     if (th.Result.IsSuccessStatusCode) break;
-                    else if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
+                    if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
+                    else break;
                 }
                 while (i++ < 5 - 1);
                 if (IsSt429(th.Result)) throw new Exception(TooManyReq);
-                else
+                results = JsonConvert.DeserializeObject(th.Result.Content.ReadAsStringAsync().Result);
+                if (Convert.ToInt32(results["header"]["user_id"])<=0)
                 {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, await th.Result.Content.ReadAsStringAsync());
+                    await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
+                    return;
+                }
+                foreach(var result in results["results"])
+                {
+                    /*if (Convert.ToDecimal(results["header"]["minimum_similarity"]) > Convert.ToDecimal(result["header"]["similarity"])) continue;
+                    System.IO.Stream get_pic = await Client.GetStreamAsync(result["header"]["thumbnail"]);
+                    await this.Bot.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result["header"]["thumbnail"].Split('/').Last().Split('?')[0]), replyToMessageId: this.Msg.MessageId);
+                    */
+                    System.String res_str = /*result["header"]["index_name"] +*/ "Source URLs:";
+                    foreach (var url in result["data"]["ext_urls"]) res_str += "\n" + url;
+                    await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, res_str);
                 }
             }
             catch (Exception ex)
             {
-                serving.Exceptions.Add(ex);
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message, replyToMessageId: msg.MessageId);
+                if (ex.Message != TooManyReq) serving.Exceptions.Add(ex);
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
             }
         }
     }

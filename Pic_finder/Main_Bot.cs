@@ -34,16 +34,6 @@ namespace Pic_finder
     public class Main_Bot : BotBase //Основний 
     {
         public SqlConnection DBconn = null; //Підключення до БД.
-        private DataSet msgsData = null;
-        public DataSet MsgsData
-        {
-            get
-            {
-                if (this.DBconn == null) return null;
-                this.AbsorbToDb();
-                return this.msgsData?.Copy();
-            }
-        }
         private List<SqlCommand> GetCommands = new List<SqlCommand>() //Команди для почергового зчитування таблиць.
         {
             new SqlCommand("Select * from Chat"),
@@ -73,7 +63,6 @@ namespace Pic_finder
                 if (this.DBconn.State == ConnectionState.Open)
                 {
                     this.ToWrite = new ConcurrentQueue<List<Message>>();
-                    this.msgsData = new DataSet();
                     this.MsgSilentWriter = new Thread(() =>
                     {
                         while (true)
@@ -103,12 +92,6 @@ namespace Pic_finder
         {
             if (this.DBconn.State == ConnectionState.Open && messages != null)
             {
-                try
-                { this.msgsData.Relations.Clear(); }
-                catch { }
-                try
-                { this.msgsData.Tables.Clear(); }
-                catch { }
                 Dictionary<Message, ulong> msgs_db_ids = new Dictionary<Message, ulong>();
                 for (UInt16 i = 0; i < this.GetCommands.Count; i++) //По-табличний запис.
                 {
@@ -184,11 +167,6 @@ namespace Pic_finder
                                     nMsg["MessageType"] = msg.Type;
                                     nMsg["Serialized"] = sMsg;
                                     dataSet.Tables[0].Rows.Add(nMsg);
-                                    /*
-                                    try
-                                    { this.msgsData.Tables[2].ImportRow(nMsg); }
-                                    catch { }
-                                    */
                                     ulong msgid = 0;
                                     UInt64.TryParse(nMsg["Id"].ToString(), out msgid);
                                     msgs_db_ids.Add(msg, msgid);
@@ -219,10 +197,6 @@ namespace Pic_finder
                                             nFile["MimeType"] = DBNull.Value;
                                         }
                                         dataSet.Tables[0].Rows.Add(nFile);
-                                        /*
-                                        try
-                                        { this.msgsData.Tables[3].ImportRow(nFile); }
-                                        catch { }*/
                                     }
                                 });
                                 break;
@@ -291,10 +265,6 @@ namespace Pic_finder
                                 nUser["LanguageCode"] = user.LanguageCode;
                                 nUser["Serialize"] = sUser;
                                 dataSet.Tables[0].Rows.Add(nUser);
-                                /*
-                                try
-                                { this.msgsData.Tables[1].ImportRow(nUser); }
-                                catch { }*/
                             }
                         }
                     try
@@ -306,20 +276,8 @@ namespace Pic_finder
                     {
                         this.Exceptions.Add(ex); //Запис виключення в лог.
                         transaction.Rollback(); //Скасування транзакції.
-                        this.msgsData.RejectChanges();
                     }
-                    try
-                    {
-                        DataTable table = dataSet.Tables[0].Copy();
-                        table.TableName = "Table" + i.ToString();
-                        this.msgsData.Tables.Add(table);
-                    }
-                    finally
-                    { this.msgsData.AcceptChanges(); }
                 }
-                this.msgsData.Relations.Add(new DataRelation("ChatMessages", this.msgsData.Tables[0].Columns["Id"], this.msgsData.Tables[2].Columns["ChatId"]));
-                this.msgsData.Relations.Add(new DataRelation("UserMessages", this.msgsData.Tables[1].Columns["Id"], this.msgsData.Tables[2].Columns["FromUser"]));
-                //this.msgsData.Relations.Add(new DataRelation("MessageFile", this.msgsData.Tables[2].Columns["Id"], this.msgsData.Tables[3].Columns["MessageId"]));
             }
         }
 

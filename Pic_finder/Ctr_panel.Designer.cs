@@ -47,8 +47,6 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.MsgLog = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.UsersMsgs = new System.Windows.Forms.TextBox();
-            this.RefMsgs = new System.Windows.Forms.Button();
             this.Msg_type_group.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -56,6 +54,7 @@
             // 
             // Msg_type_group
             // 
+            this.Msg_type_group.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Msg_type_group.Controls.Add(this.radioFile);
             this.Msg_type_group.Controls.Add(this.radioVideo);
             this.Msg_type_group.Controls.Add(this.radioPhoto);
@@ -115,7 +114,7 @@
             // MsgText
             // 
             this.MsgText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MsgText.Location = new System.Drawing.Point(393, 190);
             this.MsgText.Multiline = true;
             this.MsgText.Name = "MsgText";
@@ -125,7 +124,7 @@
             // 
             // button1
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Location = new System.Drawing.Point(393, 354);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(187, 25);
@@ -136,6 +135,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.radioDelete);
             this.groupBox1.Controls.Add(this.radioReply);
             this.groupBox1.Controls.Add(this.radioSend);
@@ -225,6 +225,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.ChatIdEdit);
@@ -237,8 +238,9 @@
             // 
             // MsgLog
             // 
-            this.MsgLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.MsgLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MsgLog.Location = new System.Drawing.Point(13, 13);
             this.MsgLog.Multiline = true;
             this.MsgLog.Name = "MsgLog";
@@ -251,35 +253,11 @@
             // 
             this.openFileDialog1.Multiselect = true;
             // 
-            // UsersMsgs
-            // 
-            this.UsersMsgs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.UsersMsgs.Location = new System.Drawing.Point(590, 13);
-            this.UsersMsgs.Multiline = true;
-            this.UsersMsgs.Name = "UsersMsgs";
-            this.UsersMsgs.ReadOnly = true;
-            this.UsersMsgs.Size = new System.Drawing.Size(425, 365);
-            this.UsersMsgs.TabIndex = 6;
-            // 
-            // RefMsgs
-            // 
-            this.RefMsgs.Location = new System.Drawing.Point(495, 6);
-            this.RefMsgs.Name = "RefMsgs";
-            this.RefMsgs.Size = new System.Drawing.Size(85, 24);
-            this.RefMsgs.TabIndex = 7;
-            this.RefMsgs.Text = "Refresh";
-            this.RefMsgs.UseVisualStyleBackColor = true;
-            this.RefMsgs.Click += new System.EventHandler(this.RefMsgs_Click);
-            // 
             // Ctr_panel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1027, 390);
-            this.Controls.Add(this.RefMsgs);
-            this.Controls.Add(this.UsersMsgs);
+            this.ClientSize = new System.Drawing.Size(592, 390);
             this.Controls.Add(this.MsgLog);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -321,7 +299,5 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox MsgLog;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.TextBox UsersMsgs;
-        private System.Windows.Forms.Button RefMsgs;
     }
 }
