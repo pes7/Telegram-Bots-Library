@@ -95,3 +95,68 @@ add constraint FK_Files_TMessages foreign key (MessageId)
 	on delete no action
 	on update no action
 ;
+
+
+Create Table SauceNAO_accs(
+Id BigInt Primary Key identity(0 , 1),
+UserId BigInt,
+SauceNAO_UserId BigInt,
+Acc_type tinyint,
+ApiKey varchar(40),
+LongLimit SmallInt,
+LongRemaining SmallInt,
+ShortLimit TinyInt,
+ShortRemaining TinyInt,
+LastRequest DateTime)
+
+Alter table SauceNAO_accs
+add constraint FK_SNAO_ACC_TUser foreign key (UserId)
+	references Users (Id)
+	on delete cascade
+	on update cascade
+;
+
+Create table SauceSearch(
+Id BigInt Primary Key identity (0,1),
+AccId BigInt,
+ImageHash varchar(32),
+SearchStatus tinyint,
+ResultsRequested tinyint,
+SearchDepth varchar(4),
+MinimumSimularity real,
+ResultsReturned tinyint,
+JSONresp text)
+
+Alter table SauceSearch
+add constraint FK_SrRes_SNAO_ACC foreign key (AccId)
+	references SauceNAO_accs (Id)
+	on delete no action
+	on update no action
+;
+
+Create Table SauceSearchResult(
+Id BigInt Primary Key identity (0,1),
+SearchId BigInt,
+Similarity real,
+Thumbnail text,
+IndexId tinyint,
+IndexName varchar(50))
+
+Alter table SauceSearchResult
+add constraint FK_SrRes_Search foreign key (SearchId)
+	references SauceSearch (Id)
+	on delete cascade
+	on update cascade
+;
+
+create table ExtURLs_of_Search(
+Id BigInt Primary Key identity (0,1),
+ResId BigInt,
+ResultURL text)
+
+Alter table ExtURLs_of_Search
+add constraint FK_ExtURL_Search foreign key (ResId)
+	references SauceSearchResult (Id)
+	on delete cascade
+	on update cascade
+;

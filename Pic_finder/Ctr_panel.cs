@@ -53,7 +53,7 @@ namespace Pic_finder
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                new SauceNAO_Mod(RobotInit["SauceNAO"]["api_access_key"])
+                new SauceNAO_Mod(sql)
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -124,6 +124,10 @@ namespace Pic_finder
                 Robot.GetModule<SauceNAO_Mod>().SearchPic, 
                 new List<string>() { "getsauce" }, 
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<SauceNAO_Mod>().AddKeyToDB,
+                new List<string>() { "putkey" },
+                commandName: "putkey", descr: "Inputs api key to bot\'s DB."));
 
             Robot.Start();
 
