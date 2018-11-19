@@ -35,6 +35,10 @@ If you need more about commands, you can call /help.");
                 " yandere_tags, or /getyandere_tags — gather names of avalible tags on yande.re;\n" +
                 " danbooru_tags, or /getdanbooru_tags — gather names of avalible tags on Danbooru;\n" +
                 " gelbooru_tags, or /getgelbooru_tags — gather names of avalible tags on Gelbooru;\n" +
+                " sauce or /getsauce — (experimental function) gets links to the pic which caption is \"AniPicsauce\" (requires SauceNAO account);\n" +
+                " putkey or /putkey — puts your API-key of your SauceNAO account, which is in parameter \"key\";\n" +
+                " deletekey or /deletekey — deletes API-key of your SauceNAO account from bot\'s database;\n" +
+                " stats or /getstats — gets count of avalieble searches via SauceNAO.\n" +
                 "To use parameters, to adjust search with commands, you need type them with an actual command.\n" +
                 "With default commands you need to type parameter in this way: \"-<key>:<value>\"(without qoutation marks), if parameter doesn't have a value — -<key>.\n" +
                 "If you use named command, just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".\n" +

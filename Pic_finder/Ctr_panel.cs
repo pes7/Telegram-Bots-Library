@@ -53,7 +53,7 @@ namespace Pic_finder
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                new SauceNAO_Mod(sql)
+                new SauceNAO_Mod(sql, RobotInit["SauceNAO"]["SavePicsDir"])
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -122,12 +122,20 @@ namespace Pic_finder
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().SearchPic, 
-                new List<string>() { "getsauce" }, 
+                new List<string>() { "/getsauce" }, 
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().AddKeyToDB,
-                new List<string>() { "putkey" },
+                new List<string>() { "/putkey" },
                 commandName: "putkey", descr: "Inputs api key to bot\'s DB."));
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<SauceNAO_Mod>().DeleteKeyFromDB,
+                new List<string>() { "/deletekey" },
+                commandName: "deletekey", descr: "Deletes API-key of certain user from DB"));
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<SauceNAO_Mod>().GetMySearchStats,
+                new List<string>() { "/getstats" },
+                commandName: "stats", descr: "Gets stats of searches of current user."));
 
             Robot.Start();
 
