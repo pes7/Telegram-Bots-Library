@@ -26,11 +26,11 @@ namespace Pic_finder
             InitializeComponent();
             FileIniDataParser parser = new FileIniDataParser();
             SqlConnection sql = null;
+            SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
             try
             {
                 this.RobotInit = parser.ReadFile("robot.ini");
                 sql = new SqlConnection();
-                SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
                 connBuilder.DataSource = RobotInit["DB"]["DataSource"];
                 //connBuilder.IntegratedSecurity = bool.Parse(RobotInit["DB"]["IntegratedSecurity"]);
                 connBuilder.InitialCatalog = RobotInit["DB"]["InitialCatalog"];
@@ -53,7 +53,7 @@ namespace Pic_finder
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                new SauceNAO_Mod(sql, RobotInit["SauceNAO"]["SavePicsDir"])
+                new SauceNAO_Mod(connBuilder.ConnectionString, RobotInit["SauceNAO"]["SavePicsDir"])
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()

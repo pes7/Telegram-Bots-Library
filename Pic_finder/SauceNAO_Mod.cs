@@ -166,12 +166,10 @@ namespace Pic_finder
         public System.String SavePicsDir;
         private readonly System.String TooManyReq = "Unfortunatelly you had reached out from search limit.\nPlease try again in a next day.";
 
-        public SauceNAO_Mod(SqlConnection sql, System.String save_dir) : base("SauceNAO finder", typeof(SauceNAO_Mod))
+        public SauceNAO_Mod(System.String sql_conn_string, System.String save_dir) : base("SauceNAO finder", typeof(SauceNAO_Mod))
         {
-            if (sql != null)
-            { if (sql.State == System.Data.ConnectionState.Broken || sql.State == System.Data.ConnectionState.Closed) return; }
-            else return;
-            this.dataContext = new DataContext(sql);
+            if (sql_conn_string == null) return;
+            this.dataContext = new DataContext(sql_conn_string);
             this.Users = this.dataContext.GetTable<SauceNAO_Acc>();
             this.SearchQueries = this.dataContext.GetTable<SearchQuery>();
             this.SearchResults = this.dataContext.GetTable<SearchResult>();
@@ -210,7 +208,7 @@ namespace Pic_finder
                 HttpContent content = new ByteArrayContent(push.ToArray());
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
                 post_data.Add(content, "file", "image.png");
-                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=1&minsim=" + minsim + "db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=16&minsim=" + minsim + "db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
             }
         }
 
@@ -261,7 +259,7 @@ namespace Pic_finder
                 }
                 catch(NullReferenceException)
                 {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You should put your key in the \"key\" parameter", replyToMessageId: msg.MessageId);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You should put your key in the \"key\" parameter");
                     return;
                 }
                 var users = from u in this.Users
@@ -407,6 +405,11 @@ namespace Pic_finder
                             await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
                             use_db = true;
                         }
+                        if (Convert.ToInt32(results["header"]["results_returned"]?.Value<int>()) <= 0)
+                        {
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly SauceNAO didn\'t returned results for this image, sorry…");
+                            return;
+                        }
                     }
                 }
                 SearchQuery query = null;
@@ -450,7 +453,7 @@ namespace Pic_finder
                     if (!use_db)
                     {
                         System.IO.Stream get_pic = await Client.GetStreamAsync(result["header"]["thumbnail"].Value<String>());
-                        await this.Bot.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result["header"]["thumbnail"].Value<System.String>().Split('/').Last().Split('?')[0]), replyToMessageId: msg.MessageId);
+                        await this.Bot.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result["header"]["thumbnail"].Value<System.String>().Split('/').Last().Split('?')[0]));
                     }
                     System.String res_str = result["header"]["index_name"].Value<System.String>() + "\nSimilarity: " + result["header"]["similarity"].Value<decimal>().ToString() + "\nSource URLs:";
                     IEnumerable<ExternalUrls> urls = new List<ExternalUrls>();
