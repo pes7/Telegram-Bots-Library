@@ -25,19 +25,15 @@ namespace Pic_finder
         {
             InitializeComponent();
             FileIniDataParser parser = new FileIniDataParser();
-            SqlConnection sql = null;
             SqlConnectionStringBuilder connBuilder = new SqlConnectionStringBuilder();
             try
             {
                 this.RobotInit = parser.ReadFile("robot.ini");
-                sql = new SqlConnection();
                 connBuilder.DataSource = RobotInit["DB"]["DataSource"];
                 //connBuilder.IntegratedSecurity = bool.Parse(RobotInit["DB"]["IntegratedSecurity"]);
                 connBuilder.InitialCatalog = RobotInit["DB"]["InitialCatalog"];
                 connBuilder.UserID = RobotInit["DB"]["user"];
                 connBuilder.Password = RobotInit["DB"]["password"];
-                sql.ConnectionString = connBuilder.ConnectionString;
-                sql.Open();
             }
             catch (Exception ex)
             {
@@ -49,7 +45,6 @@ namespace Pic_finder
                 name: RobotInit["Robot"]["name"],
                 shortName: RobotInit["Robot"]["shortName"],
                 creatorName: RobotInit["Robot"]["creatorName"],
-                dbconn: sql,
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),

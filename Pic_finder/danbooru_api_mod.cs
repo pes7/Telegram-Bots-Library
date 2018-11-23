@@ -164,7 +164,7 @@ namespace Pic_finder
                         System.String[] to_arg_div = to_arg.Split('=');
                         this.Args.Add(new ArgC(to_arg_div.ElementAt(0), to_arg_div.Length > 1 ? to_arg_div.ElementAt(1) : null));
                     }
-                    this.Args.RemoveAt(0);
+                        if (this.Args.Count != 0) this.Args.RemoveAt(0);
                 }
             }
             catch (Exception ex)

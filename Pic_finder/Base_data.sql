@@ -140,7 +140,7 @@ SearchId BigInt,
 Similarity real,
 Thumbnail text,
 IndexId tinyint,
-IndexName varchar(100))
+IndexName nText)
 
 Alter table SauceSearchResult
 add constraint FK_SrRes_Search foreign key (SearchId)
