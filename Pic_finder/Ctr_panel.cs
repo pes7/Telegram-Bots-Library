@@ -132,6 +132,8 @@ namespace Pic_finder
                 new List<string>() { "/getstats" },
                 commandName: "stats", descr: "Gets stats of searches of current user."));
 
+            Robot.AutoInvokes.Add(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
+
             Robot.Start();
 
 

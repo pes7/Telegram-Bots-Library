@@ -164,6 +164,7 @@ namespace Pic_finder
         private ImageHashes imageHasher = new ImageHashes(new ImageMagickTransformer());
         //private int db_bitmask;
         public System.String SavePicsDir;
+        public readonly UInt16 DefNumres = 7;
         private readonly System.String TooManyReq = "Unfortunatelly you had reached out from search limit.\nPlease try again in a next day.";
 
         public SauceNAO_Mod(System.String sql_conn_string, System.String save_dir) : base("SauceNAO finder", typeof(SauceNAO_Mod))
@@ -199,7 +200,7 @@ namespace Pic_finder
         }
 
 
-        private async Task<HttpResponseMessage> DoASearchAsync(System.IO.Stream take, System.String api_key)
+        private async Task<HttpResponseMessage> DoASearchAsync(System.IO.Stream take, System.String api_key, UInt16 numres)
         {
             System.String minsim = "80";
             using (MemoryStream push = new MemoryStream())
@@ -210,7 +211,7 @@ namespace Pic_finder
                 HttpContent content = new ByteArrayContent(push.ToArray());
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
                 post_data.Add(content, "file", "image.png");
-                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=7&minsim=" + minsim + "&db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=" + numres.ToString() + "&minsim=" + minsim + "&db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
             }
         }
 
@@ -341,10 +342,12 @@ namespace Pic_finder
             }
             else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You have no account registred in bot");
         }
-
+        
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
             this.Bot = serving;
+            this.Args = args;
+            this.NormalizeArgs();
             try
             {
                 bool use_db = false;
@@ -367,10 +370,14 @@ namespace Pic_finder
                 System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.First()?.FileId).Result.FilePath);
                 System.String hash = System.String.Empty;
                 Task<HttpResponseMessage> th;
-                UInt16 i = 0;
+                UInt16 i = 0, numres = this.DefNumres;
+                try
+                { numres = Convert.ToUInt16(ArgC.GetArg(this.Args, "limit").Arg); }
+                catch(NullReferenceException)
+                { numres = this.DefNumres; }
                 do
                 {
-                    th = this.DoASearchAsync(photo, user.ApiKey);
+                    th = this.DoASearchAsync(photo, user.ApiKey, numres);
                     await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
                     if (th.Result.IsSuccessStatusCode) break;
                     if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
@@ -441,8 +448,16 @@ namespace Pic_finder
                         AccountId = user.Id
                     };
                 }
+                bool inc_low = false;
+                try
+                {
+                    if (ArgC.GetArg(this.Args, "unsimilar").Arg.ToLower().Contains("yes")) inc_low = true;
+                }
+                catch(NullReferenceException)
+                { }
                 foreach (var result in results["results"].Children())
                 {
+                    if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>() && !inc_low) break;
                     if (!use_db)
                     {
                         try
@@ -481,7 +496,6 @@ namespace Pic_finder
                     this.dataContext.SubmitChanges();
                     foreach (var result in results["results"].Children())
                     {
-                        //if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>()) break;
                         SearchResult searchResult = new SearchResult
                         {
                             IndexId = result["header"]["index_id"].Value<ushort>(),
@@ -518,6 +532,11 @@ namespace Pic_finder
                 if (ex.Message != TooManyReq) serving.Exceptions.Add(ex);
                 await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
             }
+        }
+
+        public void SearchPicOnSend(IBot serving, Message msg)
+        {
+            if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private) this.SearchPic(msg, serving, null);
         }
     }
 }

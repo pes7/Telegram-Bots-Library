@@ -109,12 +109,14 @@ ShortLimit TinyInt,
 ShortRemaining TinyInt,
 LastRequest DateTime)
 
+/*
 Alter table SauceNAO_accs
 add constraint FK_SNAO_ACC_TUser foreign key (UserId)
 	references Users (Id)
 	on delete cascade
 	on update cascade
 ;
+*/
 
 Create table SauceSearch(
 Id BigInt Primary Key identity (0,1),
@@ -157,6 +159,21 @@ ResultURL text)
 Alter table ExtURLs_of_Search
 add constraint FK_ExtURL_Search foreign key (ResId)
 	references SauceSearchResult (Id)
+	on delete cascade
+	on update cascade
+;
+
+create table SharedKeyTo(
+Id BigInt Primary key identity(0,1),
+Username varchar(100),
+SharedTo BigInt,
+SharedBy BigInt,
+limitTo smallint
+);
+
+Alter table SharedKeyTo
+add constraint ShKeyOfUser foreign key (SharedBy)
+	references SauceNAO_accs (Id)
 	on delete cascade
 	on update cascade
 ;
