@@ -54,20 +54,20 @@ namespace Pic_finder
 
         private void FireListener()
         {
-            try
+            Thread thread = new Thread(delegate ()
             {
-                Thread thread = new Thread(delegate ()
+                try
                 {
                     Message[] msgslast, prelast;
                     lock (this.MessagesLast)
                     {
                         msgslast = new Message[this.MessagesLast.Count];
-                        this.MessagesLast.CopyTo(msgslast);
+                        if (this.MessagesLast.Count <= msgslast.Length) this.MessagesLast.CopyTo(msgslast);
                     }
                     lock(this.preLastMsgs)
                     {
                         prelast = new Message[this.preLastMsgs.Count];
-                        this.preLastMsgs.CopyTo(prelast);
+                        if (this.preLastMsgs.Count <= prelast.Length) this.preLastMsgs.CopyTo(prelast);
                     }
                     List<Message> listen_msgs = msgslast.ToList().Except(prelast.ToList()).ToList();
                     this.preLastMsgs.Clear();
@@ -76,13 +76,13 @@ namespace Pic_finder
                     {
                         foreach (Message msg in listen_msgs) invoke(this, msg);
                     }
-                });
-                thread.Start();
-            }
-            catch(Exception ex)
-            {
-                this.Exceptions.Add(ex);
-            }
+                }
+                catch (Exception ex)
+                {
+                    this.Exceptions.Add(ex);
+                }
+            });
+            thread.Start();
         }
     }
 }

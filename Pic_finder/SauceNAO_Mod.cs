@@ -455,9 +455,11 @@ namespace Pic_finder
                 }
                 catch(NullReferenceException)
                 { }
+                bool unsent = true;
                 foreach (var result in results["results"].Children())
                 {
-                    if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>() && !inc_low) break;
+                    if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>())
+                    { if (!inc_low) break; }
                     if (!use_db)
                     {
                         try
@@ -486,8 +488,11 @@ namespace Pic_finder
                         if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>()) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Low similarity result bellow.");
                         await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, res_str);
                     }
+                    unsent = false;
                 }
                 if (results["results"].Count() == 0) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results, some how, sorry.");
+                if (unsent && !inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "If results wasn\'t sent, try to send this image with caption \"anipic sauce unsimilar=yes\"");
+                //if (unsent && inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry but we didn\'t got results for your request.");
                 if (!use_db)
                 {
                     hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
@@ -536,7 +541,14 @@ namespace Pic_finder
 
         public void SearchPicOnSend(IBot serving, Message msg)
         {
-            if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private) this.SearchPic(msg, serving, null);
+            try
+            {
+                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty))) this.SearchPic(msg, serving, null);
+            }
+            catch (Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+            }
         }
     }
 }
