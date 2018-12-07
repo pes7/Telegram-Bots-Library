@@ -116,8 +116,8 @@ namespace Pic_finder
                 },
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
             Robot.SynkCommands.Add(new SynkCommand(
-                Robot.GetModule<SauceNAO_Mod>().SearchPic, 
-                new List<string>() { "/getsauce" }, 
+                Robot.GetModule<SauceNAO_Mod>().SearchPic,
+                new List<string>() { "/getsauce" },
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().AddKeyToDB,

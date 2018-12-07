@@ -166,6 +166,8 @@ namespace Pic_finder
         public System.String SavePicsDir;
         public readonly UInt16 DefNumres = 7;
         private readonly System.String TooManyReq = "Unfortunatelly you had reached out from search limit.\nPlease try again in a next day.";
+        private readonly System.String GotWrong = "Oops, something got wrong.\n";
+        private readonly System.String NoKey = "You have no registred SauceNAO API-key in the bot.\nYou can get it by following instructions from a /help command.";
 
         public SauceNAO_Mod(System.String sql_conn_string, System.String save_dir) : base("SauceNAO finder", typeof(SauceNAO_Mod))
         {
@@ -291,7 +293,7 @@ namespace Pic_finder
             catch (Exception ex)
             {
                 serving.Exceptions.Add(ex);
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong.\n" + ex.Message);
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.GotWrong + ex.Message);
             }
         }
 
@@ -335,12 +337,12 @@ namespace Pic_finder
                     if (user.LongRemaining != 0 && user.ShortRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalSeconds > 10.0) user.ShortRemaining = user.ShortLimit;
                 }
                 this.dataContext.SubmitChanges();
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Your stats.\n" +
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Your stats.\n(Information can be incorrect, because it\'s bases on your last request.)\n" +
                     "Long count of avalieble searches is " + user.LongRemaining.ToString() + " out of " + user.LongLimit.ToString() +
                     ".\nShort count – " + user.ShortRemaining.ToString() + " out of " + user.ShortLimit.ToString() + "." +
                     ((DateTime.Now - user.LastRequestTime).Value.TotalHours < 24.0 && user.LongRemaining == 0 ? "\nNext searches will be avalieble in " + (24.0 - (DateTime.Now - user.LastRequestTime).Value.TotalHours).ToString() + " hours." : ""));
             }
-            else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You have no account registred in bot");
+            else await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.NoKey);
         }
         
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
@@ -356,7 +358,7 @@ namespace Pic_finder
                             select key;
                 if (users.Count() == 0)
                 {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You didn't registered your key.");
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.NoKey);
                     return;
                 }
                 SauceNAO_Acc user = users.FirstOrDefault();
@@ -367,7 +369,7 @@ namespace Pic_finder
                 }
                 else if (user.LongRemaining != 0 && user.ShortRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalSeconds < 10.0) Thread.Sleep(new TimeSpan(0, 0, 10));
                 JObject results = null;
-                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.First()?.FileId).Result.FilePath);
+                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo[2]?.FileId).Result.FilePath);
                 System.String hash = System.String.Empty;
                 Task<HttpResponseMessage> th;
                 UInt16 i = 0, numres = this.DefNumres;
@@ -448,13 +450,14 @@ namespace Pic_finder
                         AccountId = user.Id
                     };
                 }
-                bool inc_low = false;
+                bool inc_low;
                 try
                 {
-                    if (ArgC.GetArg(this.Args, "unsimilar").Arg.ToLower().Contains("yes")) inc_low = true;
+                    if (ArgC.GetArg(this.Args, "unsimilar") != null) inc_low = true;
+                    else inc_low = false;
                 }
                 catch(NullReferenceException)
-                { }
+                { inc_low = false; }
                 bool unsent = true;
                 foreach (var result in results["results"].Children())
                 {
@@ -473,7 +476,7 @@ namespace Pic_finder
                     try
                     {
                         res_str = result["header"]["index_name"].Value<System.String>() + "\nSimilarity " + result["header"]["similarity"].Value<decimal>().ToString() + "\nSource URLs:";
-                        if (result["data"]["ext_urls"] == null) res_str += " links unfortunally wasn\'t provided.";
+                        if (result["data"]["ext_urls"] == null) res_str += " unfortunally links wasn\'t provided.";
                         else
                         {
                             foreach (var url in result["data"]["ext_urls"].Values<System.String>())
@@ -490,7 +493,7 @@ namespace Pic_finder
                     }
                     unsent = false;
                 }
-                if (results["results"].Count() == 0) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results, some how, sorry.");
+                if (results["results"].Count() == 0) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry.");
                 if (unsent && !inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "If results wasn\'t sent, try to send this image with caption \"anipic sauce unsimilar=yes\"");
                 //if (unsent && inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry but we didn\'t got results for your request.");
                 if (!use_db)
@@ -525,7 +528,7 @@ namespace Pic_finder
                         this.dataContext.SubmitChanges();
 
                     }
-                    System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + ".jpg";
+                    System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
                     FileStream file = System.IO.File.Create(filepath);
                     photo.Seek(0, SeekOrigin.Begin);
                     photo.CopyTo(file);
@@ -543,7 +546,7 @@ namespace Pic_finder
         {
             try
             {
-                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty))) this.SearchPic(msg, serving, null);
+                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, null);
             }
             catch (Exception ex)
             {
