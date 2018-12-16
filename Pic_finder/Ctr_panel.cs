@@ -119,6 +119,9 @@ namespace Pic_finder
                 Robot.GetModule<SauceNAO_Mod>().SearchPic,
                 new List<string>() { "/getsauce" },
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
+            SynkCommand get_sauce = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
+            get_sauce.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(get_sauce);
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().AddKeyToDB,
                 new List<string>() { "/putkey" },

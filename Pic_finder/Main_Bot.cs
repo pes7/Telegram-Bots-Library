@@ -34,8 +34,8 @@ namespace Pic_finder
     public class Main_Bot : BotBase //Основний 
     {
         private List<Message> preLastMsgs = new List<Message>();
-        public delegate void AutoIvoke(IBot serving, Message msg);
-        public List<AutoIvoke> AutoInvokes = new List<AutoIvoke>();
+        public delegate void AutoInvoke(Message msg, IBot serving, List<ArgC> args);
+        public List<AutoInvoke> AutoInvokes = new List<AutoInvoke>();
         public Main_Bot(
             System.String api_key,
             System.String name,
@@ -47,42 +47,6 @@ namespace Pic_finder
                 name,
                 shortName,
                 modules: mods,
-                usernameofcreator: creatorName)
-        {
-            this.OnWebHoockUpdated += this.FireListener;
-        }
-
-        private void FireListener()
-        {
-            Thread thread = new Thread(delegate ()
-            {
-                try
-                {
-                    Message[] msgslast, prelast;
-                    lock (this.MessagesLast)
-                    {
-                        msgslast = new Message[this.MessagesLast.Count];
-                        if (this.MessagesLast.Count <= msgslast.Length) this.MessagesLast.CopyTo(msgslast);
-                    }
-                    lock(this.preLastMsgs)
-                    {
-                        prelast = new Message[this.preLastMsgs.Count];
-                        if (this.preLastMsgs.Count <= prelast.Length) this.preLastMsgs.CopyTo(prelast);
-                    }
-                    List<Message> listen_msgs = msgslast.ToList().Except(prelast.ToList()).ToList();
-                    this.preLastMsgs.Clear();
-                    this.preLastMsgs.AddRange(msgslast);
-                    foreach (AutoIvoke invoke in this.AutoInvokes)
-                    {
-                        foreach (Message msg in listen_msgs) invoke(this, msg);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.Exceptions.Add(ex);
-                }
-            });
-            thread.Start();
-        }
+                usernameofcreator: creatorName){ }
     }
 }

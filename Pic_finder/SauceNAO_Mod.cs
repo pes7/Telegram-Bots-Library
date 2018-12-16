@@ -347,6 +347,7 @@ namespace Pic_finder
         
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
+            if (msg.Type != Telegram.Bot.Types.Enums.MessageType.Photo) return;
             this.Bot = serving;
             this.Args = args;
             this.NormalizeArgs();
@@ -542,11 +543,16 @@ namespace Pic_finder
             }
         }
 
-        public void SearchPicOnSend(IBot serving, Message msg)
+        public async void SearchPicOnSend(Update update, IBot serving, List<ArgC> args)
+        {
+            this.SearchPicOnSend(update.Message, serving, args);
+        }
+
+        public async void SearchPicOnSend(Message msg, IBot serving, List<ArgC> args = null)
         {
             try
             {
-                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, null);
+                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
             }
             catch (Exception ex)
             {
