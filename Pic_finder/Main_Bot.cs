@@ -34,8 +34,6 @@ namespace Pic_finder
     public class Main_Bot : BotBase //Основний 
     {
         private List<Message> preLastMsgs = new List<Message>();
-        public delegate void AutoInvoke(Message msg, IBot serving, List<ArgC> args);
-        public List<AutoInvoke> AutoInvokes = new List<AutoInvoke>();
         public Main_Bot(
             System.String api_key,
             System.String name,

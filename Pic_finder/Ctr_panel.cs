@@ -119,6 +119,7 @@ namespace Pic_finder
                 Robot.GetModule<SauceNAO_Mod>().SearchPic,
                 new List<string>() { "/getsauce" },
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
+
             SynkCommand get_sauce = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
             get_sauce.Type = TypeOfCommand.AllwaysInWebHook;
             Robot.SynkCommands.Add(get_sauce);
@@ -134,8 +135,6 @@ namespace Pic_finder
                 Robot.GetModule<SauceNAO_Mod>().GetMySearchStats,
                 new List<string>() { "/getstats" },
                 commandName: "stats", descr: "Gets stats of searches of current user."));
-
-            Robot.AutoInvokes.Add(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
 
             Robot.Start();
 
@@ -205,8 +204,7 @@ namespace Pic_finder
         }
         public void AddMsgToLog(Telegram.Bot.Types.Message msg)
         {
-            MsgLog.AppendText("Message Id: " + msg.MessageId.ToString() + ". Chat Id: " + msg.Chat.Id + ". Context: \"" + msg.Text + "\".");
-            MsgLog.AppendText(Environment.NewLine);
+            MsgLog.AppendText("Message Id: " + msg.MessageId.ToString() + ". Chat Id: " + msg.Chat.Id + ". Context: \"" + msg.Text + "\"." + Environment.NewLine + Environment.NewLine);
         }
 
         private void radioPhoto_CheckedChanged(object sender, EventArgs e)

@@ -495,7 +495,7 @@ namespace Pic_finder
                     unsent = false;
                 }
                 if (results["results"].Count() == 0) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry.");
-                if (unsent && !inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "If results wasn\'t sent, try to send this image with caption \"anipic sauce unsimilar=yes\"");
+                if (unsent && !inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "If results wasn\'t sent, try to send this image with caption \"anipic sauce unsimilar\"");
                 //if (unsent && inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry but we didn\'t got results for your request.");
                 if (!use_db)
                 {
