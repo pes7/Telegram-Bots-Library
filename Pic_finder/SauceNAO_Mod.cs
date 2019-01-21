@@ -421,6 +421,7 @@ namespace Pic_finder
             this.Bot = serving;
             this.Args = args;
             this.NormalizeArgs();
+            bool db_unppt = false;
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
@@ -582,16 +583,21 @@ namespace Pic_finder
                         hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
                         query.ImageHash = hash;
                         SearchQueries.InsertOnSubmit(query);
-                        try
+                        do
                         {
-                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            try
+                            {
+                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                db_unppt = false;
+                            }
+                            catch (ChangeConflictException)
+                            {
+                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                    changeConflict.Resolve(RefreshMode.KeepChanges);
+                                db_unppt = true;
+                            }
                         }
-                        catch (ChangeConflictException)
-                        {
-                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                changeConflict.Resolve(RefreshMode.KeepChanges);
-                            dataContext.SubmitChanges(ConflictMode.FailOnFirstConflict);
-                        }
+                        while (db_unppt);
                         foreach (var result in results["results"].Children())
                         {
                             SearchResult searchResult = new SearchResult
@@ -603,16 +609,21 @@ namespace Pic_finder
                                 SearchId = query.Id
                             };
                             SearchResults.InsertOnSubmit(searchResult);
-                            try
+                            do
                             {
-                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                try
+                                {
+                                    dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                    db_unppt = false;
+                                }
+                                catch (ChangeConflictException)
+                                {
+                                    foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                        changeConflict.Resolve(RefreshMode.KeepChanges);
+                                    db_unppt = true;
+                                }
                             }
-                            catch (ChangeConflictException)
-                            {
-                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                    changeConflict.Resolve(RefreshMode.KeepChanges);
-                                dataContext.SubmitChanges(ConflictMode.FailOnFirstConflict);
-                            }
+                            while (db_unppt);
                             if (result["data"]["ext_urls"] != null)
                             {
                                 foreach (var url in result["data"]["ext_urls"].Values<System.String>())
@@ -624,16 +635,21 @@ namespace Pic_finder
                                     });
                                 }
                             }
-                            try
+                            do
                             {
-                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                try
+                                {
+                                    dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                    db_unppt = false;
+                                }
+                                catch (ChangeConflictException)
+                                {
+                                    foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                        changeConflict.Resolve(RefreshMode.KeepChanges);
+                                    db_unppt = true;
+                                }
                             }
-                            catch (ChangeConflictException)
-                            {
-                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                    changeConflict.Resolve(RefreshMode.KeepChanges);
-                                dataContext.SubmitChanges(ConflictMode.FailOnFirstConflict);
-                            }
+                            while (db_unppt);
                         }
                         System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
                         FileStream file = System.IO.File.Create(filepath);
