@@ -20,6 +20,7 @@ using System.Data.Linq.Mapping;
 using System.Data.Linq;
 using System.Data.SqlClient;
 using DupImageLib;
+using HtmlAgilityPack;
 
 namespace Pic_finder
 {
@@ -231,6 +232,20 @@ namespace Pic_finder
             }
         }
 
+        private async Task<HttpResponseMessage> DoTrivialRequest(System.IO.Stream take)
+        {
+            using (MemoryStream push = new MemoryStream())
+            {
+                Bitmap to_push = new Bitmap(take);
+                to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
+                MultipartFormDataContent post_data = new MultipartFormDataContent();
+                HttpContent content = new ByteArrayContent(push.ToArray());
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+                post_data.Add(content, "file", "image.png");
+                return await Client.PostAsync("https://iqdb.org/", post_data);
+            }
+        }
+
         private void NormalizeArgs()
         {
             if (this.Args == null) return;
@@ -436,7 +451,8 @@ namespace Pic_finder
                                 select key;
                     if (users.Count() == 0)
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.NoKey);
+                        //await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.NoKey);
+                        this.SearchWithoutSauceNAO(msg, serving, args);
                         return;
                     }
                     SauceNAO_Acc user = users.FirstOrDefault();
@@ -556,7 +572,7 @@ namespace Pic_finder
                         System.String res_str = System.String.Empty;
                         try
                         {
-                            res_str = result["header"]["index_name"].Value<System.String>() + "\nSimilarity " + result["header"]["similarity"].Value<decimal>().ToString() + "\nSource URLs:";
+                            res_str = result["header"]["index_name"].Value<System.String>() + ".\nSimilarity – " + result["header"]["similarity"].Value<decimal>().ToString() + "%.\nSource URLs:";
                             if (result["data"]["ext_urls"] == null) res_str += " unfortunally links wasn\'t provided.";
                             else
                             {
@@ -651,11 +667,7 @@ namespace Pic_finder
                             }
                             while (db_unppt);
                         }
-                        System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
-                        FileStream file = System.IO.File.Create(filepath);
-                        photo.Seek(0, SeekOrigin.Begin);
-                        photo.CopyTo(file);
-                        file.Close();
+                        await SaveFileAsync(photo, hash);
                     }
                 }
                 catch (Exception ex)
@@ -664,6 +676,21 @@ namespace Pic_finder
                     await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
                 }
             }
+        }
+
+        private async Task SaveFileAsync(System.IO.Stream photo, System.String hash)
+        {
+            System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
+            FileStream file = System.IO.File.Create(filepath);
+            photo.Seek(0, SeekOrigin.Begin);
+            await photo.CopyToAsync(file);
+            file.Close();
+        }
+
+        private System.String GetImageHash(System.IO.Stream photo)
+        {
+            photo.Seek(0, SeekOrigin.Begin);
+            return this.imageHasher.CalculateDifferenceHash64(photo).ToString();
         }
 
         public async void SearchPicOnSend(Update update, IBot serving, List<ArgC> args)
@@ -680,6 +707,182 @@ namespace Pic_finder
             catch //(Exception ex)
             {
                 //serving.Exceptions.Add(ex);
+            }
+        }
+
+        public async void SearchWithoutSauceNAO(Message msg, IBot serving, List<ArgC> args)
+        {
+            try
+            {
+                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo[2]?.FileId).Result.FilePath);
+                HttpResponseMessage httpResponse = await this.DoTrivialRequest(photo);
+                System.String res = await httpResponse.Content.ReadAsStringAsync();
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong…");
+                    return;
+                }
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
+                HtmlDocument parse = new HtmlDocument();
+                parse.LoadHtml(res);
+                HtmlNodeCollection pages = parse.DocumentNode.SelectNodes("//div[contains(@id, 'pages')]/div");
+                SearchQuery query = new SearchQuery
+                {
+                    JSON = res,
+                    MinimumSimularity = 0,
+                    ResultsRequested = 0,
+                    SearchDepth = null,
+                    ResultsReturned = Convert.ToUInt16(pages.Count - 1),
+                    AccountId = null
+                };
+                Dictionary<SearchResult, List<ExternalUrls>> Results = new Dictionary<SearchResult, List<ExternalUrls>>();
+                foreach (HtmlNode page in pages)
+                {
+                    try
+                    {
+                        if (page == pages[0]) continue;
+                        /*
+                        System.String link = "http:" + page.SelectSingleNode("table/tbody/tr/td[@class='image']/a").Attributes.GetNamedItem("href").Value;
+                        */
+                        HtmlNodeCollection rows = page.ChildNodes["table"].ChildNodes;
+                        if (page == pages[1])
+                        {
+                            System.String ch = rows[0].ChildNodes[0].InnerText;
+                            if (ch == "No relevant matches")
+                            {
+                                query.SearchStatus = 1;
+                                query.ResultsReturned = Convert.ToUInt16(query.ResultsReturned - 1);
+                                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly there`s no images that close to your`s, so the`re some of them, that can possibly match.");
+                                continue;
+                            }
+                            else { query.SearchStatus = 0; }
+                        }
+                        Results.Add(new SearchResult
+                        {
+                            IndexId = 0,
+                            IndexName = rows[2].ChildNodes[0].InnerText,
+                            Similarity = Convert.ToInt16(new String(rows[4].ChildNodes[0].InnerText.Where(Char.IsDigit).ToArray())),
+                            Thumbnail = "https://iqdb.org/" + rows[1].ChildNodes["td"].ChildNodes["a"].ChildNodes["img"].GetAttributeValue("src", "")
+                        },
+                        new List<ExternalUrls>()
+                        {
+                        new ExternalUrls
+                        {
+                            URL ="https:" + rows[1].ChildNodes["td"].ChildNodes["a"].GetAttributeValue("href", "")
+                        }
+                        });
+                        if (rows[2].ChildNodes[0].HasChildNodes)
+                        {
+                            if (rows[2].ChildNodes[0].ChildNodes["span"] != null)
+                            {
+                                if (rows[2].ChildNodes[0].ChildNodes["span"].HasChildNodes)
+                                {
+                                    foreach (HtmlNode htmlNode in rows[2].ChildNodes[0].ChildNodes["span"].ChildNodes)
+                                    {
+                                        Results.Last().Value.Add(new ExternalUrls
+                                        {
+                                            URL = "https:" + htmlNode.GetAttributeValue("href", "")
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        serving.Exceptions.Add(e);
+                    }
+                }
+                foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in Results)
+                {
+                    try
+                    {
+                        System.IO.Stream get_pic = await Client.GetStreamAsync(keyValue.Key.Thumbnail);
+                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, keyValue.Key.Thumbnail.Split('/').Last().Split('?')[0]));
+                        System.String send_info = keyValue.Key.IndexName + ".\nSimilarity – " +
+                            keyValue.Key.Similarity.ToString() +
+                            "%.\nSource URLs:\n";
+                        foreach (ExternalUrls urls in keyValue.Value) send_info += urls.URL + "\n";
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, send_info);
+                    }
+                    catch (Exception e)
+                    {
+                        serving.Exceptions.Add(e);
+                    }
+                }
+                System.String hash = this.GetImageHash(photo);
+                using (DataContext dataContext = new DataContext(this.ConnStr))
+                {
+                    //Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
+                    bool db_unppt = false;
+                    Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                    Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+                    Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
+
+                    query.ImageHash = hash;
+                    SearchQueries.InsertOnSubmit(query);
+                    do
+                    {
+                        try
+                        {
+                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            db_unppt = false;
+                        }
+                        catch (ChangeConflictException)
+                        {
+                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                changeConflict.Resolve(RefreshMode.KeepChanges);
+                            db_unppt = true;
+                        }
+                    }
+                    while (db_unppt);
+                    foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in Results)
+                    {
+                        keyValue.Key.SearchId = query.Id;
+                        SearchResults.InsertOnSubmit(keyValue.Key);
+                        do
+                        {
+                            try
+                            {
+                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                db_unppt = false;
+                            }
+                            catch (ChangeConflictException)
+                            {
+                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                    changeConflict.Resolve(RefreshMode.KeepChanges);
+                                db_unppt = true;
+                            }
+                        }
+                        while (db_unppt);
+                        foreach (ExternalUrls externalUrls in keyValue.Value)
+                        {
+                            externalUrls.ResultId = keyValue.Key.Id;
+                            ExternalUrls.InsertOnSubmit(externalUrls);
+                        }
+                        do
+                        {
+                            try
+                            {
+                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                                db_unppt = false;
+                            }
+                            catch (ChangeConflictException)
+                            {
+                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                    changeConflict.Resolve(RefreshMode.KeepChanges);
+                                db_unppt = true;
+                            }
+                        }
+                        while (db_unppt);
+                    }
+                }
+                await this.SaveFileAsync(photo, hash);
+            }
+            catch (Exception e)
+            {
+                serving.Exceptions.Add(e);
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
             }
         }
     }

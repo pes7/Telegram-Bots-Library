@@ -120,6 +120,11 @@ namespace Pic_finder
                 new List<string>() { "/getsauce" },
                 commandName: "sauce", descr: "Get's source image of picture.", isPhotoCommand: true));
 
+            /*Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<SauceNAO_Mod>().SearchWithoutSauceNAO,
+                new List<string>() { "/getsauce_alt" },
+                commandName: "sauce_alt", descr: "Get's source image of picture.", isPhotoCommand: true));*/
+
             SynkCommand get_sauce = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
             get_sauce.Type = TypeOfCommand.AllwaysInWebHook;
             Robot.SynkCommands.Add(get_sauce);
