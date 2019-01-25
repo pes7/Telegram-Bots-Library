@@ -21,6 +21,7 @@ using System.Data.Linq;
 using System.Data.SqlClient;
 using DupImageLib;
 using HtmlAgilityPack;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pic_finder
 {
@@ -436,16 +437,12 @@ namespace Pic_finder
             this.Bot = serving;
             this.Args = args;
             this.NormalizeArgs();
-            bool db_unppt = false;
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
-                Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
-                Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
-                Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
                 try
                 {
-                    bool use_db = false;
+                    bool use_iqdb = false;
                     var users = from key in Users
                                 where key.UserId == msg.From.Id
                                 select key;
@@ -474,7 +471,7 @@ namespace Pic_finder
                     do
                     {
                         th = this.DoASearchAsync(photo, user.ApiKey, numres);
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching…" + (i > 0 ? ("\nNumber of retry – " + i.ToString()) : ""));
                         if (th.Result.IsSuccessStatusCode) break;
                         if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
                         else break;
@@ -484,23 +481,23 @@ namespace Pic_finder
                     {
                         await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally there was too many requests from you.\n" +
                             "Please wait until a next day.");
-                        use_db = true;
+                        use_iqdb = true;
                     }
-                    if (!use_db)
+                    if (!use_iqdb)
                     {
                         System.String res = th.Result.Content.ReadAsStringAsync().Result;
                         results = JObject.Parse(res);
                         if (results == null)
                         {
                             await Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have an error with results.");
-                            use_db = true;
+                            use_iqdb = true;
                         }
-                        if (!use_db)
+                        if (!use_iqdb)
                         {
                             if (Convert.ToInt32(results["header"]["user_id"]?.Value<int>()) <= 0)
                             {
                                 await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
-                                use_db = true;
+                                use_iqdb = true;
                             }
                             if (Convert.ToInt32(results["header"]["results_returned"]?.Value<int>()) <= 0)
                             {
@@ -508,166 +505,69 @@ namespace Pic_finder
                                 return;
                             }
                         }
-                    }
-                    SearchQuery query = null;
-                    photo.Seek(0, SeekOrigin.Begin);
-                    if (use_db)
-                    {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Trying to use cashed results for other users.");
-                        hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
-                        var q = SearchQueries.Where(rq => rq.ImageHash == hash);
-                        if (q.Count() != 0) results = JObject.Parse(q.FirstOrDefault().JSON);
-                        else
+                        if (results?["results"].Count() == 0)
                         {
-                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally nobody didn\'t looked for image that looks like yours.");
-                            return;
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry.");
+                            use_iqdb = true;
                         }
                     }
-                    else
+                    if (use_iqdb)
                     {
-                        user.LastRequestTime = DateTime.Now;
-                        if (user.AccountType != results["header"]["account_type"].Value<short>()) user.AccountType = results["header"]["account_type"].Value<short>();
-                        if (user.SauceNAO_UserId != results["header"]["user_id"].Value<short>()) user.SauceNAO_UserId = results["header"]["user_id"].Value<long>();
-                        if (user.LongLimit != results["header"]["long_limit"].Value<ushort>()) user.LongLimit = results["header"]["long_limit"].Value<ushort>();
-                        if (user.ShortLimit != results["header"]["short_limit"].Value<ushort>()) user.ShortLimit = results["header"]["short_limit"].Value<ushort>();
-                        user.LongRemaining = results["header"]["long_remaining"].Value<ushort>();
-                        user.ShortRemaining = results["header"]["short_remaining"].Value<ushort>();
-                        query = new SearchQuery
-                        {
-                            JSON = th.Result.Content.ReadAsStringAsync().Result,
-                            MinimumSimularity = results["header"]["minimum_similarity"].Value<float>(),
-                            ResultsRequested = results["header"]["results_requested"].Value<ushort>(),
-                            ResultsReturned = results["header"]["results_returned"].Value<ushort>(),
-                            SearchDepth = results["header"]["search_depth"].Value<System.String>(),
-                            SearchStatus = results["header"]["status"].Value<ushort>(),
-                            ImageHash = hash,
-                            AccountId = user.Id
-                        };
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Trying to use the IQDB instead.");
+                        this.SearchWithoutSauceNAO(msg, serving, args);
+                        return;
                     }
-                    bool inc_low;
-                    try
+                    user.LastRequestTime = DateTime.Now;
+                    if (user.AccountType != results["header"]["account_type"].Value<short>()) user.AccountType = results["header"]["account_type"].Value<short>();
+                    if (user.SauceNAO_UserId != results["header"]["user_id"].Value<short>()) user.SauceNAO_UserId = results["header"]["user_id"].Value<long>();
+                    if (user.LongLimit != results["header"]["long_limit"].Value<ushort>()) user.LongLimit = results["header"]["long_limit"].Value<ushort>();
+                    if (user.ShortLimit != results["header"]["short_limit"].Value<ushort>()) user.ShortLimit = results["header"]["short_limit"].Value<ushort>();
+                    user.LongRemaining = results["header"]["long_remaining"].Value<ushort>();
+                    user.ShortRemaining = results["header"]["short_remaining"].Value<ushort>();
+                    SearchQuery query = new SearchQuery
                     {
-                        if (ArgC.GetArg(this.Args, "unsimilar") != null) inc_low = true;
-                        else inc_low = false;
-                    }
-                    catch (NullReferenceException)
-                    { inc_low = false; }
-                    bool unsent = true;
+                        JSON = th.Result.Content.ReadAsStringAsync().Result,
+                        MinimumSimularity = results["header"]["minimum_similarity"].Value<float>(),
+                        ResultsRequested = results["header"]["results_requested"].Value<ushort>(),
+                        ResultsReturned = results["header"]["results_returned"].Value<ushort>(),
+                        SearchDepth = results["header"]["search_depth"].Value<System.String>(),
+                        SearchStatus = results["header"]["status"].Value<ushort>(),
+                        AccountId = user.Id
+                    };
+                    Dictionary<SearchResult, List<ExternalUrls>> Results = new Dictionary<SearchResult, List<ExternalUrls>>();
                     foreach (var result in results["results"].Children())
                     {
-                        if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>())
-                        { if (!inc_low) break; }
-                        if (!use_db)
+                        List<ExternalUrls> urls = new List<ExternalUrls>();
+                        foreach (var url in result["data"]["ext_urls"].Values<System.String>())
+                            urls.Add(new Pic_finder.ExternalUrls
+                            { URL = url });
+                        Results.Add(new SearchResult
                         {
-                            try
-                            {
-                                System.IO.Stream get_pic = await Client.GetStreamAsync(result["header"]["thumbnail"].Value<String>());
-                                await this.Bot.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result["header"]["thumbnail"].Value<System.String>().Split('/').Last().Split('?')[0]));
-                            }
-                            catch (Exception ex)
-                            {
-                                this.Bot.Exceptions.Add(ex);
-                            }
-                        }
-                        System.String res_str = System.String.Empty;
-                        try
-                        {
-                            res_str = result["header"]["index_name"].Value<System.String>() + ".\nSimilarity – " + result["header"]["similarity"].Value<decimal>().ToString() + "%.\nSource URLs:";
-                            if (result["data"]["ext_urls"] == null) res_str += " unfortunally links wasn\'t provided.";
-                            else
-                            {
-                                foreach (var url in result["data"]["ext_urls"].Values<System.String>())
-                                {
-                                    res_str += "\n" + url;
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        { this.Bot.Exceptions.Add(ex); }
-                        finally
-                        {
-                            if (results["header"]["minimum_similarity"].Value<decimal>() > result["header"]["similarity"].Value<decimal>()) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Low similarity result bellow.");
-                            await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, res_str);
-                        }
-                        unsent = false;
+                            IndexId = result["header"]["index_id"].Value<ushort>(),
+                            IndexName = result["header"]["index_name"].Value<System.String>(),
+                            Similarity = result["header"]["similarity"].Value<float>(),
+                            Thumbnail = result["header"]["thumbnail"].Value<String>()
+                        }, urls);
                     }
-                    if (results["results"].Count() == 0) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry.");
-                    if (unsent && !inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "If results wasn\'t sent, try to send this image with caption \"anipic sauce unsimilar\"");
-                    //if (unsent && inc_low) await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry but we didn\'t got results for your request.");
-                    if (!use_db)
+                    Dictionary<SearchResult, List<ExternalUrls>> ResSim = new Dictionary<SearchResult, List<ExternalUrls>>();
+                    try
                     {
-                        hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
-                        query.ImageHash = hash;
-                        SearchQueries.InsertOnSubmit(query);
-                        do
+                        if (ArgC.GetArg(args, "unsimilar") != null) this.SendResults(serving, msg, Results);
+                        else
                         {
-                            try
-                            {
-                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                                db_unppt = false;
-                            }
-                            catch (ChangeConflictException)
-                            {
-                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                    changeConflict.Resolve(RefreshMode.KeepChanges);
-                                db_unppt = true;
-                            }
+                            ResSim = (Dictionary<SearchResult, List<ExternalUrls>>)Results.Where(res => res.Key.Similarity >= query.MinimumSimularity);
+                            this.SendResults(serving, msg, ResSim);
                         }
-                        while (db_unppt);
-                        foreach (var result in results["results"].Children())
-                        {
-                            SearchResult searchResult = new SearchResult
-                            {
-                                IndexId = result["header"]["index_id"].Value<ushort>(),
-                                IndexName = result["header"]["index_name"].Value<System.String>(),
-                                Similarity = result["header"]["similarity"].Value<float>(),
-                                Thumbnail = result["header"]["thumbnail"].Value<String>(),
-                                SearchId = query.Id
-                            };
-                            SearchResults.InsertOnSubmit(searchResult);
-                            do
-                            {
-                                try
-                                {
-                                    dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                                    db_unppt = false;
-                                }
-                                catch (ChangeConflictException)
-                                {
-                                    foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                        changeConflict.Resolve(RefreshMode.KeepChanges);
-                                    db_unppt = true;
-                                }
-                            }
-                            while (db_unppt);
-                            if (result["data"]["ext_urls"] != null)
-                            {
-                                foreach (var url in result["data"]["ext_urls"].Values<System.String>())
-                                {
-                                    ExternalUrls.InsertOnSubmit(new ExternalUrls
-                                    {
-                                        URL = url,
-                                        ResultId = searchResult.Id
-                                    });
-                                }
-                            }
-                            do
-                            {
-                                try
-                                {
-                                    dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                                    db_unppt = false;
-                                }
-                                catch (ChangeConflictException)
-                                {
-                                    foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                        changeConflict.Resolve(RefreshMode.KeepChanges);
-                                    db_unppt = true;
-                                }
-                            }
-                            while (db_unppt);
-                        }
-                        await SaveFileAsync(photo, hash);
+                    }
+                    catch(NullReferenceException)
+                    {
+                        ResSim = Results.Where(res => res.Key.Similarity >= query.MinimumSimularity).ToDictionary(x => x.Key, x => x.Value);
+                        this.SendResults(serving, msg, ResSim);
+                    }
+                    this.SaveResultsToDB(photo, query, Results);
+                    if (Results.Count>ResSim.Count)
+                    {
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "There are results which marked as unsimilar.", replyMarkup: this.KeyToReceiveUnsimilar(query));
                     }
                 }
                 catch (Exception ex)
@@ -677,6 +577,85 @@ namespace Pic_finder
                 }
             }
         }
+
+        private InlineKeyboardMarkup KeyToReceiveUnsimilar(SearchQuery query)
+        {
+            return new InlineKeyboardMarkup(new InlineKeyboardButton[1][]
+            {
+                new []
+                {
+                    new InlineKeyboardButton()
+                    {
+                        Text="Get it",
+                        CallbackData ="action=receive_unsimilar query_id="+query.Id.ToString()
+                    }
+                }
+            });
+        }
+
+        private InlineKeyboardMarkup DownloadFromSource(List<ExternalUrls> urls)
+        {
+            try
+            {
+                List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
+                foreach (ExternalUrls url_db in urls)
+                {
+                    if (url_db.URL.Contains("danbooru.donmai.us"))
+                    buttons.Add(new InlineKeyboardButton()
+                    {
+                        Text = "Download from Danbooru",
+                        CallbackData = "action=download_from_danbooru danbooru_id=" + url_db.URL.Split('/').Last()
+                    });
+                    if (url_db.URL.Contains("yande.re"))
+                    buttons.Add(new InlineKeyboardButton()
+                    {
+                        Text = "Download from Yandere",
+                        CallbackData = "action=download_from_yandere yandere_id=" + url_db.URL.Split('/').Last()
+                    });
+                }
+                if (buttons.Count > 0)
+                {
+                    return new InlineKeyboardMarkup(new InlineKeyboardButton[1][]
+                    {
+                    buttons.ToArray()
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                this.Bot.Exceptions.Add(ex);
+            }
+            return null;
+        }
+
+        private async void DownloadDanbooru(IBot serving, Message msg, System.String callback)
+        {
+            try
+            {
+                System.String dnb_id = callback.Split(' ')[1].Split('=')[1];
+                if (callback.Contains("download_from_danbooru")) serving.GetModule<danbooru_api_mod>().GetDanbooruAsync(msg, serving,
+                    new List<ArgC>()
+                    {
+                        new ArgC("/getdanbooru"),
+                        new ArgC("file"),
+                        new ArgC("id", dnb_id.ToString())
+                    });
+                if (callback.Contains("download_from_yandere")) serving.GetModule<danbooru_api_mod>().GetYandereAsync(msg, serving,
+                    new List<ArgC>()
+                    {
+                        new ArgC("/getyandere"),
+                        new ArgC("file"),
+                        new ArgC("id", dnb_id.ToString())
+                    });
+            }
+            catch(Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+            }
+        }
+
+        //public async Action(object sc, CallbackQueryEventArgs )
 
         private async Task SaveFileAsync(System.IO.Stream photo, System.String hash)
         {
@@ -693,9 +672,169 @@ namespace Pic_finder
             return this.imageHasher.CalculateDifferenceHash64(photo).ToString();
         }
 
+        private async void SendResults(IBot serving, Message msg, Dictionary<SearchResult, List<ExternalUrls>> results)
+        {
+            this.Bot = serving;
+            if (results == null) return;
+            foreach (KeyValuePair<SearchResult, List<ExternalUrls>> result in results)
+            {
+                try
+                {
+                    System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
+                    await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]));
+                }
+                catch (Exception ex)
+                {
+                    this.Bot.Exceptions.Add(ex);
+                }
+                System.String res_str = System.String.Empty;
+                try
+                {
+                    res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                    if (result.Value.Count == 0) res_str += " unfortunally links wasn\'t provided.";
+                    else
+                    {
+                        foreach (var url in result.Value)
+                        {
+                            res_str += "\n" + url.URL;
+                        }
+                    }
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSource(result.Value));
+                }
+                catch (Exception ex)
+                { serving.Exceptions.Add(ex); }
+            }
+        }
+
+        private async void SaveResultsToDB(System.IO.Stream photo, SearchQuery query, Dictionary<SearchResult, List<ExternalUrls>> results)
+        {
+            System.String hash = this.GetImageHash(photo);
+            using (DataContext dataContext = new DataContext(this.ConnStr))
+            {
+                //Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
+                bool db_unppt = false;
+                Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+                Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
+
+                query.ImageHash = hash;
+                SearchQueries.InsertOnSubmit(query);
+                do
+                {
+                    try
+                    {
+                        dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                        db_unppt = false;
+                    }
+                    catch (ChangeConflictException)
+                    {
+                        foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                            changeConflict.Resolve(RefreshMode.KeepChanges);
+                        db_unppt = true;
+                    }
+                }
+                while (db_unppt);
+                foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in results)
+                {
+                    keyValue.Key.SearchId = query.Id;
+                    SearchResults.InsertOnSubmit(keyValue.Key);
+                    do
+                    {
+                        try
+                        {
+                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            db_unppt = false;
+                        }
+                        catch (ChangeConflictException)
+                        {
+                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                changeConflict.Resolve(RefreshMode.KeepChanges);
+                            db_unppt = true;
+                        }
+                    }
+                    while (db_unppt);
+                    foreach (ExternalUrls externalUrls in keyValue.Value)
+                    {
+                        externalUrls.ResultId = keyValue.Key.Id;
+                        ExternalUrls.InsertOnSubmit(externalUrls);
+                    }
+                    do
+                    {
+                        try
+                        {
+                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            db_unppt = false;
+                        }
+                        catch (ChangeConflictException)
+                        {
+                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                changeConflict.Resolve(RefreshMode.KeepChanges);
+                            db_unppt = true;
+                        }
+                    }
+                    while (db_unppt);
+                }
+            }
+            //await this.SaveFileAsync(photo, hash);
+            System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
+            FileStream file = System.IO.File.Create(filepath);
+            photo.Seek(0, SeekOrigin.Begin);
+            await photo.CopyToAsync(file);
+            file.Close();
+        }
+
+        private async void SendUnsimilar(IBot serving, Message msg, System.String Callback)
+        {
+            using (DataContext dataContext = new DataContext(this.ConnStr))
+            {
+                try
+                {
+                    Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                    Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+                    Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
+
+                    var queries = from q in SearchQueries
+                                  where q.Id == Convert.ToInt32(Callback.Split(' ')[1].Split('=')[1])
+                                  select q;
+                    if (queries.Count() != 0)
+                    {
+                        SearchQuery query = queries.FirstOrDefault();
+                        Dictionary<SearchResult, List<ExternalUrls>> results = new Dictionary<SearchResult, List<ExternalUrls>>();
+                        var results_db = from r in SearchResults
+                                         where query.Id == r.SearchId && r.Similarity < query.MinimumSimularity
+                                         select r;
+                        foreach (var res_db in results_db)
+                        {
+                            var urls_db = from u in ExternalUrls
+                                          where res_db.Id == u.ResultId
+                                          select u;
+                            results.Add(res_db, urls_db.ToList());
+                        }
+                        this.SendResults(serving, msg, results);
+                    }
+                    else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "There is no query with this Id.");
+                }
+                catch (Exception ex)
+                {
+                    serving.Exceptions.Add(ex);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oop… Something got wrong.");
+                }
+            }
+        }
+
         public async void SearchPicOnSend(Update update, IBot serving, List<ArgC> args)
         {
-            this.SearchPicOnSend(update.Message, serving, args);
+            switch (update.Type)
+            {
+                case Telegram.Bot.Types.Enums.UpdateType.Message:
+                    this.SearchPicOnSend(update.Message, serving, args);
+                    break;
+                case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
+                    if (update.CallbackQuery.Data.Contains("receive_unsimilar")) this.SendUnsimilar(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
+                    if (update.CallbackQuery.Data.Contains("download_from_danbooru") || update.CallbackQuery.Data.Contains("download_from_yandere"))
+                        this.DownloadDanbooru(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
+                    break;
+            }
         }
 
         public async void SearchPicOnSend(Message msg, IBot serving, List<ArgC> args = null)
@@ -793,6 +932,7 @@ namespace Pic_finder
                         serving.Exceptions.Add(e);
                     }
                 }
+                /*
                 foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in Results)
                 {
                     try
@@ -810,6 +950,10 @@ namespace Pic_finder
                         serving.Exceptions.Add(e);
                     }
                 }
+                */
+                this.SendResults(serving, msg, Results);
+                this.SaveResultsToDB(photo, query, Results);
+                /*
                 System.String hash = this.GetImageHash(photo);
                 using (DataContext dataContext = new DataContext(this.ConnStr))
                 {
@@ -878,6 +1022,7 @@ namespace Pic_finder
                     }
                 }
                 await this.SaveFileAsync(photo, hash);
+                */
             }
             catch (Exception e)
             {
