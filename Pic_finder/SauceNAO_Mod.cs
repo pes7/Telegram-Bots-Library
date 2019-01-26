@@ -183,17 +183,9 @@ namespace Pic_finder
             }
             catch (Exception ex)
             {
-                //this.Bot.Exceptions.Add(ex);
                 System.Environment.Exit(1);
             }
             this.ConnStr = sql_conn_string;
-            /*
-            this.dataContext = new DataContext(sql_conn_string);
-            this.Users = this.dataContext.GetTable<SauceNAO_Acc>();
-            this.SearchQueries = this.dataContext.GetTable<SearchQuery>();
-            this.SearchResults = this.dataContext.GetTable<SearchResult>();
-            this.ExternalUrls = this.dataContext.GetTable<ExternalUrls>();
-            */
             this.SavePicsDir = save_dir;
             /*
             System.String index_hmags = "0",
@@ -290,9 +282,6 @@ namespace Pic_finder
                 try
                 {
                     Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
-                    //Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
-                    //Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
-                    //Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
                     System.String api_key;
                     this.NormalizeArgs();
                     try
@@ -538,9 +527,15 @@ namespace Pic_finder
                     foreach (var result in results["results"].Children())
                     {
                         List<ExternalUrls> urls = new List<ExternalUrls>();
-                        foreach (var url in result["data"]["ext_urls"].Values<System.String>())
-                            urls.Add(new Pic_finder.ExternalUrls
-                            { URL = url });
+                        try
+                        {
+                            if (result["data"]["ext_urls"].Values<System.String>() != null)
+                                foreach (System.String url in result["data"]["ext_urls"].Values<System.String>())
+                                    urls.Add(new Pic_finder.ExternalUrls
+                                    { URL = url });
+                        }
+                        catch(NullReferenceException)
+                        { }
                         Results.Add(new SearchResult
                         {
                             IndexId = result["header"]["index_id"].Value<ushort>(),
@@ -586,40 +581,40 @@ namespace Pic_finder
                 {
                     new InlineKeyboardButton()
                     {
-                        Text="Get it",
+                        Text="Show it",
                         CallbackData ="action=receive_unsimilar query_id="+query.Id.ToString()
                     }
                 }
             });
         }
 
-        private InlineKeyboardMarkup DownloadFromSource(List<ExternalUrls> urls)
+        private InlineKeyboardMarkup DownloadFromSourceButtons(List<ExternalUrls> urls)
         {
             try
             {
-                List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
+                List<InlineKeyboardButton[]> buttons = new List<InlineKeyboardButton[]>();
                 foreach (ExternalUrls url_db in urls)
                 {
                     if (url_db.URL.Contains("danbooru.donmai.us"))
-                    buttons.Add(new InlineKeyboardButton()
-                    {
-                        Text = "Download from Danbooru",
-                        CallbackData = "action=download_from_danbooru danbooru_id=" + url_db.URL.Split('/').Last()
-                    });
+                        buttons.Add(new InlineKeyboardButton[]
+                            {new InlineKeyboardButton(){
+                                Text = "Download from Danbooru",
+                                CallbackData = "action=download_from_danbooru danbooru_id=" + url_db.URL.Split('/').Last()
+                            }});
                     if (url_db.URL.Contains("yande.re"))
-                    buttons.Add(new InlineKeyboardButton()
-                    {
-                        Text = "Download from Yandere",
-                        CallbackData = "action=download_from_yandere yandere_id=" + url_db.URL.Split('/').Last()
-                    });
+                        buttons.Add(new InlineKeyboardButton[]
+                            {new InlineKeyboardButton(){
+                                Text = "Download from Yandere",
+                                CallbackData = "action=download_from_yandere yandere_id=" + url_db.URL.Split('/').Last()
+                            }});
+                    if (url_db.URL.Contains("gelbooru.com") && url_db.URL.Contains("id="))
+                        buttons.Add(new InlineKeyboardButton[]
+                            {new InlineKeyboardButton(){
+                                Text = "Download from Gelbooru",
+                                CallbackData = "action=download_from_gelbooru gelbooru_id=" + url_db.URL.Split('&').Where(p => p.Contains("id")).FirstOrDefault().Split('=').Last()
+                            }});
                 }
-                if (buttons.Count > 0)
-                {
-                    return new InlineKeyboardMarkup(new InlineKeyboardButton[1][]
-                    {
-                    buttons.ToArray()
-                    });
-                }
+                if (buttons.Count > 0) return new InlineKeyboardMarkup(buttons.ToArray());
             }
             catch(Exception ex)
             {
@@ -628,7 +623,7 @@ namespace Pic_finder
             return null;
         }
 
-        private async void DownloadDanbooru(IBot serving, Message msg, System.String callback)
+        private async void DownloadSource(IBot serving, Message msg, System.String callback)
         {
             try
             {
@@ -647,6 +642,13 @@ namespace Pic_finder
                         new ArgC("file"),
                         new ArgC("id", dnb_id.ToString())
                     });
+                if (callback.Contains("download_from_gelbooru")) serving.GetModule<danbooru_api_mod>().GetGelboorruAsync(msg, serving,
+                    new List<ArgC>()
+                    {
+                        new ArgC("/getgelbooru"),
+                        new ArgC("file"),
+                        new ArgC("id", dnb_id.ToString())
+                    });
             }
             catch(Exception ex)
             {
@@ -655,43 +657,25 @@ namespace Pic_finder
             }
         }
 
-        //public async Action(object sc, CallbackQueryEventArgs )
-
-        private async Task SaveFileAsync(System.IO.Stream photo, System.String hash)
-        {
-            System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
-            FileStream file = System.IO.File.Create(filepath);
-            photo.Seek(0, SeekOrigin.Begin);
-            await photo.CopyToAsync(file);
-            file.Close();
-        }
-
-        private System.String GetImageHash(System.IO.Stream photo)
-        {
-            photo.Seek(0, SeekOrigin.Begin);
-            return this.imageHasher.CalculateDifferenceHash64(photo).ToString();
-        }
-
         private async void SendResults(IBot serving, Message msg, Dictionary<SearchResult, List<ExternalUrls>> results)
         {
             this.Bot = serving;
-            if (results == null) return;
+            //if (results == null) return;
             foreach (KeyValuePair<SearchResult, List<ExternalUrls>> result in results)
             {
                 try
                 {
                     System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
-                    await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]));
+                    if (get_pic != null)
+                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]));
                 }
-                catch (Exception ex)
-                {
-                    this.Bot.Exceptions.Add(ex);
-                }
+                catch
+                { }
                 System.String res_str = System.String.Empty;
                 try
                 {
                     res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
-                    if (result.Value.Count == 0) res_str += " unfortunally links wasn\'t provided.";
+                    if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                     else
                     {
                         foreach (var url in result.Value)
@@ -699,7 +683,7 @@ namespace Pic_finder
                             res_str += "\n" + url.URL;
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSource(result.Value));
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value));
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
@@ -708,7 +692,8 @@ namespace Pic_finder
 
         private async void SaveResultsToDB(System.IO.Stream photo, SearchQuery query, Dictionary<SearchResult, List<ExternalUrls>> results)
         {
-            System.String hash = this.GetImageHash(photo);
+            photo.Seek(0, SeekOrigin.Begin);
+            System.String hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 //Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
@@ -775,7 +760,6 @@ namespace Pic_finder
                     while (db_unppt);
                 }
             }
-            //await this.SaveFileAsync(photo, hash);
             System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
             FileStream file = System.IO.File.Create(filepath);
             photo.Seek(0, SeekOrigin.Begin);
@@ -817,7 +801,7 @@ namespace Pic_finder
                 catch (Exception ex)
                 {
                     serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oop… Something got wrong.");
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
                 }
             }
         }
@@ -831,8 +815,8 @@ namespace Pic_finder
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
                     if (update.CallbackQuery.Data.Contains("receive_unsimilar")) this.SendUnsimilar(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
-                    if (update.CallbackQuery.Data.Contains("download_from_danbooru") || update.CallbackQuery.Data.Contains("download_from_yandere"))
-                        this.DownloadDanbooru(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
+                    if (update.CallbackQuery.Data.Contains("download_from"))
+                        this.DownloadSource(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
                     break;
             }
         }
@@ -932,97 +916,8 @@ namespace Pic_finder
                         serving.Exceptions.Add(e);
                     }
                 }
-                /*
-                foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in Results)
-                {
-                    try
-                    {
-                        System.IO.Stream get_pic = await Client.GetStreamAsync(keyValue.Key.Thumbnail);
-                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, keyValue.Key.Thumbnail.Split('/').Last().Split('?')[0]));
-                        System.String send_info = keyValue.Key.IndexName + ".\nSimilarity – " +
-                            keyValue.Key.Similarity.ToString() +
-                            "%.\nSource URLs:\n";
-                        foreach (ExternalUrls urls in keyValue.Value) send_info += urls.URL + "\n";
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, send_info);
-                    }
-                    catch (Exception e)
-                    {
-                        serving.Exceptions.Add(e);
-                    }
-                }
-                */
                 this.SendResults(serving, msg, Results);
                 this.SaveResultsToDB(photo, query, Results);
-                /*
-                System.String hash = this.GetImageHash(photo);
-                using (DataContext dataContext = new DataContext(this.ConnStr))
-                {
-                    //Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
-                    bool db_unppt = false;
-                    Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
-                    Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
-                    Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
-
-                    query.ImageHash = hash;
-                    SearchQueries.InsertOnSubmit(query);
-                    do
-                    {
-                        try
-                        {
-                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                            db_unppt = false;
-                        }
-                        catch (ChangeConflictException)
-                        {
-                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                changeConflict.Resolve(RefreshMode.KeepChanges);
-                            db_unppt = true;
-                        }
-                    }
-                    while (db_unppt);
-                    foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in Results)
-                    {
-                        keyValue.Key.SearchId = query.Id;
-                        SearchResults.InsertOnSubmit(keyValue.Key);
-                        do
-                        {
-                            try
-                            {
-                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                                db_unppt = false;
-                            }
-                            catch (ChangeConflictException)
-                            {
-                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                    changeConflict.Resolve(RefreshMode.KeepChanges);
-                                db_unppt = true;
-                            }
-                        }
-                        while (db_unppt);
-                        foreach (ExternalUrls externalUrls in keyValue.Value)
-                        {
-                            externalUrls.ResultId = keyValue.Key.Id;
-                            ExternalUrls.InsertOnSubmit(externalUrls);
-                        }
-                        do
-                        {
-                            try
-                            {
-                                dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
-                                db_unppt = false;
-                            }
-                            catch (ChangeConflictException)
-                            {
-                                foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
-                                    changeConflict.Resolve(RefreshMode.KeepChanges);
-                                db_unppt = true;
-                            }
-                        }
-                        while (db_unppt);
-                    }
-                }
-                await this.SaveFileAsync(photo, hash);
-                */
             }
             catch (Exception e)
             {
