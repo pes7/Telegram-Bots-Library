@@ -62,11 +62,21 @@ namespace Pic_finder
             },
             commandName: "shutdown", access: TypeOfAccess.Named, descr: "Shut\'s down a bot permanently.", clearcommand: true));
 
-            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().Help, new List<string>()
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().Help_new, new List<string>()
             {
                 "/help"
             },
             commandName: "help", descr: "Display\'s help for a user."));
+
+            SynkCommand mc_log = new SynkCommand(Robot.GetModule<micro_logic>().ReceiveUpdate);
+            mc_log.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(mc_log);
+
+            /*
+            SynkCommand dn_log = new SynkCommand(Robot.GetModule<danbooru_api_mod>().UpdateRequests);
+            dn_log.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(dn_log);
+            */
 
             /*Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().DeleteMyMessage, new List<string>()
             {
@@ -93,6 +103,13 @@ namespace Pic_finder
                 "/getgelbooru@anime_pic_finder_bot"
             },
             commandName:"gelbooru", descr: "Get\'s images from Gelbooru."));
+
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetKonachanAsync, new List<string>()
+            {
+                "/getkonachan",
+                "/getkonachan@anime_pic_finder_bot"
+            },
+            commandName: "konachan", descr: "Get\'s images from Konachan."));
 
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<danbooru_api_mod>().GetYandereTagsAsync,
@@ -128,6 +145,7 @@ namespace Pic_finder
             SynkCommand get_sauce = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
             get_sauce.Type = TypeOfCommand.AllwaysInWebHook;
             Robot.SynkCommands.Add(get_sauce);
+
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().AddKeyToDB,
                 new List<string>() { "/putkey" },

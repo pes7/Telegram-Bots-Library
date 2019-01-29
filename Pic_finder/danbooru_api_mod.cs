@@ -13,6 +13,8 @@ using System.Threading;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
+using Telegram.Bot.Types.InlineQueryResults;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pic_finder
 {
@@ -33,6 +35,40 @@ namespace Pic_finder
         private bool show_a = false; //Do picture`s showing even if they has non-safe rating.
         private bool is_res = false; //Did the result`s has been sent.
         public danbooru_api_mod():base("Danbooru API service\'s collection", typeof(danbooru_api_mod)) { }
+
+        /*
+        public async void UpdateRequests(Update update, IBot serving, List<ArgC> args)
+        {
+            switch (update.Type)
+            {
+                case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
+                    try
+                    {
+                        if (update.CallbackQuery.Data.Contains("get_pics"))
+                        {
+                            List<ArgC> call_args = new List<ArgC>();
+                            System.String[] n_args = update.CallbackQuery.Data.Split(' ');
+                            foreach (System.String n_a in n_args)
+                            {
+                                System.String[] n_as = n_a.Split('=');
+                                call_args.Add(new ArgC(n_as[0], n_as.Length > 1 ? n_as[1] : null));
+                            }
+                            call_args.RemoveAt(0);
+                            call_args.RemoveAt(call_args.Count - 1);
+                            if (call_args.FirstOrDefault().Name.Contains("yandere")) this.GetYandereAsync(update.CallbackQuery.Message, serving, call_args);
+                            if (call_args.FirstOrDefault().Name.Contains("danbooru")) this.GetDanbooruAsync(update.CallbackQuery.Message, serving, call_args);
+                            if (call_args.FirstOrDefault().Name.Contains("gelbooru")) this.GetGelboorruAsync(update.CallbackQuery.Message, serving, call_args);
+                            if (call_args.FirstOrDefault().Name.Contains("konachan")) this.GetKonachanAsync(update.CallbackQuery.Message, serving, call_args);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        serving.Exceptions.Add(ex);
+                    }
+                    break;
+            }
+        }
+        */
 
         private System.String GenerateURL(System.String base_url, UInt16 max_lim, System.Boolean id_to_tags=true) //URL Generator.
         {
@@ -177,7 +213,9 @@ namespace Pic_finder
         {
             try
             {
+                //ArgC command = this.Args?.First();
                 this.NormalizeArgs();
+                List<ArgC> before_prep = this.Args;
                 if (prep_args != null) prep_args();
                 if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
@@ -187,6 +225,39 @@ namespace Pic_finder
                     await this.GetAndSendPicAsync(url, rating, e_rate);
                 }
                 if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
+                /*
+                else
+                {
+                    System.String next_req = System.String.Empty;
+                    before_prep.Insert(0, command);
+                    if (ArgC.GetArg(before_prep, "page") == null) before_prep.Add(new ArgC("page", "2"));
+                    else
+                    {
+                        ArgC page_arg = before_prep.Where(a => a.Name?.ToLower() == "page").FirstOrDefault();
+                        int ind = before_prep.IndexOf(page_arg);
+                        if (page_arg.Arg != null)
+                        {
+                            page_arg.Arg = (Convert.ToUInt32(page_arg.Arg) + 1).ToString();
+                            before_prep.RemoveAt(ind);
+                            before_prep.Add(page_arg);
+                        }
+                    }
+                    foreach (ArgC arg in this.Args)
+                    {
+                        next_req += arg.Name ?? System.String.Empty;
+                        next_req += arg.Arg != null ? "=" : System.String.Empty;
+                        next_req += arg.Arg ?? System.String.Empty;
+                        next_req += " ";
+                    }
+                    await this.Serving.Client.SendTextMessageAsync(
+                        this.Msg.Chat.Id,
+                        "Do you wanna get next results?",
+                        replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                        {
+                            Text = "Get it",
+                            CallbackData = "action=get_pics " + next_req
+                        }));
+                }*/
                 //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
             }
             catch(Exception ex)
@@ -287,6 +358,14 @@ namespace Pic_finder
             {
                 if (this.Args != null) args.ForEach(delegate (ArgC arg) { if (arg.Name.IndexOf("page") != -1) this.Args.ElementAt(this.Args.IndexOf(arg)).Name = arg.Name.Replace("page", "pid"); }); //Replacing "page" to "pid" for normal browsing.
             });
+        }
+
+        public async void GetKonachanAsync(Message msg, IBot serving, List<ArgC> args)
+        {
+            this.Msg = msg;
+            this.Serving = serving;
+            this.Args = args;
+            await this.DoAStJobAsync("https://konachan.com/post.json?");
         }
     }
 }

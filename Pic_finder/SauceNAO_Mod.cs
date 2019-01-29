@@ -562,7 +562,14 @@ namespace Pic_finder
                     this.SaveResultsToDB(photo, query, Results);
                     if (Results.Count>ResSim.Count)
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "There are results which marked as unsimilar.", replyMarkup: this.KeyToReceiveUnsimilar(query));
+                        await serving.Client.SendTextMessageAsync(
+                            msg.Chat.Id,
+                            "There are results which marked as unsimilar.",
+                            replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                            {
+                                Text = "Show it",
+                                CallbackData = "action=receive_unsimilar query_id=" + query.Id.ToString()
+                            }));
                     }
                 }
                 catch (Exception ex)
@@ -571,21 +578,6 @@ namespace Pic_finder
                     await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
                 }
             }
-        }
-
-        private InlineKeyboardMarkup KeyToReceiveUnsimilar(SearchQuery query)
-        {
-            return new InlineKeyboardMarkup(new InlineKeyboardButton[1][]
-            {
-                new []
-                {
-                    new InlineKeyboardButton()
-                    {
-                        Text="Show it",
-                        CallbackData ="action=receive_unsimilar query_id="+query.Id.ToString()
-                    }
-                }
-            });
         }
 
         private InlineKeyboardMarkup DownloadFromSourceButtons(List<ExternalUrls> urls)
@@ -613,6 +605,12 @@ namespace Pic_finder
                                 Text = "Download from Gelbooru",
                                 CallbackData = "action=download_from_gelbooru gelbooru_id=" + url_db.URL.Split('&').Where(p => p.Contains("id")).FirstOrDefault().Split('=').Last()
                             }});
+                    if (url_db.URL.Contains("konachan.com"))
+                        buttons.Add(new InlineKeyboardButton[]
+                            {new InlineKeyboardButton(){
+                                Text = "Download from Konachan",
+                                CallbackData = "action=download_from_konachan konachan_id=" + url_db.URL.Split('/').Last()
+                            }});
                 }
                 if (buttons.Count > 0) return new InlineKeyboardMarkup(buttons.ToArray());
             }
@@ -633,21 +631,28 @@ namespace Pic_finder
                     {
                         new ArgC("/getdanbooru"),
                         new ArgC("file"),
-                        new ArgC("id", dnb_id.ToString())
+                        new ArgC("id", dnb_id)
                     });
                 if (callback.Contains("download_from_yandere")) serving.GetModule<danbooru_api_mod>().GetYandereAsync(msg, serving,
                     new List<ArgC>()
                     {
                         new ArgC("/getyandere"),
                         new ArgC("file"),
-                        new ArgC("id", dnb_id.ToString())
+                        new ArgC("id", dnb_id)
                     });
                 if (callback.Contains("download_from_gelbooru")) serving.GetModule<danbooru_api_mod>().GetGelboorruAsync(msg, serving,
                     new List<ArgC>()
                     {
                         new ArgC("/getgelbooru"),
                         new ArgC("file"),
-                        new ArgC("id", dnb_id.ToString())
+                        new ArgC("id", dnb_id)
+                    });
+                if (callback.Contains("download_from_konachan")) serving.GetModule<danbooru_api_mod>().GetKonachanAsync(msg, serving,
+                    new List<ArgC>()
+                    {
+                        new ArgC("/getkonachan"),
+                        new ArgC("file"),
+                        new ArgC("id", dnb_id)
                     });
             }
             catch(Exception ex)
@@ -815,7 +820,7 @@ namespace Pic_finder
                     break;
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
                     if (update.CallbackQuery.Data.Contains("receive_unsimilar")) this.SendUnsimilar(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
-                    if (update.CallbackQuery.Data.Contains("download_from"))
+                    if (update.CallbackQuery.Data.Contains("action=download_from"))
                         this.DownloadSource(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
                     break;
             }
@@ -825,6 +830,11 @@ namespace Pic_finder
         {
             try
             {
+                if (msg.ReplyToMessage!=null && (msg.Text!=null || msg.Caption!=null))
+                {
+                    System.String inc = msg.Text ?? System.String.Empty + msg.Caption ?? System.String.Empty;
+                    if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo && inc.ToLower().Contains("anipic") && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args);
+                }
                 if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
             }
             catch //(Exception ex)
