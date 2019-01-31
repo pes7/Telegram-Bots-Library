@@ -68,16 +68,6 @@ namespace Pic_finder
             },
             commandName: "help", descr: "Display\'s help for a user."));
 
-            SynkCommand mc_log = new SynkCommand(Robot.GetModule<micro_logic>().ReceiveUpdate);
-            mc_log.Type = TypeOfCommand.AllwaysInWebHook;
-            Robot.SynkCommands.Add(mc_log);
-
-            /*
-            SynkCommand dn_log = new SynkCommand(Robot.GetModule<danbooru_api_mod>().UpdateRequests);
-            dn_log.Type = TypeOfCommand.AllwaysInWebHook;
-            Robot.SynkCommands.Add(dn_log);
-            */
-
             /*Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().DeleteMyMessage, new List<string>()
             {
                 "/delete"
@@ -141,6 +131,15 @@ namespace Pic_finder
                 Robot.GetModule<SauceNAO_Mod>().SearchWithoutSauceNAO,
                 new List<string>() { "/getsauce_alt" },
                 commandName: "sauce_alt", descr: "Get's source image of picture.", isPhotoCommand: true));*/
+
+
+            SynkCommand mc_log = new SynkCommand(Robot.GetModule<micro_logic>().ReceiveUpdate);
+            mc_log.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(mc_log);
+
+            SynkCommand dn_log = new SynkCommand(Robot.GetModule<danbooru_api_mod>().UpdateRequests);
+            dn_log.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(dn_log);
 
             SynkCommand get_sauce = new SynkCommand(Robot.GetModule<SauceNAO_Mod>().SearchPicOnSend);
             get_sauce.Type = TypeOfCommand.AllwaysInWebHook;

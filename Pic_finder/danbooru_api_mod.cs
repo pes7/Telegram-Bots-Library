@@ -13,8 +13,8 @@ using System.Threading;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-//using Telegram.Bot.Types.InlineQueryResults;
-//using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types.InlineQueryResults;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pic_finder
 {
@@ -35,8 +35,7 @@ namespace Pic_finder
         private bool show_a = false; //Do picture`s showing even if they has non-safe rating.
         private bool is_res = false; //Did the result`s has been sent.
         public danbooru_api_mod():base("Danbooru API service\'s collection", typeof(danbooru_api_mod)) { }
-
-        /*
+        
         public async void UpdateRequests(Update update, IBot serving, List<ArgC> args)
         {
             switch (update.Type)
@@ -44,7 +43,7 @@ namespace Pic_finder
                 case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
                     try
                     {
-                        if (update.CallbackQuery.Data.Contains("get_pics"))
+                        if (update.CallbackQuery.Data.Contains("action=get_pics"))
                         {
                             List<ArgC> call_args = new List<ArgC>();
                             System.String[] n_args = update.CallbackQuery.Data.Split(' ');
@@ -54,7 +53,7 @@ namespace Pic_finder
                                 call_args.Add(new ArgC(n_as[0], n_as.Length > 1 ? n_as[1] : null));
                             }
                             call_args.RemoveAt(0);
-                            call_args.RemoveAt(call_args.Count - 1);
+                            //call_args.RemoveAt(call_args.Count - 1);
                             if (call_args.FirstOrDefault().Name.Contains("yandere")) this.GetYandereAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("danbooru")) this.GetDanbooruAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("gelbooru")) this.GetGelboorruAsync(update.CallbackQuery.Message, serving, call_args);
@@ -68,7 +67,6 @@ namespace Pic_finder
                     break;
             }
         }
-        */
 
         private System.String GenerateURL(System.String base_url, UInt16 max_lim, System.Boolean id_to_tags=true) //URL Generator.
         {
@@ -213,9 +211,16 @@ namespace Pic_finder
         {
             try
             {
-                //ArgC command = this.Args?.First();
+                ArgC command = this.Args?.First();
                 this.NormalizeArgs();
-                //List<ArgC> before_prep = this.Args;
+                List<ArgC> before_prep = new List<ArgC>();
+                foreach(ArgC arg in this.Args)
+                {
+                    before_prep.Add(new ArgC(
+                        name: arg.Name ?? System.String.Empty,
+                        arg: arg.Arg ?? System.String.Empty
+                        ));
+                }
                 if (prep_args != null) prep_args();
                 if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
@@ -225,7 +230,6 @@ namespace Pic_finder
                     await this.GetAndSendPicAsync(url, rating, e_rate);
                 }
                 if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
-                /*
                 else
                 {
                     System.String next_req = System.String.Empty;
@@ -242,13 +246,14 @@ namespace Pic_finder
                             before_prep.Add(page_arg);
                         }
                     }
-                    foreach (ArgC arg in this.Args)
+                    foreach (ArgC arg in before_prep)
                     {
                         next_req += arg.Name ?? System.String.Empty;
                         next_req += arg.Arg != null ? "=" : System.String.Empty;
                         next_req += arg.Arg ?? System.String.Empty;
                         next_req += " ";
                     }
+                    next_req = next_req.Remove(next_req.Count() - 1);
                     await this.Serving.Client.SendTextMessageAsync(
                         this.Msg.Chat.Id,
                         "Do you wanna get next results?",
@@ -257,7 +262,7 @@ namespace Pic_finder
                             Text = "Get it",
                             CallbackData = "action=get_pics " + next_req
                         }));
-                }*/
+                }
                 //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
             }
             catch(Exception ex)
