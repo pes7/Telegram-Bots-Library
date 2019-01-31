@@ -91,7 +91,11 @@ If you need more about commands, you can call /help.");
                 essential = "essential_parameters",
                 account = "register_SN_account",
                 about = "about_bot";
-            System.String callback_data = ArgC.GetArg(args, "help")?.Arg ?? System.String.Empty;
+            System.String callback_data = System.String.Empty;
+            try
+            { callback_data = ArgC.GetArg(args, "help").Arg; }
+            catch
+            { callback_data = System.String.Empty; }
             try
             {
                 switch (callback_data)

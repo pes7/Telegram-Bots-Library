@@ -13,8 +13,8 @@ using System.Threading;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.ReplyMarkups;
+//using Telegram.Bot.Types.InlineQueryResults;
+//using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Pic_finder
 {
@@ -215,7 +215,7 @@ namespace Pic_finder
             {
                 //ArgC command = this.Args?.First();
                 this.NormalizeArgs();
-                List<ArgC> before_prep = this.Args;
+                //List<ArgC> before_prep = this.Args;
                 if (prep_args != null) prep_args();
                 if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
@@ -263,7 +263,7 @@ namespace Pic_finder
             catch(Exception ex)
             {
                 this.Serving.Exceptions.Add(ex);
-                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Sorry, something got wrong.");
+                await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Oops… Something got wrong.");
             }
         }
 

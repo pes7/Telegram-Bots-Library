@@ -832,7 +832,8 @@ namespace Pic_finder
             {
                 if (msg.ReplyToMessage!=null && (msg.Text!=null || msg.Caption!=null))
                 {
-                    System.String inc = msg.Text ?? System.String.Empty + msg.Caption ?? System.String.Empty;
+                    System.String inc = msg.Text ?? System.String.Empty;
+                    inc += msg.Caption ?? System.String.Empty;
                     if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo && inc.ToLower().Contains("anipic") && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args);
                 }
                 if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
