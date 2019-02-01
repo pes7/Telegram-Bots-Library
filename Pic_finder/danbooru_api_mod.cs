@@ -232,6 +232,7 @@ namespace Pic_finder
                 if (!this.is_res) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Unfortunately we have no result\'s."/*, replyToMessageId: this.Msg.MessageId*/);
                 else
                 {
+                    if (before_prep.Exists(p => p.Name.Contains("id"))) return;
                     System.String next_req = System.String.Empty;
                     before_prep.Insert(0, command);
                     if (ArgC.GetArg(before_prep, "page") == null) before_prep.Add(new ArgC("page", "2"));
