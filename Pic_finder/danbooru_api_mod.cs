@@ -157,6 +157,11 @@ namespace Pic_finder
                     {
                         if (succ && rate == erate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
                         System.IO.Stream get_pic = await Client.GetStreamAsync(url);
+                        /*if (get_pic.Length > (10 * 1024) && !sd_fl && exc == System.String.Empty)
+                        {
+                            sd_fl = true;
+                            exc = "Image is too large";
+                        }*/
                         if (sd_fl) await this.Serving.Client.SendDocumentAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc/*, replyToMessageId: this.Msg.MessageId*/);
                         else await this.Serving.Client.SendPhotoAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()))/*, replyToMessageId: this.Msg.MessageId)*/;
                         exc = System.String.Empty;
@@ -167,6 +172,7 @@ namespace Pic_finder
                     {
                         if (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException)) this.Serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
                         exc = ex.Message;
+                        if (sd_fl) await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, exc);
                         sd_fl = true;
                         succ = false;
                     }
@@ -214,13 +220,15 @@ namespace Pic_finder
                 ArgC command = this.Args?.First();
                 this.NormalizeArgs();
                 List<ArgC> before_prep = new List<ArgC>();
-                foreach(ArgC arg in this.Args)
-                {
-                    before_prep.Add(new ArgC(
-                        name: arg.Name ?? System.String.Empty,
-                        arg: arg.Arg ?? System.String.Empty
-                        ));
-                }
+                if (this.Args != null)
+                    foreach (ArgC arg in this.Args)
+                    {
+                        before_prep.Add(new ArgC(
+                            name: arg.Name ?? System.String.Empty,
+                            arg: arg.Arg ?? System.String.Empty
+                            ));
+                    }
+                else command = new ArgC(this.Msg.Text);
                 if (prep_args != null) prep_args();
                 if (!await this.GetResAsync(req_url, max_lim)) return; //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await this.resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.

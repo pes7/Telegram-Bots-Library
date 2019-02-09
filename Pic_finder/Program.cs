@@ -13,6 +13,7 @@ namespace Pic_finder
         {
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
+            Console.OutputEncoding = Encoding.UTF8;
             Thread th = new Thread(() => {
                 Ctr_panel mn = new Pic_finder.Ctr_panel();
                 mn.ShowDialog();

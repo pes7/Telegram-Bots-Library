@@ -133,7 +133,7 @@ namespace Pes7BotCrator
             Reload.MainTh.Abort();
         }
 
-        private  void TimeT()
+        private void TimeT()
         {
             while (true)
             {
@@ -181,15 +181,15 @@ namespace Pes7BotCrator
                 {
 
                     Message ms = MessagesLast[i];
-                    Console.WriteLine($"    {UserM.usernameGet(ms.From)}: {ms.Text}");
+                    Console.WriteLine($"    {UserM.usernameGet(ms.From)} ({ms.Chat.Id.ToString()} | {ms.MessageId.ToString()}) : {ms.Text}\n    ({ms.Chat.Id.ToString()} | {ms.MessageId.ToString()})");
                 }
             }
             else
             {
-                for (int i =0; i< MessagesLast.Count;i++)
+                for (int i=0; i< MessagesLast.Count; i++)
                 {
                     var ms = MessagesLast[i];
-                    Console.WriteLine($"    {ms.From.Username}: {ms.Text}");
+                    Console.WriteLine($"    {ms.From.Username}: {ms.Text}\n    ({ms.Chat.Id.ToString()} | {ms.MessageId.ToString()})");
                 }
             }
             Console.WriteLine("}");

@@ -48,7 +48,8 @@ namespace Pic_finder
                 mods: new List<IModule> {
                 new danbooru_api_mod(),
                 new micro_logic(),
-                new SauceNAO_Mod(connBuilder.ConnectionString, RobotInit["SauceNAO"]["SavePicsDir"])
+                new SauceNAO_Mod(connBuilder.ConnectionString, RobotInit["SauceNAO"]["SavePicsDir"]),
+                new MessagesHook()
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -64,7 +65,7 @@ namespace Pic_finder
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().Help_new, new List<string>()
             {
-                "/help"
+                "/help@anime_pic_finder_bot"
             },
             commandName: "help", descr: "Display\'s help for a user."));
 
@@ -158,6 +159,20 @@ namespace Pic_finder
                 new List<string>() { "/getstats" },
                 commandName: "stats", descr: "Gets stats of searches of current user."));
 
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<MessagesHook>().StartHooking,
+                new List<string>() { "/starthooking" },
+                commandName: "starthooking", descr: "Allows admin to behave badly.", access: TypeOfAccess.Named));
+
+            Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<MessagesHook>().StopHooking,
+                new List<string>() { "/stophooking" },
+                commandName: "stophooking", descr: "Unallows admin to behave badly.", access: TypeOfAccess.Named));
+
+            SynkCommand hookingRec = new SynkCommand(Robot.GetModule<MessagesHook>().UpdateReceiver);
+            hookingRec.Type = TypeOfCommand.AllwaysInWebHook;
+            Robot.SynkCommands.Add(hookingRec);
+
             Robot.Start();
 
 
@@ -176,7 +191,7 @@ namespace Pic_finder
                 Telegram.Bot.Types.ChatId ChatId;
                 try
                 {
-                    ChatId = new Telegram.Bot.Types.ChatId(Convert.ToInt32(ChatIdEdit.Text));
+                    ChatId = new Telegram.Bot.Types.ChatId(Convert.ToInt64(ChatIdEdit.Text));
                 }
                 catch (FormatException)
                 {

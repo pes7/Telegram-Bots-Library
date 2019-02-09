@@ -83,6 +83,7 @@
     </Compile>
     <Compile Include="danbooru_api_mod.cs" />
     <Compile Include="Main_Bot.cs" />
+    <Compile Include="MessagesHook.cs" />
     <Compile Include="micro_logic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

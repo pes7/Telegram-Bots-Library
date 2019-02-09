@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -9,24 +10,69 @@ namespace Pic_finder
     {
         public async void ReceiveUpdate(Update update, IBot serving, List<ArgC> args)
         {
-            switch (update.Type)
+            try
             {
-                case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
-                    if (update.CallbackQuery.Data.Contains("help="))
-                    {
-                        if (args == null) args = new List<ArgC>();
-                        foreach (System.String n_arg in update.CallbackQuery.Data.Split(' '))
+                switch (update.Type)
+                {
+                    case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
+                        if (update.CallbackQuery.Data.Contains("help="))
                         {
-                            System.String[] arg_s = n_arg.Split('=');
-                            args.Add(new ArgC(arg_s[0], arg_s.Length > 1 ? arg_s[1] : null));
+                            if (args == null) args = new List<ArgC>();
+                            foreach (System.String n_arg in update.CallbackQuery.Data.Split(' '))
+                            {
+                                System.String[] arg_s = n_arg.Split('=');
+                                args.Add(new ArgC(arg_s[0], arg_s.Length > 1 ? arg_s[1] : null));
+                            }
+                            this.Help_new(update.CallbackQuery.Message, serving, args);
                         }
-                        this.Help_new(update.CallbackQuery.Message, serving, args);
-                    }
-                    break;
+                        break;
+                    case Telegram.Bot.Types.Enums.UpdateType.Message:
+                        if (update.Message.Text != null ? update.Message.Text.Contains("/help") && !update.Message.Text.Contains("@") : false)
+                            this.Help_new(update.Message, serving, args);
+                        break;
+                }
+            }
+            catch(System.Exception ex)
+            {
+                serving.Exceptions.Add(ex);
             }
         }
 
         public micro_logic():base("Robot micro logic", typeof(micro_logic)) { }
+
+        public List<ArgC> NormalizeArgs(Message msg, IBot serving, List<ArgC> args=null)
+        {
+            if (args != null)
+            try
+            {
+                args.RemoveAt(0); //A little "crunch".
+                if (args.Count > 0)
+                    if (args.ElementAt(0).Type == ArgC.TypeOfArg.Default)
+                    {
+                        args.ForEach(delegate (ArgC to_norm) //Normalizing the arg`s to prevent a blank space`s.
+                        {
+                            int inx = args.IndexOf(to_norm);
+                            if (to_norm.Name != null) args.ElementAt(inx).Name = !to_norm.Name.Contains("\"") ? to_norm.Name.Replace(" ", "") : to_norm.Name;
+                            if (to_norm.Arg != null) args.ElementAt(inx).Arg = !to_norm.Arg.Contains("\"") ? to_norm.Arg.Replace(" ", "") : to_norm.Arg;
+                        }); //End of the "crunch".
+                    }
+                    else if (args.ElementAt(0).Type == ArgC.TypeOfArg.Named)
+                    {
+                        foreach (System.String to_arg in args.ElementAt(0).Arg.Split(' '))
+                        {
+                            System.String[] to_arg_div = to_arg.Split('=');
+                            args.Add(new ArgC(to_arg_div.ElementAt(0), to_arg_div.Length > 1 ? to_arg_div.ElementAt(1) : null));
+                        }
+                        if (args.Count != 0) args.RemoveAt(0);
+                    }
+            }
+            catch (System.Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+                serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong.\n" + ex.Message);
+            }
+            return args;
+        }
 
         public async void SayHello(Message msg, IBot serving, List<ArgC> args)
         {
@@ -90,19 +136,21 @@ If you need more about commands, you can call /help.");
                 parameters = "how_to_parameters",
                 essential = "essential_parameters",
                 account = "register_SN_account",
-                about = "about_bot";
+                about = "about_bot",
+                home="help_units";
             System.String callback_data = System.String.Empty;
             try
-            { callback_data = ArgC.GetArg(args, "help").Arg; }
+            { callback_data = ArgC.GetArg(args, "help").Arg ?? System.String.Empty; }
             catch
             { callback_data = System.String.Empty; }
             try
             {
+                System.String contain = System.String.Empty;
+                List<InlineKeyboardButton> markup = new List<InlineKeyboardButton>();
                 switch (callback_data)
                 {
                     case available:
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id,
-                            "Bot can run default slash (via '/') commands, and \"named\".\n" +
+                        contain = "Bot can run default slash (via '/') commands, and \"named\".\n" +
                             "If with first it's anything is clear, with second you need to do next.\n" +
                             "To make make Bot execute a command, first of all you need to type \"anipic\"(without qoutation marks) in message, before an actual command.\n" +
                             "Then you need to type an actual phrase of it.\n" +
@@ -116,36 +164,35 @@ If you need more about commands, you can call /help.");
                             " (Actually, you can just send a photo as private message to the bot, even forward someone\'s photo-message, and it will be do a search of original with default parameters.)\n" +
                             " putkey or /putkey — puts your API-key of your SauceNAO account, which is in parameter \"key\";\n" +
                             " deletekey or /deletekey — deletes API-key of your SauceNAO account from bot\'s database;\n" +
-                            " stats or /getstats — gets count of avalieble searches via SauceNAO.",
-                            replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                            " stats or /getstats — gets count of avalieble searches via SauceNAO.";
+                        markup.Add(new InlineKeyboardButton()
                             {
-                                Text = "How to use parameters of search",
+                                Text = "How to use parameters of search?",
                                 CallbackData = "help=" + parameters
-                            }));
+                            });
                         break;
                     case parameters:
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id,
-                            "To use parameters, to adjust search with commands, you need type them with an actual command.\n" +
+                        contain = "To use parameters, to adjust search with commands, you need type them with an actual command.\n" +
                             "With default commands you need to type parameter in this way: \"-<key>:<value>\"(without qoutation marks), if parameter doesn't have a value — -<key>.\n" +
-                            "If you use \"named\" command, just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".",
-                            replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                            "If you use \"named\" command, just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".";
+                        markup.Add(new InlineKeyboardButton()
                             {
                                 Text = "Essential parameters of search",
                                 CallbackData = "help=" + essential
-                            }));
+                            });
                         break;
                     case essential:
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id,
+                        contain =
                             "Avalible keys are:" +
                             "\n limit — apply a count of results, which bot shoud returned;" +
                             "\n tag – apply tag for a search, many tags can be combined with \'plus\' sign, like \"tag1+tag2\";" +
                             "\n page – usually resluts are limited, so if you want more results from the query, you need to type it again, then apply this keys with value more than 1;" +
                             "\n id – if you know an id number of the illustration, on certain service, you can apply this key;" +
                             "\n show_any – bot doesn\'t send you pics, whic marked as \'explicit\', so you need to apply this key (wihtout a value), to make it do it;" +
-                            "\n file – if you need a pic saved in a file, to avoid a compression of Telegram, use this key (without a value).");
+                            "\n file – if you need a pic saved in a file, to avoid a compression of Telegram, use this key (without a value).";
                         break;
                     case account:
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id,
+                        contain =
                             "How to get a SauceNAO API-key?\n" +
                             "First, please go to the https://saucenao.com/user.php \n" +
                             "It should prompt you to register, or login.\n" +
@@ -154,10 +201,10 @@ If you need more about commands, you can call /help.");
                             "That\'s what we need – copy it to the buffer.\n" +
                             "Third, type a message to the bot \"AniPic putkey key=<your api-key>\"(without qoutation and less-more marks, just a key,̶ ̶a̶n̶d̶ ̶I̶ ̶t̶i̶r̶e̶d̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶t̶o̶ ̶r̶e̶p̶e̶a̶t̶ ̶t̶h̶a̶t̶) and send it.\n" +
                             "Your ready to use this bot.\n\n" +
-                            "P.S. This bot doesn\'t refers to the SauceNAO officially, it's just made by a few enthusiasts.\nSo it would be great if you may support the main resource.");
+                            "P.S. This bot doesn\'t refers to the SauceNAO officially, it's just made by a few enthusiasts.\nSo it would be great if you may support the main resource.";
                         break;
                     case about:
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id,
+                        contain =
                             "AniPic is a Telegram bot, which uses certain services for affordance of anime content in images.\n" +
                             "It`s gathers pictures from next sites:" +
                             "\n Yande.re ( https://yande.re/ )," +
@@ -168,47 +215,53 @@ If you need more about commands, you can call /help.");
                             "Please note, that this bot doesn`t refers to this resources officially.\n" +
                             "It would be great, if you donate to them, in case they apply financial help.\n" +
                             "If you interested, you can visit the GitHub page.\n" +
-                            "https://github.com/pes7/Telegram-Bots-Library/tree/tedechan");
+                            "https://github.com/pes7/Telegram-Bots-Library/tree/tedechan";
                         break;
+                    case home:
                     default:
-                        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardButton[][]
-                        {
-                        new InlineKeyboardButton[1]
-                        {new InlineKeyboardButton()
+                        contain = "Here is some of manuals.";
+                        markup.Add(
+                            new InlineKeyboardButton()
                             {
-                                Text="List of available commands",
-                                CallbackData="help=" + available
-                            }},
-                        new InlineKeyboardButton[1]
-                        {new InlineKeyboardButton()
-                            {
-                                Text="How to use parameters of search",
-                                CallbackData = "help=" + parameters
-                            }},
-                        new InlineKeyboardButton[1]
-                        {new InlineKeyboardButton()
-                            {
-                                Text="Essential parameters of search",
-                                CallbackData="help=" + essential
-                            }},
-                        new InlineKeyboardButton[1]
-                        {new InlineKeyboardButton
+                                Text = "List of available commands",
+                                CallbackData = "help=" + available
+                            });
+                        markup.Add(new InlineKeyboardButton()
                         {
-                            Text="How to register a SauceNAO account",
-                            CallbackData="help=" + account
-                        }},
-                        new InlineKeyboardButton[1]
-                        {new InlineKeyboardButton
+                            Text = "How to use parameters of search",
+                            CallbackData = "help=" + parameters
+                        });
+                        markup.Add(new InlineKeyboardButton()
                         {
-                            Text="About AniPic",
-                            CallbackData="help=" + about
-                        }}
-                        };
-                        await serving.Client.SendTextMessageAsync(
-                            msg.Chat.Id,
-                            "Here is some of manuals.",
-                            replyMarkup: inlineKeyboard);
+                            Text = "Essential parameters of search",
+                            CallbackData = "help=" + essential
+                        });
+                        markup.Add(new InlineKeyboardButton
+                        {
+                            Text = "How to register a SauceNAO account",
+                            CallbackData = "help=" + account
+                        });
+                        markup.Add(new InlineKeyboardButton
+                        {
+                            Text = "About AniPic",
+                            CallbackData = "help=" + about
+                        });
                         break;
+                }
+                List<InlineKeyboardButton[]> keyboardButtons = new List<InlineKeyboardButton[]>();
+                foreach (InlineKeyboardButton button in markup) keyboardButtons.Add(new InlineKeyboardButton[]
+                { button });
+                if (callback_data==System.String.Empty) await serving.Client.SendTextMessageAsync(msg.Chat.Id, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+                else
+                {
+                    if (callback_data != home) keyboardButtons.Add(
+                        new InlineKeyboardButton[]
+                        {new InlineKeyboardButton()
+                            {
+                                Text = "Return",
+                                CallbackData = "help=" + home
+                            }});
+                    await serving.Client.EditMessageTextAsync(msg.Chat.Id, msg.MessageId, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
                 }
             }
             catch(System.Exception ex)
