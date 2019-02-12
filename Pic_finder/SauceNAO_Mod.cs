@@ -449,7 +449,12 @@ namespace Pic_finder
                     }
                     else if (user.LongRemaining != 0 && user.ShortRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalSeconds < 10.0) Thread.Sleep(new TimeSpan(0, 0, 10));
                     JObject results = null;
-                    System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo[2]?.FileId).Result.FilePath);
+                    if (msg.Photo.Length<=0)
+                    {
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
+                        return;
+                    }
+                    System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.Last().FileId).Result.FilePath);
                     System.String hash = System.String.Empty;
                     Task<HttpResponseMessage> th;
                     UInt16 i = 0, numres = this.DefNumres;
@@ -575,7 +580,7 @@ namespace Pic_finder
                 catch (Exception ex)
                 {
                     if (ex.Message != TooManyReq) serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
                 }
             }
         }
@@ -672,7 +677,7 @@ namespace Pic_finder
                 {
                     System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
                     if (get_pic != null)
-                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]));
+                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]), disableNotification: true);
                 }
                 catch
                 { }
@@ -688,7 +693,7 @@ namespace Pic_finder
                             res_str += "\n" + url.URL;
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value));
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true);
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
@@ -848,7 +853,12 @@ namespace Pic_finder
         {
             try
             {
-                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo[2]?.FileId).Result.FilePath);
+                if (msg.Photo.Count() <= 0)
+                {
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
+                    return;
+                }
+                System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.Last().FileId).Result.FilePath);
                 HttpResponseMessage httpResponse = await this.DoTrivialRequest(photo);
                 System.String res = await httpResponse.Content.ReadAsStringAsync();
                 if (!httpResponse.IsSuccessStatusCode)

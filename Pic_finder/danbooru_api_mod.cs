@@ -270,7 +270,7 @@ namespace Pic_finder
                         {
                             Text = "Get it",
                             CallbackData = "action=get_pics " + next_req
-                        }));
+                        }), disableNotification: true);
                 }
                 //else await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
             }

@@ -49,7 +49,7 @@ namespace Pic_finder
                 if (args.Count > 0)
                     if (args.ElementAt(0).Type == ArgC.TypeOfArg.Default)
                     {
-                        args.ForEach(delegate (ArgC to_norm) //Normalizing the arg`s to prevent a blank space`s.
+                        args.ForEach(delegate (ArgC to_norm) //Normalizing the arg's to prevent a blank space's.
                         {
                             int inx = args.IndexOf(to_norm);
                             if (to_norm.Name != null) args.ElementAt(inx).Name = !to_norm.Name.Contains("\"") ? to_norm.Name.Replace(" ", "") : to_norm.Name;
@@ -147,6 +147,7 @@ If you need more about commands, you can call /help.");
             {
                 System.String contain = System.String.Empty;
                 List<InlineKeyboardButton> markup = new List<InlineKeyboardButton>();
+                Telegram.Bot.Types.Enums.ParseMode parseMode = Telegram.Bot.Types.Enums.ParseMode.Markdown;
                 switch (callback_data)
                 {
                     case available:
@@ -182,13 +183,14 @@ If you need more about commands, you can call /help.");
                             });
                         break;
                     case essential:
+                        parseMode = Telegram.Bot.Types.Enums.ParseMode.Default;
                         contain =
                             "Avalible keys are:" +
                             "\n limit — apply a count of results, which bot shoud returned;" +
-                            "\n tag – apply tag for a search, many tags can be combined with \'plus\' sign, like \"tag1+tag2\";" +
+                            "\n tag – apply tag for a search, many tags can be combined with 'plus' sign, like \"tag1+tag2\";" +
                             "\n page – usually resluts are limited, so if you want more results from the query, you need to type it again, then apply this keys with value more than 1;" +
                             "\n id – if you know an id number of the illustration, on certain service, you can apply this key;" +
-                            "\n show_any – bot doesn\'t send you pics, whic marked as \'explicit\', so you need to apply this key (wihtout a value), to make it do it;" +
+                            "\n show_any – bot doesn't send you pics, whic marked as 'explicit', so you need to apply this key (wihtout a value), to make it do it;" +
                             "\n file – if you need a pic saved in a file, to avoid a compression of Telegram, use this key (without a value).";
                         break;
                     case account:
@@ -196,7 +198,7 @@ If you need more about commands, you can call /help.");
                             "How to get a SauceNAO API-key?\n" +
                             "First, please go to the https://saucenao.com/user.php \n" +
                             "It should prompt you to register, or login.\n" +
-                            "If you hadn`t regirestered, do it.\n" +
+                            "If you hadn't regirestered, do it.\n" +
                             "Second, visit a https://saucenao.com/user.php?page=search-api and you will see the \"api key\" section with letters and numbers string.\n" +
                             "That\'s what we need – copy it to the buffer.\n" +
                             "Third, type a message to the bot \"AniPic putkey key=<your api-key>\"(without qoutation and less-more marks, just a key,̶ ̶a̶n̶d̶ ̶I̶ ̶t̶i̶r̶e̶d̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶t̶o̶ ̶r̶e̶p̶e̶a̶t̶ ̶t̶h̶a̶t̶) and send it.\n" +
@@ -206,16 +208,17 @@ If you need more about commands, you can call /help.");
                     case about:
                         contain =
                             "AniPic is a Telegram bot, which uses certain services for affordance of anime content in images.\n" +
-                            "It`s gathers pictures from next sites:" +
+                            "It's gathers pictures from next sites:" +
                             "\n Yande.re ( https://yande.re/ )," +
                             "\n Danbooru ( https://danbooru.donmai.us/ )," +
                             "\n Gelbooru ( https://gelbooru.com/ )," +
                             "\n Konachan ( https://konachan.com/ )." +
-                            "\nTo search for images originals, it`s uses the IQDB ( https://iqdb.org/ ) and SauceNAO ( https://saucenao.com/ ) (if you have their account).\n" +
-                            "Please note, that this bot doesn`t refers to this resources officially.\n" +
+                            "\nTo search for images originals, it's uses the IQDB ( https://iqdb.org/ ) and SauceNAO ( https://saucenao.com/ ) (if you have their account).\n" +
+                            "Please note, that this bot doesn't refers to this resources officially.\n" +
                             "It would be great, if you donate to them, in case they apply financial help.\n" +
                             "If you interested, you can visit the GitHub page.\n" +
-                            "https://github.com/pes7/Telegram-Bots-Library/tree/tedechan";
+                            "https://github.com/pes7/Telegram-Bots-Library/tree/tedechan \n" +
+                            "***DISCLAIMER: Any art which was sent by the bot is an intellectual property of it's authour or rights holder.***";
                         break;
                     case home:
                     default:
@@ -251,7 +254,7 @@ If you need more about commands, you can call /help.");
                 List<InlineKeyboardButton[]> keyboardButtons = new List<InlineKeyboardButton[]>();
                 foreach (InlineKeyboardButton button in markup) keyboardButtons.Add(new InlineKeyboardButton[]
                 { button });
-                if (callback_data==System.String.Empty) await serving.Client.SendTextMessageAsync(msg.Chat.Id, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+                if (callback_data == System.String.Empty) await serving.Client.SendTextMessageAsync(msg.Chat.Id, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons), parseMode: parseMode);
                 else
                 {
                     if (callback_data != home) keyboardButtons.Add(
@@ -261,7 +264,7 @@ If you need more about commands, you can call /help.");
                                 Text = "Return",
                                 CallbackData = "help=" + home
                             }});
-                    await serving.Client.EditMessageTextAsync(msg.Chat.Id, msg.MessageId, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+                    await serving.Client.EditMessageTextAsync(msg.Chat.Id, msg.MessageId, contain, replyMarkup: new InlineKeyboardMarkup(keyboardButtons), parseMode: parseMode);
                 }
             }
             catch(System.Exception ex)
