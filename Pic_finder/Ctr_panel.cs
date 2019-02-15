@@ -30,7 +30,7 @@ namespace Pic_finder
             {
                 this.RobotInit = parser.ReadFile("robot.ini");
                 connBuilder.DataSource = RobotInit["DB"]["DataSource"];
-                //connBuilder.IntegratedSecurity = bool.Parse(RobotInit["DB"]["IntegratedSecurity"]);
+                connBuilder.IntegratedSecurity = bool.Parse(RobotInit["DB"]["IntegratedSecurity"]);
                 connBuilder.InitialCatalog = RobotInit["DB"]["InitialCatalog"];
                 connBuilder.UserID = RobotInit["DB"]["user"];
                 connBuilder.Password = RobotInit["DB"]["password"];
@@ -168,6 +168,11 @@ namespace Pic_finder
                 Robot.GetModule<MessagesHook>().StopHooking,
                 new List<string>() { "/stophooking" },
                 commandName: "stophooking", descr: "Unallows admin to behave badly.", access: TypeOfAccess.Named));
+
+            /*Robot.SynkCommands.Add(new SynkCommand(
+                Robot.GetModule<MessagesHook>().WatchPrevUpdate,
+                new List<string>() { "/getupdate" },
+                commandName: "getupdate", descr: "Gets update", access: TypeOfAccess.Named));*/
 
             SynkCommand hookingRec = new SynkCommand(Robot.GetModule<MessagesHook>().UpdateReceiver);
             hookingRec.Type = TypeOfCommand.AllwaysInWebHook;

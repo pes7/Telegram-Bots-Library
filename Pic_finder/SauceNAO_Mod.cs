@@ -465,7 +465,7 @@ namespace Pic_finder
                     do
                     {
                         th = this.DoASearchAsync(photo, user.ApiKey, numres);
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching…" + (i > 0 ? ("\nNumber of retry – " + i.ToString()) : ""));
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching…" + (i > 0 ? ("\nNumber of retry – " + i.ToString()) : ""), disableNotification: true);
                         if (th.Result.IsSuccessStatusCode) break;
                         if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
                         else break;
@@ -501,7 +501,7 @@ namespace Pic_finder
                         }
                         if (results?["results"].Count() == 0)
                         {
-                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry.");
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry…");
                             use_iqdb = true;
                         }
                     }
@@ -574,13 +574,13 @@ namespace Pic_finder
                             {
                                 Text = "Show it",
                                 CallbackData = "action=receive_unsimilar query_id=" + query.Id.ToString()
-                            }));
+                            }), disableNotification: true);
                     }
                 }
                 catch (Exception ex)
                 {
                     if (ex.Message != TooManyReq) serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong…");
                 }
             }
         }
@@ -673,11 +673,12 @@ namespace Pic_finder
             //if (results == null) return;
             foreach (KeyValuePair<SearchResult, List<ExternalUrls>> result in results)
             {
+                int image_msg_id = 0;
                 try
                 {
                     System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
                     if (get_pic != null)
-                        await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]), disableNotification: true);
+                        image_msg_id = (await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]), disableNotification: true)).MessageId;
                 }
                 catch
                 { }
@@ -693,7 +694,7 @@ namespace Pic_finder
                             res_str += "\n" + url.URL;
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true, replyToMessageId: image_msg_id);
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }

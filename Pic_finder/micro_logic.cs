@@ -283,7 +283,7 @@ If you need more about commands, you can call /help.");
         public async void EmExit(Message msg, IBot serving, List<ArgC> args)
         {
             //await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);
-            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Bot will got shut down.");
+            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Bot will be shuted down.");
             System.Environment.Exit(0);
         }
     }
