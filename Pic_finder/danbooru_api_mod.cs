@@ -162,8 +162,8 @@ namespace Pic_finder
                             sd_fl = true;
                             exc = "Image is too large";
                         }*/
-                        if (sd_fl) await this.Serving.Client.SendDocumentAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc/*, replyToMessageId: this.Msg.MessageId*/);
-                        else await this.Serving.Client.SendPhotoAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()))/*, replyToMessageId: this.Msg.MessageId)*/;
+                        if (sd_fl) await this.Serving.Client.SendDocumentAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
+                        else await this.Serving.Client.SendPhotoAsync(this.Msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true)/*, replyToMessageId: this.Msg.MessageId)*/;
                         exc = System.String.Empty;
                         this.is_res = true;
                         succ = true;
@@ -263,6 +263,11 @@ namespace Pic_finder
                         next_req += " ";
                     }
                     next_req = next_req.Remove(next_req.Count() - 1);
+                    await this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "You can help AniPic.", disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                    {
+                        Text = "Learn more",
+                        CallbackData = "help=donate"
+                    }));
                     await this.Serving.Client.SendTextMessageAsync(
                         this.Msg.Chat.Id,
                         "Do you wanna get next results?",

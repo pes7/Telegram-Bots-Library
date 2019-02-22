@@ -699,6 +699,16 @@ namespace Pic_finder
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
             }
+            try
+            {
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You can help AniPic.", disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                {
+                    Text = "Learn more",
+                    CallbackData = "help=donate"
+                }));
+            }
+            catch (Exception ex)
+            { serving.Exceptions.Add(ex); }
         }
 
         private async void SaveResultsToDB(System.IO.Stream photo, SearchQuery query, Dictionary<SearchResult, List<ExternalUrls>> results)

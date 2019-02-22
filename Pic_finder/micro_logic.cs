@@ -27,8 +27,10 @@ namespace Pic_finder
                         }
                         break;
                     case Telegram.Bot.Types.Enums.UpdateType.Message:
-                        if (update.Message.Text != null ? update.Message.Text.Contains("/help") && !update.Message.Text.Contains("@") : false)
+                        if (update.Message.Text != null ? update.Message.Text.Contains("/help") && !update.Message.Text.Contains("@") && update.Message.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Supergroup : false)
                             this.Help_new(update.Message, serving, args);
+                        if (update.Message.Text != null ? update.Message.Text.Contains("/start") && !update.Message.Text.Contains("@") && update.Message.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Supergroup : false)
+                            this.SayHello(update.Message, serving, args);
                         break;
                 }
             }
@@ -136,8 +138,9 @@ If you need more about commands, you can call /help.");
                 parameters = "how_to_parameters",
                 essential = "essential_parameters",
                 account = "register_SN_account",
+                donate = "donate",
                 about = "about_bot",
-                home="help_units";
+                home = "help_units";
             System.String callback_data = System.String.Empty;
             try
             { callback_data = ArgC.GetArg(args, "help").Arg ?? System.String.Empty; }
@@ -151,7 +154,8 @@ If you need more about commands, you can call /help.");
                 switch (callback_data)
                 {
                     case available:
-                        contain = "Bot can run default slash (via '/') commands, and \"named\".\n" +
+                        contain = 
+                            "Bot can run default slash (via '/') commands, and \"named\".\n" +
                             "If with first it's anything is clear, with second you need to do next.\n" +
                             "To make make Bot execute a command, first of all you need to type \"anipic\"(without qoutation marks) in message, before an actual command.\n" +
                             "Then you need to type an actual phrase of it.\n" +
@@ -193,13 +197,24 @@ If you need more about commands, you can call /help.");
                             "\n show_any – bot doesn't send you pics, whic marked as 'explicit', so you need to apply this key (wihtout a value), to make it do it;" +
                             "\n file – if you need a pic saved in a file, to avoid a compression of Telegram, use this key (without a value).";
                         break;
+                    case donate:
+                        contain =
+                            "Finances are vital part of human society.\n" +
+                            "Imagining a life without them is hard and complicated.\n" +
+                            "If you're like this bot, you can help her creators and supporters by a pinch of coins.\n" +
+                            "To do that, please make a transaction of sum which you consider worthy to donate, on this card: " +
+                            "\n\n" +
+                            "`5169360004946665`" +
+                            "\n\n" +
+                            "Thank you.\n(^.^)";
+                        break;
                     case account:
                         contain =
                             "How to get a SauceNAO API-key?\n" +
-                            "First, please go to the https://saucenao.com/user.php \n" +
+                            "First, please go to [here](https://saucenao.com/user.php).\n" +
                             "It should prompt you to register, or login.\n" +
                             "If you hadn't regirestered, do it.\n" +
-                            "Second, visit a https://saucenao.com/user.php?page=search-api and you will see the \"api key\" section with letters and numbers string.\n" +
+                            "Second, visit this [page](https://saucenao.com/user.php?page=search-api) and you will see the \"api key\" section with letters and numbers string.\n" +
                             "That\'s what we need – copy it to the buffer.\n" +
                             "Third, type a message to the bot \"AniPic putkey key=<your api-key>\"(without qoutation and less-more marks, just a key,̶ ̶a̶n̶d̶ ̶I̶ ̶t̶i̶r̶e̶d̶ ̶a̶ ̶l̶i̶t̶t̶l̶e̶ ̶t̶o̶ ̶r̶e̶p̶e̶a̶t̶ ̶t̶h̶a̶t̶) and send it.\n" +
                             "Your ready to use this bot.\n\n" +
@@ -209,16 +224,21 @@ If you need more about commands, you can call /help.");
                         contain =
                             "AniPic is a Telegram bot, which uses certain services for affordance of anime content in images.\n" +
                             "It's gathers pictures from next sites:" +
-                            "\n Yande.re ( https://yande.re/ )," +
-                            "\n Danbooru ( https://danbooru.donmai.us/ )," +
-                            "\n Gelbooru ( https://gelbooru.com/ )," +
-                            "\n Konachan ( https://konachan.com/ )." +
-                            "\nTo search for images originals, it's uses the IQDB ( https://iqdb.org/ ) and SauceNAO ( https://saucenao.com/ ) (if you have their account).\n" +
+                            "\n [Yande.re](https://yande.re/)," +
+                            "\n [Danbooru](https://danbooru.donmai.us/)," +
+                            "\n [Gelbooru](https://gelbooru.com/)," +
+                            "\n [Konachan](https://konachan.com/)." +
+                            "\nTo search for images originals, it's uses the [IQDB](https://iqdb.org/) and [SauceNAO](https://saucenao.com/) (if you have their account).\n" +
                             "Please note, that this bot doesn't refers to this resources officially.\n" +
                             "It would be great, if you donate to them, in case they apply financial help.\n" +
-                            "If you interested, you can visit the GitHub page.\n" +
-                            "https://github.com/pes7/Telegram-Bots-Library/tree/tedechan \n" +
+                            "Also you can support this bot by that kind of thing.\n" +
+                            "If you interested, you can visit the [GitHub](https://github.com/pes7/Telegram-Bots-Library/tree/tedechan) page.\n\n" +
                             "***DISCLAIMER: Any art which was sent by the bot is an intellectual property of it's authour or rights holder.***";
+                        markup.Add(new InlineKeyboardButton()
+                        {
+                            Text = "How to donate",
+                            CallbackData = "help=" + donate
+                        });
                         break;
                     case home:
                     default:
@@ -243,6 +263,11 @@ If you need more about commands, you can call /help.");
                         {
                             Text = "How to register a SauceNAO account",
                             CallbackData = "help=" + account
+                        });
+                        markup.Add(new InlineKeyboardButton
+                        {
+                            Text = "How to donate",
+                            CallbackData = "help=" + donate
                         });
                         markup.Add(new InlineKeyboardButton
                         {
@@ -272,7 +297,7 @@ If you need more about commands, you can call /help.");
                 serving.Exceptions.Add(ex);
             }
         }
-
+        
         public async void DeleteMyMessage(Message msg, IBot serving, List<ArgC> args)
         {
             if (msg.ReplyToMessage.From.Username == serving.Name) await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);

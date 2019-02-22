@@ -54,7 +54,7 @@ namespace Pic_finder
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
             {
-                "/start"
+                "/start@anime_pic_finder_bot"
             },descr:"Initiating command"));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().EmExit, new List<string>()
