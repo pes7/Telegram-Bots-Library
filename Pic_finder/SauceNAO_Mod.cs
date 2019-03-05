@@ -685,16 +685,17 @@ namespace Pic_finder
                 System.String res_str = System.String.Empty;
                 try
                 {
-                    res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                    res_str = result.Key.IndexName.Replace('_', ' ').Replace('*', ' ').Replace('`', ' ').Replace('[', ' ').Replace(']', ' ') + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:"; ;
                     if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                     else
                     {
                         foreach (var url in result.Value)
                         {
-                            res_str += "\n" + url.URL;
+                            Uri uri = new Uri(url.URL);
+                            res_str += "\n[" + uri.Host + "](" + url.URL + ")";
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true, replyToMessageId: image_msg_id);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true, replyToMessageId: image_msg_id, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown, disableWebPagePreview: true);
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
@@ -942,6 +943,11 @@ namespace Pic_finder
                                 }
                             }
                         }
+                        /*if (Results.Last().Value.Where(p=>p.URL.Contains("danbooru.donmai.us")).Count()!=0)
+                        {
+                            System.String dand_post_id = Results.Last().Value.Where(p => p.URL.Contains("danbooru.donmai.us")).First().URL.Split('/').Last();
+
+                        }*/
                     }
                     catch (Exception e)
                     {
