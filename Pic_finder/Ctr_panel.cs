@@ -102,7 +102,7 @@ namespace Pic_finder
             },
             commandName: "konachan", descr: "Get\'s images from Konachan."));
 
-            Robot.SynkCommands.Add(new SynkCommand(
+            /*Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<danbooru_api_mod>().GetYandereTagsAsync,
                 new List<string>()
                 {
@@ -123,6 +123,7 @@ namespace Pic_finder
                     "/getgelbooru_tags"
                 },
                 commandName: "gelbooru_tags", descr: "Get tags from Gelbooru."));
+            */
             Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<SauceNAO_Mod>().SearchPic,
                 new List<string>() { "/getsauce" },

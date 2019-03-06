@@ -154,9 +154,9 @@ namespace Pic_finder
 
     public class SauceNAO_Mod : Module
     {
-        public IBot Bot;
-        public List<ArgC> Args;
-        public Message Msg;
+        //public IBot Bot;
+        //public List<ArgC> Args;
+        //public Message Msg;
         private HttpClient Client = new HttpClient();
         private System.String ConnStr;
         /*
@@ -238,55 +238,19 @@ namespace Pic_finder
                 return await Client.PostAsync("https://iqdb.org/", post_data);
             }
         }
-
-        private void NormalizeArgs()
-        {
-            if (this.Args == null) return;
-            try
-            {
-                this.Args.RemoveAt(0); //A little "crunch".
-                if (this.Args.Count>0)
-                if (this.Args.ElementAt(0).Type == ArgC.TypeOfArg.Default)
-                {
-                    this.Args.ForEach(delegate (ArgC to_norm) //Normalizing the arg`s to prevent a blank space`s.
-                    {
-                        int inx = this.Args.IndexOf(to_norm);
-                        if (to_norm.Name != null) this.Args.ElementAt(inx).Name = !to_norm.Name.Contains("\"") ? to_norm.Name.Replace(" ", "") : to_norm.Name;
-                        if (to_norm.Arg != null) this.Args.ElementAt(inx).Arg = !to_norm.Arg.Contains("\"") ? to_norm.Arg.Replace(" ", "") : to_norm.Arg;
-                    }); //End of the "crunch".
-                }
-                else if (this.Args.ElementAt(0).Type == ArgC.TypeOfArg.Named)
-                {
-                    foreach (System.String to_arg in this.Args.ElementAt(0).Arg.Split(' '))
-                    {
-                        System.String[] to_arg_div = to_arg.Split('=');
-                        this.Args.Add(new ArgC(to_arg_div.ElementAt(0), to_arg_div.Length > 1 ? to_arg_div.ElementAt(1) : null));
-                    }
-                        if (this.Args.Count != 0) this.Args.RemoveAt(0);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Bot.Exceptions.Add(ex);
-                this.Bot.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Oops, something got wrong.\n"+ex.Message);
-            }
-        }
-
+        
         public async void AddKeyToDB(Message msg, IBot serving, List<ArgC> args)
         {
-            this.Msg = msg;
-            this.Bot = serving;
-            this.Args = args;
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 try
                 {
                     Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
                     System.String api_key;
-                    this.NormalizeArgs();
+                    args = serving.GetModule<micro_logic>().NormalizeArgs(msg, serving, args);
                     try
                     {
-                        api_key = ArgC.GetArg(this.Args, "key").Arg;
+                        api_key = ArgC.GetArg(args, "key").Arg;
                     }
                     catch (NullReferenceException)
                     {
@@ -300,7 +264,7 @@ namespace Pic_finder
                     {
                         Users.InsertOnSubmit(new SauceNAO_Acc
                         {
-                            UserId = this.Msg.From.Id,
+                            UserId = msg.From.Id,
                             SauceNAO_UserId = 0,
                             AccountType = 0,
                             ApiKey = api_key,
@@ -311,7 +275,7 @@ namespace Pic_finder
                             LastRequestTime = DateTime.Now
                         });
                     }
-                    else users.FirstOrDefault().ApiKey = ArgC.GetArg(this.Args, "key").Arg;
+                    else users.FirstOrDefault().ApiKey = ArgC.GetArg(args, "key").Arg;
                     try
                     {
                         dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
@@ -415,7 +379,7 @@ namespace Pic_finder
                 }
                 catch (Exception ex)
                 {
-                    this.Bot.Exceptions.Add(ex);
+                    serving.Exceptions.Add(ex);
                 }
             }
         }
@@ -423,9 +387,7 @@ namespace Pic_finder
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
             if (msg.Type != Telegram.Bot.Types.Enums.MessageType.Photo) return;
-            this.Bot = serving;
-            this.Args = args;
-            this.NormalizeArgs();
+            args = serving.GetModule<micro_logic>().NormalizeArgs(msg, serving, args);
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
@@ -444,7 +406,7 @@ namespace Pic_finder
                     SauceNAO_Acc user = users.FirstOrDefault();
                     if (user.LongRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalHours < 24.0)
                     {
-                        await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally your count of searches didn\'t restocked.\'nYou have to wait for it about " + (user.LastRequestTime - DateTime.Now).Value.TotalHours.ToString() + " hours.");
+                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally your count of searches didn\'t restocked.\'nYou have to wait for it about " + (user.LastRequestTime - DateTime.Now).Value.TotalHours.ToString() + " hours.");
                         return;
                     }
                     else if (user.LongRemaining != 0 && user.ShortRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalSeconds < 10.0) Thread.Sleep(new TimeSpan(0, 0, 10));
@@ -459,7 +421,7 @@ namespace Pic_finder
                     Task<HttpResponseMessage> th;
                     UInt16 i = 0, numres = this.DefNumres;
                     try
-                    { numres = Convert.ToUInt16(ArgC.GetArg(this.Args, "limit").Arg); }
+                    { numres = Convert.ToUInt16(ArgC.GetArg(args, "limit").Arg); }
                     catch (NullReferenceException)
                     { numres = this.DefNumres; }
                     do
@@ -483,14 +445,14 @@ namespace Pic_finder
                         results = JObject.Parse(res);
                         if (results == null)
                         {
-                            await Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have an error with results.");
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have an error with results.");
                             use_iqdb = true;
                         }
                         if (!use_iqdb)
                         {
                             if (Convert.ToInt32(results["header"]["user_id"]?.Value<int>()) <= 0)
                             {
-                                await this.Bot.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
+                                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
                                 use_iqdb = true;
                             }
                             if (Convert.ToInt32(results["header"]["results_returned"]?.Value<int>()) <= 0)
@@ -585,7 +547,7 @@ namespace Pic_finder
             }
         }
 
-        private InlineKeyboardMarkup DownloadFromSourceButtons(List<ExternalUrls> urls)
+        private InlineKeyboardMarkup DownloadFromSourceButtons(List<ExternalUrls> urls, IBot serving)
         {
             try
             {
@@ -621,7 +583,7 @@ namespace Pic_finder
             }
             catch(Exception ex)
             {
-                this.Bot.Exceptions.Add(ex);
+                serving.Exceptions.Add(ex);
             }
             return null;
         }
@@ -669,11 +631,11 @@ namespace Pic_finder
 
         private async void SendResults(IBot serving, Message msg, Dictionary<SearchResult, List<ExternalUrls>> results)
         {
-            this.Bot = serving;
             //if (results == null) return;
             foreach (KeyValuePair<SearchResult, List<ExternalUrls>> result in results)
             {
                 int image_msg_id = 0;
+                /*
                 try
                 {
                     System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
@@ -682,25 +644,34 @@ namespace Pic_finder
                 }
                 catch
                 { }
+                */
                 System.String res_str = System.String.Empty;
                 try
                 {
-                    res_str = result.Key.IndexName.Replace('_', ' ').Replace('*', ' ').Replace('`', ' ').Replace('[', ' ').Replace(']', ' ') + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:"; ;
+                    res_str = result.Key.IndexName/*.Replace('_', ' ').Replace('*', ' ').Replace('`', ' ').Replace('[', ' ').Replace(']', ' ')*/ + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                    if (result.Key.Thumbnail !=null)
+                    {
+                        res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
+                    }
                     if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                     else
                     {
                         foreach (var url in result.Value)
                         {
-                            Uri uri = new Uri(url.URL);
-                            res_str += "\n[" + uri.Host + "](" + url.URL + ")";
+                            try
+                            {
+                                Uri uri = new Uri(url.URL);
+                                res_str += "<a href=\"" + url.URL + "\">" + uri.Host + "</a>";
+                            }
+                            catch (Exception ex) { serving.Exceptions.Add(ex); }
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value), disableNotification: true, replyToMessageId: image_msg_id, parseMode: Telegram.Bot.Types.Enums.ParseMode.Markdown, disableWebPagePreview: true);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value, serving), disableNotification: true, replyToMessageId: image_msg_id, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, disableWebPagePreview: false);
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
             }
-            try
+            /*try
             {
                 await serving.Client.SendTextMessageAsync(msg.Chat.Id, "You can help AniPic.", disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
                 {
@@ -709,7 +680,7 @@ namespace Pic_finder
                 }));
             }
             catch (Exception ex)
-            { serving.Exceptions.Add(ex); }
+            { serving.Exceptions.Add(ex); }*/
         }
 
         private async void SaveResultsToDB(System.IO.Stream photo, SearchQuery query, Dictionary<SearchResult, List<ExternalUrls>> results)
@@ -851,9 +822,9 @@ namespace Pic_finder
                 {
                     System.String inc = msg.Text ?? System.String.Empty;
                     inc += msg.Caption ?? System.String.Empty;
-                    if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo && inc.ToLower().Contains("anipic") && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args);
+                    if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo /*&& inc.ToLower().Contains("anipic")*/ && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args);
                 }
-                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(msg.Caption.ToLower().Contains("anipic") && msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
+                if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(/*msg.Caption.ToLower().Contains("anipic") &&*/ msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
             }
             catch //(Exception ex)
             {
