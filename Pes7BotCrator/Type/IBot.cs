@@ -21,7 +21,8 @@ namespace Pes7BotCrator.Type
         List<Message> MessagesLast { get; set; }
         List<dynamic> MessagesQueue { get; set; }
         List<Command> ActionCommands { get; set; }
-        List<UserM> ActiveUsers { get; set; }
+        List<UserM> ActiveUsers { get; }
+        Dictionary<int, int> StackUsersId { get; set; }
         List<Exception> Exceptions { get; set; }
         List<IModule> Modules { get; set; }
         GList<SynkCommand> SynkCommands { get; set; }
@@ -30,6 +31,7 @@ namespace Pes7BotCrator.Type
         Action OnWebHoockUpdated { get; set; }
         int RunTime { get; set; }
         string TimeToString(int i);
+        void AddActiveUser(User us, bool stackMessages = false);
         void setModulesParent();
         void Start();
     }

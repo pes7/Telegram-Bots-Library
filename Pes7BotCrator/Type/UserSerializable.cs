@@ -17,6 +17,7 @@ namespace Pes7BotCrator.Type
         public string LastName { get; set; }
         public int Id { get; set; }
         public string FirstName { get; set; }
+        public List<MessageM> Messages { get; set; }
         public UserSerializable(UserM us)
         {
             this.FromChat = us.FromChat;
@@ -26,6 +27,10 @@ namespace Pes7BotCrator.Type
             this.FirstName = us.FirstName;
             this.PhotoPath = us.PhotoPath;
             this.MessageCount = us.MessageCount;
+            if (us.Stack)
+                Messages = us.Messages;
+            else
+                Messages = new List<MessageM>();
         }
         public UserSerializable(User us)
         {
@@ -34,6 +39,7 @@ namespace Pes7BotCrator.Type
             this.LastName = us.LastName;
             this.Id = us.Id;
             this.FirstName = us.FirstName;
+            Messages = new List<MessageM>();
         }
         public UserM GetUserM()
         {
@@ -46,6 +52,7 @@ namespace Pes7BotCrator.Type
             m.PhotoPath = PhotoPath;
             m.MessageCount = MessageCount;
             m.FromChat = FromChat;
+            m.Messages = Messages;
             return m;
         }
         public User GetUser()

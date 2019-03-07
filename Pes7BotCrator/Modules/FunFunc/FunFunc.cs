@@ -31,6 +31,7 @@ namespace Pes7BotCrator.Modules.FunFunc
         public Random Rand { get; set; }
         public BossOfTheGym _BossOfTheGym { get; set; }
         public BossOfTheGymSide _BossOfTheGymSide { get; set; }
+        public GiznIliMut _GiznIliMut { get; set; }
         public string FaceImageDir { get; set; }
         public string WhoTitles { get; set; }
         public string WhoAnswers { get; set; }
@@ -50,6 +51,7 @@ namespace Pes7BotCrator.Modules.FunFunc
             _Otvetka = new Otvetka();
             _BossOfTheGym = new BossOfTheGym();
             _BossOfTheGymSide = new BossOfTheGymSide();
+            _GiznIliMut = new GiznIliMut();
             WhoTitles = whoTitles;
             WhoAnswers = whoAnswers;
             FaceImageDir = imageDir;
@@ -110,6 +112,26 @@ namespace Pes7BotCrator.Modules.FunFunc
         public class BossOfTheGymSide : SynkCommand
         {
             public BossOfTheGymSide() : base(BossOfTheGymActRegistration, new List<string>() { "/boss" }, commandName: "босс", descr: "Сражаться за ринг.", clearcommand: false) { }
+        }
+        public class GiznIliMut : SynkCommand
+        {
+            public GiznIliMut() : base(GiznIliMutAct, new List<string>() { "/muterand" }, commandName: "мут", descr: "Проверь свою удачу. (МУТ)", clearcommand: false) { }
+        }
+
+        public static void GiznIliMutAct(Message re, IBot Parent, List<ArgC> args)
+        {
+            if (re != null)
+            {
+                var inter = Parent.Rand.Next(0,100);
+                if (inter > 50)
+                {
+                    var hours = Parent.Rand.Next(1, 6);
+                    Parent.Client.RestrictChatMemberAsync(re.Chat.Id, re.From.Id, DateTime.UtcNow.AddHours(hours), false, false, false, false);
+                    Parent.Client.SendTextMessageAsync(re.Chat.Id, $"press F for @{re.From.Username} [{hours}h.]");
+                }
+                else
+                    Parent.Client.SendTextMessageAsync(re.Chat.Id, $"На этот раз тебе повезло @{re.From.Username}");
+            }
         }
 
         private List<UserSerializable> LoadBosses()

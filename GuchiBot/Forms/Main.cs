@@ -16,6 +16,7 @@ using GuchiBot.Commands;
 using Pes7BotCrator.Modules.FunFunc;
 using Pes7BotCrator.Modules.LikeDislikeModule;
 using GuchiBot.Modules;
+using System.Configuration;
 
 namespace GuchiBot
 {
@@ -45,7 +46,8 @@ namespace GuchiBot
              * В опрос надо добавить параметрический ввод своего текста кнопок. Так же сделать не анонимное голосование.
              */
             Bot = new Bot(
-                key: "466088141:AAEpmcmKEZ5Fq5IWrsJmDtHkeSH4n5h-rMY",
+                /*key - please put ur public bot key, u can put it directly here or on app.config*/
+                key: ConfigurationManager.ConnectionStrings["botKey"].ConnectionString,
                 name: "guchimuchibot",
                 nameString: "Гачи",
                 usernameofcreator:"nazarpes7",
@@ -89,6 +91,7 @@ namespace GuchiBot
             Bot.SynkCommands.Add(Bot.GetModule<GuchiVoice>()._GVoice);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGym);
             Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._BossOfTheGymSide);
+            Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._GiznIliMut);
             //Bot.SynkCommands.Add(Bot.GetModule<FunFunc>()._ActiveUsersMosaic);
             Bot.SynkCommands.Add(new SynkCommand(new WebmModule().WebmFuncForBot, new List<string>()
             {

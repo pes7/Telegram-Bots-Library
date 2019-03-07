@@ -21,7 +21,6 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debu
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.dll
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\System.Runtime.InteropServices.RuntimeInformation.dll
-C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.xml
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Pes7BotCrator.pdb
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csprojResolveAssemblyReference.cache
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\obj\Debug\GuchiBot.Main.resources
@@ -60,11 +59,13 @@ C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debu
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\HtmlAgilityPack.xml
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.resx
-C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
 C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.resx
-C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Modules\FunFunc\FunRes.Designer.cs
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csprojAssemblyReference.cache
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.CoreCompileInputs.cache
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\obj\Debug\GuchiBot.csproj.CopyComplete
 C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Telegram.Bot.dll
 C:\Users\user\documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\LuaAble.dll
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\Telegram.Bot.dll
+C:\Users\ukolo\OneDrive\Документы\GitHub\TelegramBots\GuchiBot\bin\Debug\LuaAble.pdb
+C:\Users\user\Documents\visual studio 2017\Projects\TelegramBots\GuchiBot\bin\Debug\LuaAble.pdb
