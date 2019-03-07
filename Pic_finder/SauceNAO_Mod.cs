@@ -157,7 +157,7 @@ namespace Pic_finder
         //public IBot Bot;
         //public List<ArgC> Args;
         //public Message Msg;
-        private HttpClient Client = new HttpClient();
+        //private HttpClient Client = new HttpClient();
         private System.String ConnStr;
         /*
         public DataContext dataContext;
@@ -215,13 +215,16 @@ namespace Pic_finder
             System.String minsim = "80";
             using (MemoryStream push = new MemoryStream())
             {
-                Bitmap to_push = new Bitmap(take);
-                to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
-                MultipartFormDataContent post_data = new MultipartFormDataContent();
-                HttpContent content = new ByteArrayContent(push.ToArray());
-                content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-                post_data.Add(content, "file", "image.png");
-                return await Client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=" + numres.ToString() + "&minsim=" + minsim + "&db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+                using (HttpClient client = new HttpClient())
+                {
+                    Bitmap to_push = new Bitmap(take);
+                    to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
+                    MultipartFormDataContent post_data = new MultipartFormDataContent();
+                    HttpContent content = new ByteArrayContent(push.ToArray());
+                    content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+                    post_data.Add(content, "file", "image.png");
+                    return await client.PostAsync("http://saucenao.com/search.php?output_type=2&numres=" + numres.ToString() + "&minsim=" + minsim + "&db=999" /*"&dbmask=999" *//*+ Convert.ToString(this.db_bitmask)*/ + "&api_key=" + api_key, post_data);
+                }
             }
         }
 
@@ -229,13 +232,16 @@ namespace Pic_finder
         {
             using (MemoryStream push = new MemoryStream())
             {
-                Bitmap to_push = new Bitmap(take);
-                to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
-                MultipartFormDataContent post_data = new MultipartFormDataContent();
-                HttpContent content = new ByteArrayContent(push.ToArray());
-                content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-                post_data.Add(content, "file", "image.png");
-                return await Client.PostAsync("https://iqdb.org/", post_data);
+                using (HttpClient client = new HttpClient())
+                {
+                    Bitmap to_push = new Bitmap(take);
+                    to_push.Save(push, System.Drawing.Imaging.ImageFormat.Png);
+                    MultipartFormDataContent post_data = new MultipartFormDataContent();
+                    HttpContent content = new ByteArrayContent(push.ToArray());
+                    content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+                    post_data.Add(content, "file", "image.png");
+                    return await client.PostAsync("https://iqdb.org/", post_data);
+                }
             }
         }
         

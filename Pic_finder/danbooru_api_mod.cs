@@ -20,7 +20,7 @@ namespace Pic_finder
 {
     public class danbooru_api_mod : Module //Module to handle with danbooru like API`s.
     {
-        private HttpClient Client = new HttpClient();
+        //private HttpClient Client = new HttpClient();
         private readonly List<System.String> Service_Args = new List<string>() //Service tags for bot workaround, but doesn`t include into URL constructor.
         {
             "file",
@@ -123,20 +123,23 @@ namespace Pic_finder
         private async Task<HttpResponseMessage> GetResAsync(System.String base_url, UInt16 m_lim, Message msg, IBot serving, System.Boolean id_to_tags = true, List<ArgC> args=null) //Getting API document.
         {
             HttpResponseMessage resp;
-            try
+            using (HttpClient httpClient = new HttpClient())
             {
-                resp = await this.Client.GetAsync(this.GenerateURL(base_url, m_lim, id_to_tags, args));
+                try
+                {
+                    resp = await httpClient.GetAsync(this.GenerateURL(base_url, m_lim, id_to_tags, args));
+                }
+                catch (Exception ex)
+                {
+                    serving.Exceptions.Add(ex);
+                    throw new BotGetsWrongException(ex.Message, ex);
+                }
+                if (resp != null)
+                {
+                    if (!resp.IsSuccessStatusCode || resp.Content.Headers.ContentLength == 0) throw new BotGetsWrongException("Unfortunately, request is unsuccesful.");
+                }
+                return resp;
             }
-            catch (Exception ex)
-            {
-                serving.Exceptions.Add(ex);
-                throw new BotGetsWrongException(ex.Message, ex);
-            }
-            if (resp!=null)
-            {
-                if (!resp.IsSuccessStatusCode || resp.Content.Headers.ContentLength == 0) throw new BotGetsWrongException("Unfortunately, request is unsuccesful.");
-            }
-            return resp;
         }
 
         private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name="", Int64 post_id=0, bool sd_fl=false, bool shw_a=false) //Getting and sending a pic from API-result`s.
@@ -149,22 +152,25 @@ namespace Pic_finder
                 {
                     try
                     {
-                        if (succ && rate == erate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
-                        System.IO.Stream get_pic = await Client.GetStreamAsync(url);
-                        /*if (get_pic.Length > (10 * 1024) && !sd_fl && exc == System.String.Empty)
+                        using (HttpClient httpClient = new HttpClient())
                         {
-                            sd_fl = true;
-                            exc = "Image is too large";
-                        }*/
-                        if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
-                        else await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
-                        {
-                            Text = "Download as file",
-                            CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                        }))/*, replyToMessageId: this.Msg.MessageId)*/;
-                        exc = System.String.Empty;
-                        is_res = true;
-                        succ = true;
+                            if (succ && rate == erate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
+                            System.IO.Stream get_pic = await httpClient.GetStreamAsync(url);
+                            /*if (get_pic.Length > (10 * 1024) && !sd_fl && exc == System.String.Empty)
+                            {
+                                sd_fl = true;
+                                exc = "Image is too large";
+                            }*/
+                            if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
+                            else await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                            {
+                                Text = "Download as file",
+                                CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
+                            }))/*, replyToMessageId: this.Msg.MessageId)*/;
+                            exc = System.String.Empty;
+                            is_res = true;
+                            succ = true;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -284,12 +290,20 @@ namespace Pic_finder
                         }), disableNotification: true);
                 //else await serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
             }
-            catch (BotGetsWrongException ex)
-            { await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message); }
             catch(Exception ex)
             {
-                serving.Exceptions.Add(ex);
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                try
+                {
+                    if (ex is BotGetsWrongException) await serving.Client.SendTextMessageAsync(msg.Chat.Id, ex.Message);
+                    else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                }
+                catch (Exception ex1)
+                { serving.Exceptions.Add(ex1); }
+                finally
+                {
+                    if (ex.InnerException != null) serving.Exceptions.Add(ex.InnerException);
+                    if (!(ex is BotGetsWrongException)) serving.Exceptions.Add(ex);
+                }
             }
         }
 
@@ -335,11 +349,8 @@ namespace Pic_finder
                  {
                      if (args1 != null)
                      {
-                         if (ArgC.GetArg(args, "tag")?.Arg.Split('+').Length > 2) //Caution about using more than two tags.
-                         {
-                             serv.Client.SendTextMessageAsync(msg1.Chat.Id, "Unfortunatelly you can\'t input more than two tags, using danbooru."/*, replyToMessageId: msg.MessageId*/).Wait();
-                             throw new BotGetsWrongException("Unfortunatelly you can\'t input more than two tags, using danbooru.");
-                         }
+                         if (ArgC.GetArg(args1, "tag")?.Arg.Split('+').Length > 2) //Caution about using more than two tags.
+                            throw new BotGetsWrongException("Unfortunatelly you can\'t input more than two tags, using danbooru.");
                      }
                      return args1;
                  });
@@ -364,7 +375,7 @@ namespace Pic_finder
         {
             await this.DoAStJobAsync("https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&", msg, serving: serving, args: args, prep_args: delegate (List<ArgC> args1, IBot serv, Message msg1)
             {
-                if (args1 != null) args.ForEach(delegate (ArgC arg) { if (arg.Name.IndexOf("page") != -1) args1.ElementAt(args1.IndexOf(arg)).Name = arg.Name.Replace("page", "pid"); }); //Replacing "page" to "pid" for normal browsing.
+                if (args1 != null) args1.ForEach(delegate (ArgC arg) { if (arg.Name.IndexOf("page") != -1) args1.ElementAt(args1.IndexOf(arg)).Name = arg.Name.Replace("page", "pid"); }); //Replacing "page" to "pid" for normal browsing.
                 return args1;
             });
         }
