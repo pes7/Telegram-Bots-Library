@@ -667,7 +667,7 @@ namespace Pic_finder
                             try
                             {
                                 Uri uri = new Uri(url.URL);
-                                res_str += "<a href=\"" + url.URL + "\">" + uri.Host + "</a>";
+                                res_str += "<a href=\"" + url.URL + "\">" + uri.Host + "</a>\n";
                             }
                             catch (Exception ex) { serving.Exceptions.Add(ex); }
                         }
@@ -824,7 +824,7 @@ namespace Pic_finder
         {
             try
             {
-                if (msg.ReplyToMessage!=null && (msg.Text!=null || msg.Caption!=null))
+                if (msg.ReplyToMessage != null && (msg.Text != null || msg.Caption != null))
                 {
                     System.String inc = msg.Text ?? System.String.Empty;
                     inc += msg.Caption ?? System.String.Empty;
@@ -855,7 +855,7 @@ namespace Pic_finder
                     await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong…");
                     return;
                 }
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
+                Task<Message> srch_msg_async = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching", disableNotification: true);
                 HtmlDocument parse = new HtmlDocument();
                 parse.LoadHtml(res);
                 HtmlNodeCollection pages = parse.DocumentNode.SelectNodes("//div[contains(@id, 'pages')]/div");
@@ -890,6 +890,8 @@ namespace Pic_finder
                             }
                             else { query.SearchStatus = 0; }
                         }
+                        System.String add_url = rows[1].ChildNodes["td"].ChildNodes["a"].GetAttributeValue("href", "");
+                        add_url = add_url.Contains("http") ? add_url : "https:" + add_url;
                         Results.Add(new SearchResult
                         {
                             IndexId = 0,
@@ -901,9 +903,10 @@ namespace Pic_finder
                         {
                         new ExternalUrls
                         {
-                            URL ="https:" + rows[1].ChildNodes["td"].ChildNodes["a"].GetAttributeValue("href", "")
+                            URL = add_url
                         }
                         });
+                        add_url = System.String.Empty;
                         if (rows[2].ChildNodes[0].HasChildNodes)
                         {
                             if (rows[2].ChildNodes[0].ChildNodes["span"] != null)
@@ -912,25 +915,49 @@ namespace Pic_finder
                                 {
                                     foreach (HtmlNode htmlNode in rows[2].ChildNodes[0].ChildNodes["span"].ChildNodes)
                                     {
+                                        add_url = htmlNode.GetAttributeValue("href", "");
+                                        add_url = add_url.Contains("http") ? add_url : "https:" + add_url;
                                         Results.Last().Value.Add(new ExternalUrls
                                         {
-                                            URL = "https:" + htmlNode.GetAttributeValue("href", "")
+                                            URL = add_url
                                         });
                                     }
                                 }
                             }
                         }
-                        /*if (Results.Last().Value.Where(p=>p.URL.Contains("danbooru.donmai.us")).Count()!=0)
+                        List<ExternalUrls> whr_danb = Results.Last().Value.Where(p => p.URL.Contains("danbooru.donmai.us")).ToList();
+                        if (whr_danb.Count() != 0)
                         {
-                            System.String dand_post_id = Results.Last().Value.Where(p => p.URL.Contains("danbooru.donmai.us")).First().URL.Split('/').Last();
-
-                        }*/
+                            System.String dand_post_id = whr_danb.First().URL.Split('/').Last();
+                            using (HttpClient http = new HttpClient())
+                            {
+                                try
+                                {
+                                    HttpResponseMessage danb_resp = await http.GetAsync("https://danbooru.donmai.us/posts.json?tags=id:" + dand_post_id);
+                                    System.String resp_text = await danb_resp.Content.ReadAsStringAsync();
+                                    dynamic json_resp = JsonConvert.DeserializeObject(resp_text);
+                                    System.String pixiv_id = json_resp.First["pixiv_id"];
+                                    if (pixiv_id != null)
+                                    {
+                                        Results.Last().Value.Add(new ExternalUrls()
+                                        {
+                                            URL = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixiv_id
+                                        });
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    serving.Exceptions.Add(ex);
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
                         serving.Exceptions.Add(e);
                     }
                 }
+                await serving.Client.DeleteMessageAsync(srch_msg_async.Result.Chat.Id, srch_msg_async.Result.MessageId);
                 this.SendResults(serving, msg, Results);
                 this.SaveResultsToDB(photo, query, Results);
             }
