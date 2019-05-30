@@ -161,6 +161,7 @@ namespace Pic_finder
                                 sd_fl = true;
                                 exc = "Image is too large";
                             }*/
+                            is_res = true;
                             if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
                             else await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
                             {
@@ -168,7 +169,6 @@ namespace Pic_finder
                                 CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
                             }))/*, replyToMessageId: this.Msg.MessageId)*/;
                             exc = System.String.Empty;
-                            is_res = true;
                             succ = true;
                         }
                     }
@@ -176,7 +176,11 @@ namespace Pic_finder
                     {
                         if (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException)) serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
                         exc = ex.Message;
-                        if (sd_fl) await serving.Client.SendTextMessageAsync(msg.Chat.Id, exc + (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException) ? "\nURL which has caused this:\n" + url : System.String.Empty));
+                        if (sd_fl)
+                        {
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, exc + (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException) ? "\nURL which has caused this:\n" + url : System.String.Empty));
+                            break; //hotfix
+                        }
                         sd_fl = true;
                         succ = false;
                     }
@@ -185,39 +189,7 @@ namespace Pic_finder
             else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Can\'t send the post: download link wasn\'t provided."/*, replyToMessageId: this.Msg.MessageId*/);
             if (!is_res) throw new BotGetsWrongException("Unfortunately we have no results.");
         }
-        /*
-        private void NormalizeArgs()
-        {
-            if (this.Args == null) return;
-            try
-            {
-                this.Args.RemoveAt(0); //A little "crunch".
-                if (this.Args.Count>0)
-                if (this.Args.ElementAt(0).Type == ArgC.TypeOfArg.Default)
-                {
-                    this.Args.ForEach(delegate (ArgC to_norm) //Normalizing the arg`s to prevent a blank space`s.
-                    {
-                        int inx = this.Args.IndexOf(to_norm);
-                        if (to_norm.Name != null) this.Args.ElementAt(inx).Name = !to_norm.Name.Contains("\"") ? to_norm.Name.Replace(" ", "") : to_norm.Name;
-                        if (to_norm.Arg != null) this.Args.ElementAt(inx).Arg = !to_norm.Arg.Contains("\"") ? to_norm.Arg.Replace(" ", "") : to_norm.Arg;
-                    }); //End of the "crunch".
-                }
-                else if (this.Args.ElementAt(0).Type == ArgC.TypeOfArg.Named)
-                {
-                    foreach (System.String to_arg in this.Args.ElementAt(0).Arg.Split(' '))
-                    {
-                        System.String[] to_arg_div = to_arg.Split('=');
-                        this.Args.Add(new ArgC(to_arg_div.ElementAt(0), to_arg_div.Length > 1 ? to_arg_div.ElementAt(1) : null));
-                    }
-                        if (this.Args.Count != 0) this.Args.RemoveAt(0);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Oops, something got wrong.\n"+ex.Message);
-            }
-        }
-        */
+
         private async Task DoAStJobAsync(System.String req_url, Message msg, List<ArgC> args, IBot serving, UInt16 max_lim = 100, System.String fl_url = "file_url", System.String rt_prop = "rating", System.String e_rate = "e", System.String url_prefix = "", Func<List<ArgC>, IBot, Message, List<ArgC>> prep_args = null) //Do a typical job to get art`s.
         {
             try
@@ -244,14 +216,23 @@ namespace Pic_finder
                 if (prep_args != null) args = prep_args(args, serving, msg);
                 resp = await this.GetResAsync(req_url, max_lim, msg, serving, args: args); //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
-                foreach (var post in result)
+                if (((JArray)result).Count() == 0)
                 {
-                    System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop],
-                        cm = System.String.Empty;
-                    cm += command.Name ?? System.String.Empty;
-                    cm += command.Arg ?? System.String.Empty;
-                    await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry, but there\'s no further results.");
+                    try
+                    { await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId); }
+                    finally { }
                 }
+                else
+                {
+                    foreach (var post in result)
+                    {
+                        System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop],
+                            cm = System.String.Empty;
+                        cm += command.Name ?? System.String.Empty;
+                        cm += command.Arg ?? System.String.Empty;
+                        await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a);
+                    }
                     if (before_prep.Exists(p => p.Name.Contains("id"))) return;
                     System.String next_req = System.String.Empty;
                     before_prep.Insert(0, command);
@@ -275,11 +256,6 @@ namespace Pic_finder
                         next_req += " ";
                     }
                     next_req = next_req.Remove(next_req.Count() - 1);
-                    /*await serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "You can help AniPic.", disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
-                    {
-                        Text = "Learn more",
-                        CallbackData = "help=donate"
-                    }));*/
                     await serving.Client.SendTextMessageAsync(
                         msg.Chat.Id,
                         "Do you wanna get next results?",
@@ -288,7 +264,7 @@ namespace Pic_finder
                             Text = "Get it",
                             CallbackData = "action=get_pics " + next_req
                         }), disableNotification: true);
-                //else await serving.Client.SendTextMessageAsync(this.Msg.Chat.Id, "Posts has been sent."/*, replyToMessageId: this.Msg.MessageId*/);
+                }
             }
             catch(Exception ex)
             {

@@ -138,7 +138,7 @@ If you need more about commands, you can call /help.");
                 parameters = "how_to_parameters",
                 essential = "essential_parameters",
                 account = "register_SN_account",
-                donate = "donate",
+                //donate = "donate",
                 about = "about_bot",
                 home = "help_units";
             System.String callback_data = System.String.Empty;
@@ -197,17 +197,16 @@ If you need more about commands, you can call /help.");
                             "\n show_any – bot doesn't send you pics, whic marked as 'explicit', so you need to apply this key (wihtout a value), to make it do it;" +
                             "\n file – if you need a pic saved in a file, to avoid a compression of Telegram, use this key (without a value).";
                         break;
-                    case donate:
+                    /*case donate:
                         contain =
                             "Finances are vital part of human society.\n" +
                             "Imagining a life without them is hard and complicated.\n" +
                             "If you're like this bot, you can help her creators and supporters by a pinch of coins.\n" +
                             "To do that, please make a transaction of sum which you consider worthy to donate, on this card: " +
                             "\n\n" +
-                            "`5169360004946665`" +
                             "\n\n" +
                             "Thank you.\n(^.^)";
-                        break;
+                        break;*/
                     case account:
                         contain =
                             "How to get a SauceNAO API-key?\n" +
@@ -234,11 +233,11 @@ If you need more about commands, you can call /help.");
                             "Also you can support this bot by that kind of thing.\n" +
                             "If you interested, you can visit the [GitHub](https://github.com/pes7/Telegram-Bots-Library/tree/tedechan) page.\n\n" +
                             "***DISCLAIMER: Any art which was sent by the bot is an intellectual property of it's authour or rights holder.***";
-                        markup.Add(new InlineKeyboardButton()
+                        /*markup.Add(new InlineKeyboardButton()
                         {
                             Text = "How to donate",
                             CallbackData = "help=" + donate
-                        });
+                        });*/
                         break;
                     case home:
                     default:
@@ -264,11 +263,11 @@ If you need more about commands, you can call /help.");
                             Text = "How to register a SauceNAO account",
                             CallbackData = "help=" + account
                         });
-                        markup.Add(new InlineKeyboardButton
+                        /*markup.Add(new InlineKeyboardButton
                         {
                             Text = "How to donate",
                             CallbackData = "help=" + donate
-                        });
+                        });*/
                         markup.Add(new InlineKeyboardButton
                         {
                             Text = "About AniPic",
@@ -309,6 +308,13 @@ If you need more about commands, you can call /help.");
         {
             //await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);
             await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Bot will be shuted down.");
+            System.Environment.Exit(0);
+        }
+
+        public async void EmRestart(Message msg, IBot serving, List<ArgC> args)
+        {
+            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Bot will be restarted.");
+            System.Diagnostics.Process.Start($"{System.Windows.Forms.Application.ExecutablePath}"); 
             System.Environment.Exit(0);
         }
     }

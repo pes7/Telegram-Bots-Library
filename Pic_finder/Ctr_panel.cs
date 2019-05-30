@@ -49,7 +49,7 @@ namespace Pic_finder
                 new danbooru_api_mod(),
                 new micro_logic(),
                 new SauceNAO_Mod(connBuilder.ConnectionString, RobotInit["SauceNAO"]["SavePicsDir"]),
-                new MessagesHook()
+                //new MessagesHook()
             });
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().SayHello, new List<string>()
@@ -61,7 +61,13 @@ namespace Pic_finder
             {
                 "/emexit"
             },
-            commandName: "shutdown", access: TypeOfAccess.Named, descr: "Shut\'s down a bot permanently.", clearcommand: true));
+            commandName: "shutdown", access: TypeOfAccess.Named, descr: "Shut\'s down the bot permanently.", clearcommand: true));
+
+            Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().EmRestart, new List<string>()
+            {
+                "/emrestart"
+            },
+            commandName: "restart", access: TypeOfAccess.Named, descr: "Restarts the bot permanently.", clearcommand: true));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<micro_logic>().Help_new, new List<string>()
             {
@@ -160,7 +166,7 @@ namespace Pic_finder
                 new List<string>() { "/getstats" },
                 commandName: "stats", descr: "Gets stats of searches of current user."));
 
-            Robot.SynkCommands.Add(new SynkCommand(
+            /*Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<MessagesHook>().StartHooking,
                 new List<string>() { "/starthooking" },
                 commandName: "starthooking", descr: "Allows admin to behave badly.", access: TypeOfAccess.Named));
@@ -170,14 +176,14 @@ namespace Pic_finder
                 new List<string>() { "/stophooking" },
                 commandName: "stophooking", descr: "Unallows admin to behave badly.", access: TypeOfAccess.Named));
 
-            /*Robot.SynkCommands.Add(new SynkCommand(
+            Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<MessagesHook>().WatchPrevUpdate,
                 new List<string>() { "/getupdate" },
-                commandName: "getupdate", descr: "Gets update", access: TypeOfAccess.Named));*/
+                commandName: "getupdate", descr: "Gets update", access: TypeOfAccess.Named));
 
             SynkCommand hookingRec = new SynkCommand(Robot.GetModule<MessagesHook>().UpdateReceiver);
             hookingRec.Type = TypeOfCommand.AllwaysInWebHook;
-            Robot.SynkCommands.Add(hookingRec);
+            Robot.SynkCommands.Add(hookingRec);*/
 
             Robot.Start();
 
