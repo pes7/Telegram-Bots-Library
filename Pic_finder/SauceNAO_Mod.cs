@@ -22,6 +22,7 @@ using System.Data.SqlClient;
 using DupImageLib;
 using HtmlAgilityPack;
 using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types.InlineQueryResults;
 
 namespace Pic_finder
 {
@@ -181,7 +182,7 @@ namespace Pic_finder
             {
                 using (SqlConnection connection = new SqlConnection(sql_conn_string)) connection.Open();
             }
-            catch (Exception ex)
+            catch
             {
                 System.Environment.Exit(1);
             }
@@ -206,9 +207,7 @@ namespace Pic_finder
         }
 
         private bool IsSt429(HttpResponseMessage resp)
-        {
-            return resp.StatusCode.ToString().Contains("429");
-        }
+        { return resp.StatusCode.ToString().Contains("429"); }
 
         private async Task<HttpResponseMessage> DoASearchAsync(System.IO.Stream take, System.String api_key, UInt16 numres)
         {
@@ -555,6 +554,10 @@ namespace Pic_finder
 
         private InlineKeyboardMarkup DownloadFromSourceButtons(List<ExternalUrls> urls, IBot serving)
         {
+            return new InlineKeyboardMarkup(DownloadFromSourceButtonsArray(urls, serving));
+        }
+        private InlineKeyboardButton[][] DownloadFromSourceButtonsArray(List<ExternalUrls> urls, IBot serving)
+        {
             try
             {
                 List<InlineKeyboardButton[]> buttons = new List<InlineKeyboardButton[]>();
@@ -585,7 +588,7 @@ namespace Pic_finder
                                 CallbackData = "action=download_from_konachan konachan_id=" + url_db.URL.Split('/').Last()
                             }});
                 }
-                if (buttons.Count > 0) return new InlineKeyboardMarkup(buttons.ToArray());
+                return buttons.ToArray();
             }
             catch(Exception ex)
             {
@@ -640,25 +643,11 @@ namespace Pic_finder
             //if (results == null) return;
             foreach (KeyValuePair<SearchResult, List<ExternalUrls>> result in results)
             {
-                int image_msg_id = 0;
-                /*
-                try
-                {
-                    System.IO.Stream get_pic = await Client.GetStreamAsync(result.Key.Thumbnail);
-                    if (get_pic != null)
-                        image_msg_id = (await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, result.Key.Thumbnail.Split('/').Last().Split('?')[0]), disableNotification: true)).MessageId;
-                }
-                catch
-                { }
-                */
                 System.String res_str = System.String.Empty;
                 try
                 {
-                    res_str = result.Key.IndexName/*.Replace('_', ' ').Replace('*', ' ').Replace('`', ' ').Replace('[', ' ').Replace(']', ' ')*/ + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
-                    if (result.Key.Thumbnail !=null)
-                    {
-                        res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
-                    }
+                    res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                    if (result.Key.Thumbnail !=null) res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
                     if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                     else
                     {
@@ -672,7 +661,7 @@ namespace Pic_finder
                             catch (Exception ex) { serving.Exceptions.Add(ex); }
                         }
                     }
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value, serving), disableNotification: true, replyToMessageId: image_msg_id, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, disableWebPagePreview: false);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, res_str, replyMarkup: this.DownloadFromSourceButtons(result.Value, serving), disableNotification: true, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, disableWebPagePreview: false);
                 }
                 catch (Exception ex)
                 { serving.Exceptions.Add(ex); }
@@ -766,6 +755,187 @@ namespace Pic_finder
             file.Close();
         }
 
+        private async void SaveAndSendResults(IBot serving, System.IO.Stream photo, SearchQuery query, Dictionary<SearchResult, List<ExternalUrls>> results, Message sent_msg = null)
+        {
+
+            photo.Seek(0, SeekOrigin.Begin);
+            System.String hash = this.imageHasher.CalculateDifferenceHash64(photo).ToString();
+            query.ImageHash = hash;
+            using (DataContext dataContext = new DataContext(this.ConnStr))
+            {
+                //Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
+                bool db_unppt = false;
+                Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+                Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
+
+                SearchQueries.InsertOnSubmit(query);
+                do
+                {
+                    try
+                    {
+                        dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                        db_unppt = false;
+                    }
+                    catch (ChangeConflictException)
+                    {
+                        foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                            changeConflict.Resolve(RefreshMode.KeepChanges);
+                        db_unppt = true;
+                    }
+                }
+                while (db_unppt);
+                foreach (KeyValuePair<SearchResult, List<ExternalUrls>> keyValue in results)
+                {
+                    keyValue.Key.SearchId = query.Id;
+                    SearchResults.InsertOnSubmit(keyValue.Key);
+                    do
+                    {
+                        try
+                        {
+                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            db_unppt = false;
+                        }
+                        catch (ChangeConflictException)
+                        {
+                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                changeConflict.Resolve(RefreshMode.KeepChanges);
+                            db_unppt = true;
+                        }
+                    }
+                    while (db_unppt);
+                    foreach (ExternalUrls externalUrls in keyValue.Value)
+                    {
+                        externalUrls.ResultId = keyValue.Key.Id;
+                        ExternalUrls.InsertOnSubmit(externalUrls);
+                    }
+                    do
+                    {
+                        try
+                        {
+                            dataContext.SubmitChanges(ConflictMode.ContinueOnConflict);
+                            db_unppt = false;
+                        }
+                        catch (ChangeConflictException)
+                        {
+                            foreach (ObjectChangeConflict changeConflict in dataContext.ChangeConflicts)
+                                changeConflict.Resolve(RefreshMode.KeepChanges);
+                            db_unppt = true;
+                        }
+                    }
+                    while (db_unppt);
+                }
+
+                try
+                {
+                    this.ChangeResultMessage(serving, query, results, msg: sent_msg);
+                }
+                catch (Exception ex)
+                {
+                    serving.Exceptions.Add(ex);
+                }
+
+                System.String filepath = this.SavePicsDir + hash.ToString() + "_" + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString() + "_" + DateTime.Now.Day.ToString() + "_" + DateTime.Now.Month.ToString() + "_" + DateTime.Now.Year.ToString() + ".jpg";
+                FileStream file = System.IO.File.Create(filepath);
+                photo.Seek(0, SeekOrigin.Begin);
+                await photo.CopyToAsync(file);
+                file.Close();
+            }
+
+
+        }
+
+        private async void ChangeResultMessage(IBot serving, SearchQuery query = null, Dictionary<SearchResult, List<ExternalUrls>> results = null, Message msg = null, CallbackQuery callback = null)
+        {
+            System.String res_str;
+            KeyValuePair<SearchResult, List<ExternalUrls>> result = new KeyValuePair<SearchResult, List<ExternalUrls>>();
+
+            try
+            {
+                if (callback != null)
+                {
+                    if (msg == null) msg = callback.Message;
+                    Dictionary<string, string> CallArgs = callback.Data.Split(new[] { ' ' }).Select(part => part.Split('=')).ToDictionary(sp => sp[0], sp => sp[1]);
+
+                    if (CallArgs["action"] == "switch_res")
+                    {
+                        if (query == null || results == null)
+                        {
+                            using (DataContext dataContext = new DataContext(this.ConnStr))
+                            {
+                                Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                                Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+                                Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
+
+                                IQueryable<SearchQuery> queries = from q in SearchQueries
+                                                                  where q.Id == Convert.ToInt32(CallArgs["q_id"])
+                                                                  select q;
+                                query = queries.FirstOrDefault();
+                                IQueryable<SearchResult> searches = from q in SearchResults
+                                                                    where q.SearchId == query.Id
+                                                                    select q;
+                                results = new Dictionary<SearchResult, List<ExternalUrls>>();
+                                foreach (SearchResult search in searches)
+                                {
+                                    IQueryable<ExternalUrls> externalUrls = from q in ExternalUrls
+                                                                            where q.ResultId == search.Id
+                                                                            select q;
+                                    List<ExternalUrls> urls = new List<ExternalUrls>();
+                                    urls.AddRange(externalUrls);
+                                    results.Add(search, urls);
+                                }
+                            }
+                        }
+                        result = results.Where(res => res.Key.Id == Convert.ToInt64(CallArgs["res_id"])).FirstOrDefault();
+                    }
+                }
+
+                if (query == null || results == null) return;
+
+                if (msg != null && callback == null) result = results.First();
+                res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                if (result.Key.Thumbnail != null) res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
+                if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
+                else
+                {
+                    foreach (var url in result.Value)
+                    {
+                        try
+                        {
+                            Uri uri = new Uri(url.URL);
+                            res_str += "<a href=\"" + url.URL + "\">" + uri.Host + "</a>\n";
+                        }
+                        catch (Exception ex) { serving.Exceptions.Add(ex); }
+                    }
+                }
+                List<InlineKeyboardButton[]> buttons = new List<InlineKeyboardButton[]>();
+                List<InlineKeyboardButton> s_buttons = new List<InlineKeyboardButton>();
+                int res_index = results.Keys.ToList().IndexOf(result.Key);
+                if (result.Key != results.First().Key) s_buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = "←",
+                    CallbackData = "action=switch_res q_id=" + query.Id.ToString() + " res_id=" + results.Keys.ToList().ElementAt(res_index - 1).Id.ToString()
+                });
+                /*if (results.Keys.Count() > 1) s_buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = (res_index+1).ToString() + "/" + results.Keys.Count().ToString(),
+                    
+                });*/
+                if (result.Key != results.Last().Key) s_buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = "→",
+                    CallbackData = "action=switch_res q_id=" + query.Id.ToString() + " res_id=" + results.Keys.ToList().ElementAt(res_index + 1).Id.ToString()
+                });
+                buttons.Add(s_buttons.ToArray());
+                buttons.AddRange(this.DownloadFromSourceButtonsArray(result.Value, serving));
+                if (msg != null) await serving.Client.EditMessageTextAsync(msg.Chat.Id, msg.MessageId, res_str, replyMarkup: new InlineKeyboardMarkup(buttons.ToArray()), parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+            }
+            catch (Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+            }
+        }
+
         private async void SendUnsimilar(IBot serving, Message msg, System.String Callback)
         {
             using (DataContext dataContext = new DataContext(this.ConnStr))
@@ -816,6 +986,10 @@ namespace Pic_finder
                     if (update.CallbackQuery.Data.Contains("receive_unsimilar")) this.SendUnsimilar(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
                     if (update.CallbackQuery.Data.Contains("action=download_from"))
                         this.DownloadSource(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
+                    if (update.CallbackQuery.Data.Contains("action=switch_res"))
+                    {
+                        this.ChangeResultMessage(serving, null, null, callback: update.CallbackQuery);
+                    }
                     break;
             }
         }
@@ -840,11 +1014,16 @@ namespace Pic_finder
 
         public async void SearchWithoutSauceNAO(Message msg, IBot serving, List<ArgC> args)
         {
+            this.SearchWithoutSauceNAO(serving, msg, null);
+        }
+        public async void SearchWithoutSauceNAO(IBot serving, Message msg = null, ChosenInlineResult inlineResult = null)
+        {
             try
             {
                 if (msg.Photo.Count() <= 0)
                 {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
+                    if (inlineResult == null) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
+                    else await serving.Client.EditMessageTextAsync(inlineResult.InlineMessageId, "Images wasn`t found.\nSorry…");
                     return;
                 }
                 System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.Last().FileId).Result.FilePath);
@@ -852,10 +1031,12 @@ namespace Pic_finder
                 System.String res = await httpResponse.Content.ReadAsStringAsync();
                 if (!httpResponse.IsSuccessStatusCode)
                 {
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong…");
+                    if (inlineResult == null) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong…");
+                    else await serving.Client.EditMessageTextAsync(inlineResult.InlineMessageId, "Oops, something got wrong…");
                     return;
                 }
-                Task<Message> srch_msg_async = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching", disableNotification: true);
+                Task<Message> srch_msg_async = null;
+                if (inlineResult == null) srch_msg_async = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching", disableNotification: true);
                 HtmlDocument parse = new HtmlDocument();
                 parse.LoadHtml(res);
                 HtmlNodeCollection pages = parse.DocumentNode.SelectNodes("//div[contains(@id, 'pages')]/div");
@@ -957,9 +1138,10 @@ namespace Pic_finder
                         serving.Exceptions.Add(e);
                     }
                 }
-                await serving.Client.DeleteMessageAsync(srch_msg_async.Result.Chat.Id, srch_msg_async.Result.MessageId);
+                /*await serving.Client.DeleteMessageAsync(srch_msg_async.Result.Chat.Id, srch_msg_async.Result.MessageId);
                 this.SendResults(serving, msg, Results);
-                this.SaveResultsToDB(photo, query, Results);
+                this.SaveResultsToDB(photo, query, Results);*/
+                this.SaveAndSendResults(serving, photo, query, Results, sent_msg: srch_msg_async?.Result);
             }
             catch (Exception e)
             {
