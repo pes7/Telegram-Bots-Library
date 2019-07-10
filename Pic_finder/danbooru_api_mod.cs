@@ -144,7 +144,7 @@ namespace Pic_finder
 
         private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name="", Int64 post_id=0, bool sd_fl=false, bool shw_a=false) //Getting and sending a pic from API-result`s.
         {
-            bool succ = true, is_res=false; //If current operation was successed.
+            bool succ = true, is_res = false, tr_snd_file = false; //If current operation was successed.
             if (rate == null) rate = System.String.Empty;
             if (erate == null) erate = "e";
             System.String exc = System.String.Empty;
@@ -163,23 +163,34 @@ namespace Pic_finder
                             }*/
                             is_res = true;
                             if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
-                            else await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                            else
                             {
-                                Text = "Download as file",
-                                CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                            }))/*, replyToMessageId: this.Msg.MessageId)*/;
-                            exc = System.String.Empty;
-                            succ = true;
+                                if (!url.ToLower().EndsWith(".webm")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                                {
+                                    Text = "Download as file",
+                                    CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
+                                }))/*, replyToMessageId: this.Msg.MessageId)*/;
+                                else await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                                {
+                                    Text = "Download as file",
+                                    CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
+                                }), supportsStreaming: true);
+                                exc = System.String.Empty;
+                                succ = true;
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        if (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException)) serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
+                        bool t_exc = !(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException);
+                        if (t_exc) serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
                         exc = ex.Message;
                         if (sd_fl)
                         {
-                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, exc + (!(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException) ? "\nURL which has caused this:\n" + url : System.String.Empty));
-                            break; //hotfix
+                            if (tr_snd_file) break; //hotfix
+                            else tr_snd_file = true;
+                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, exc + (t_exc ? "\nURL which has caused this:\n" + url : System.String.Empty));
+                            if (t_exc) exc = System.String.Empty;
                         }
                         sd_fl = true;
                         succ = false;

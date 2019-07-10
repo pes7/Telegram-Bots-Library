@@ -916,11 +916,12 @@ namespace Pic_finder
                     Text = "←",
                     CallbackData = "action=switch_res q_id=" + query.Id.ToString() + " res_id=" + results.Keys.ToList().ElementAt(res_index - 1).Id.ToString()
                 });
-                /*if (results.Keys.Count() > 1) s_buttons.Add(new InlineKeyboardButton()
+                if (results.Keys.Count() > 1) s_buttons.Add(new InlineKeyboardButton()
                 {
-                    Text = (res_index+1).ToString() + "/" + results.Keys.Count().ToString(),
-                    
-                });*/
+                    Text = (res_index + 1).ToString() + "/" + results.Keys.Count().ToString(),
+                    CallbackData = "action=sh_all_res q_id=" + query.Id.ToString()
+
+                });
                 if (result.Key != results.Last().Key) s_buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "→",
@@ -929,6 +930,48 @@ namespace Pic_finder
                 buttons.Add(s_buttons.ToArray());
                 buttons.AddRange(this.DownloadFromSourceButtonsArray(result.Value, serving));
                 if (msg != null) await serving.Client.EditMessageTextAsync(msg.Chat.Id, msg.MessageId, res_str, replyMarkup: new InlineKeyboardMarkup(buttons.ToArray()), parseMode: Telegram.Bot.Types.Enums.ParseMode.Html);
+            }
+            catch (Exception ex)
+            {
+                serving.Exceptions.Add(ex);
+            }
+        }
+
+        private async void ShowAvaliebleResultsForQuery(IBot serving, CallbackQuery callback)
+        {
+            try
+            {
+                Dictionary<string, string> CallArgs = callback.Data.Split(new[] { ' ' }).Select(part => part.Split('=')).ToDictionary(sp => sp[0], sp => sp[1]);
+
+                if (CallArgs["action"] == "sh_all_res")
+                {
+                    SearchQuery query;
+                    List<SearchResult> results;
+                    using (DataContext dataContext = new DataContext(this.ConnStr))
+                    {
+                        Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
+                        Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
+
+
+                        query = (from q in SearchQueries
+                                 where q.Id == Convert.ToInt32(CallArgs["q_id"])
+                                 select q).FirstOrDefault();
+                        results = (from q in SearchResults
+                                   where q.SearchId == query.Id
+                                   select q).ToList<SearchResult>();
+                    }
+
+                    List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
+                    UInt16 i = 1;
+                    foreach (SearchResult result in results) buttons.Add(new InlineKeyboardButton()
+                    {
+                        Text = (i++).ToString() + ". " + result.IndexName,
+                        CallbackData = "action=switch_res q_id=" + query.Id.ToString() + " res_id=" + result.Id.ToString()
+                    });
+                    i = 0;
+                    await serving.Client.EditMessageTextAsync(callback.Message.Chat.Id, callback.Message.MessageId, "Choose a result.", replyMarkup: new InlineKeyboardMarkup(
+                         buttons.GroupBy(p=>i++).Select(p=>p.ToArray()).ToArray()));
+                }
             }
             catch (Exception ex)
             {
@@ -987,9 +1030,9 @@ namespace Pic_finder
                     if (update.CallbackQuery.Data.Contains("action=download_from"))
                         this.DownloadSource(serving, update.CallbackQuery.Message, update.CallbackQuery.Data);
                     if (update.CallbackQuery.Data.Contains("action=switch_res"))
-                    {
                         this.ChangeResultMessage(serving, null, null, callback: update.CallbackQuery);
-                    }
+                    if (update.CallbackQuery.Data.Contains("action=sh_all_res"))
+                        this.ShowAvaliebleResultsForQuery(serving, callback: update.CallbackQuery);
                     break;
             }
         }
@@ -1124,6 +1167,7 @@ namespace Pic_finder
                                         {
                                             URL = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixiv_id
                                         });
+                                        Results.Last().Key.IndexName += " Pixiv";
                                     }
                                 }
                                 catch(Exception ex)
