@@ -9,7 +9,9 @@ using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
-
+using NReco.VideoInfo;
+using NReco.VideoConverter;
+using System.IO;
 
 namespace Pic_finder
 {
@@ -20,6 +22,13 @@ namespace Pic_finder
         {
             "file",
             "show_any",
+            "id"
+        };
+        private readonly List<System.String> NonNullArgs = new List<string>()
+        {
+            "limit",
+            "tag",
+            "page",
             "id"
         };
         //private HttpResponseMessage resp = null;
@@ -165,13 +174,35 @@ namespace Pic_finder
                                     Text = "Download as file",
                                     CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
                                 }))/*, replyToMessageId: this.Msg.MessageId)*/;
-                                else await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                                else
                                 {
-                                    Text = "Download as file",
-                                    CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                                }), supportsStreaming: true, height: height, width: width);
+
+                                    using (MemoryStream ms = new MemoryStream())
+                                    {
+                                        FFProbe probe = new FFProbe();
+                                        MediaInfo mediaInfo = probe.GetMediaInfo(url);
+
+                                        FFMpegConverter converter = new FFMpegConverter();
+                                        converter.GetVideoThumbnail(url, outputJpegStream: ms);
+                                        ms.Seek(0, SeekOrigin.Begin);
+
+                                        await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                                        {
+                                            Text = "Download as file",
+                                            CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
+                                        }),
+                                        supportsStreaming: true,
+                                        height: height,
+                                        width: width,
+                                        duration: (int)mediaInfo.Duration.TotalSeconds,
+                                        thumb: new InputMedia(ms, "thumb.jpg")
+                                        );
+                                    }
+                                }
+
                                 exc = System.String.Empty;
                                 succ = true;
+
                             }
                         }
                     }
