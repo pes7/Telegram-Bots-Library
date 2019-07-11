@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using System.IO;
 using System.Net.Http;
-using System.Drawing;
-using System.Threading;
 using Pes7BotCrator.Type;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
-using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+
 
 namespace Pic_finder
 {
@@ -142,7 +137,7 @@ namespace Pic_finder
             }
         }
 
-        private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name="", Int64 post_id=0, bool sd_fl=false, bool shw_a=false) //Getting and sending a pic from API-result`s.
+        private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name = "", Int64 post_id = 0, bool sd_fl = false, bool shw_a = false, int height = 0, int width = 0) //Getting and sending a pic from API-result`s.
         {
             bool succ = true, is_res = false, tr_snd_file = false; //If current operation was successed.
             if (rate == null) rate = System.String.Empty;
@@ -174,7 +169,7 @@ namespace Pic_finder
                                 {
                                     Text = "Download as file",
                                     CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                                }), supportsStreaming: true);
+                                }), supportsStreaming: true, height: height, width: width);
                                 exc = System.String.Empty;
                                 succ = true;
                             }
@@ -242,7 +237,7 @@ namespace Pic_finder
                             cm = System.String.Empty;
                         cm += command.Name ?? System.String.Empty;
                         cm += command.Arg ?? System.String.Empty;
-                        await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a);
+                        await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a, height: Convert.ToInt32(post["height"] ?? 0.0), width: Convert.ToInt32(post["width"] ?? 0.0));
                     }
                     if (before_prep.Exists(p => p.Name.Contains("id"))) return;
                     System.String next_req = System.String.Empty;
