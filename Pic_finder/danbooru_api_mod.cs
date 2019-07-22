@@ -57,17 +57,12 @@ namespace Pic_finder
                         call_args.RemoveAt(0);
                         if (update.CallbackQuery.Data.Contains("action=get_pics"))
                         {
-                            //call_args.RemoveAt(call_args.Count - 1);
                             if (call_args.FirstOrDefault().Name.Contains("yandere")) this.GetYandereAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("danbooru")) this.GetDanbooruAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("gelbooru")) this.GetGelboorruAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("konachan")) this.GetKonachanAsync(update.CallbackQuery.Message, serving, call_args);
+                            await serving.Client.DeleteMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId);
                         }
-                        /*if (update.CallbackQuery.Data.Contains("action=download_to_file"))
-                        {
-                            System.String url = ArgC.GetArg(call_args, "url")?.Arg;
-                            await serving.Client.SendDocumentAsync(update.CallbackQuery.Message.Chat.Id, new InputOnlineFile(await this.Client.GetStreamAsync(url)));
-                        }*/
                     }
                     catch (Exception ex)
                     {
@@ -91,7 +86,7 @@ namespace Pic_finder
             {
                 foreach (ArgC p in args)
                 {
-                    if (p.Name != null && p.Arg != null && p.Arg != System.String.Empty)
+                    if (p.Name != null && p.Arg != null && (p.Arg ?? System.String.Empty) != System.String.Empty)
                     {
                         if (!this.Service_Args.Contains(p.Name)) //If arg isn`t for a service, it is using to build URL
                         {
@@ -99,7 +94,14 @@ namespace Pic_finder
                             else Tags.Add(p.Arg);
                         }
                     }
-                    else if (this.Service_Args.IndexOf(p?.Name) == -1) throw new ArgumentNullException(p.Name);
+                    else
+                    {
+                        if (this.Service_Args.IndexOf(p.Name??System.String.Empty) == -1)
+                        {
+                            if (this.NonNullArgs.IndexOf(p.Name) != -1) throw new ArgumentNullException(p.Name);
+                            else Tags.Add(p.Name);
+                        }
+                    }
                 }
                 var ida = ArgC.GetArg(args, "id");
                 if (ida == null)
@@ -148,7 +150,7 @@ namespace Pic_finder
 
         private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name = "", Int64 post_id = 0, bool sd_fl = false, bool shw_a = false, int height = 0, int width = 0) //Getting and sending a pic from API-result`s.
         {
-            bool succ = true, is_res = false, tr_snd_file = false; //If current operation was successed.
+            bool succ = true, is_res = false; //If current operation was successed.
             if (rate == null) rate = System.String.Empty;
             if (erate == null) erate = "e";
             System.String exc = System.String.Empty;
@@ -158,7 +160,12 @@ namespace Pic_finder
                     {
                         using (HttpClient httpClient = new HttpClient())
                         {
-                            if (succ && rate == erate && !shw_a) throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
+                            if (succ && rate == erate && !shw_a && exc == System.String.Empty)
+                            {
+                                //throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
+                                exc = "This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!";
+                                sd_fl = true;
+                            }
                             System.IO.Stream get_pic = await httpClient.GetStreamAsync(url);
                             /*if (get_pic.Length > (10 * 1024) && !sd_fl && exc == System.String.Empty)
                             {
@@ -169,7 +176,7 @@ namespace Pic_finder
                             if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
                             else
                             {
-                                if (!url.ToLower().EndsWith(".webm")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+                                if (!url.ToLower().EndsWith(".webm") && !url.ToLower().EndsWith(".mp4")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
                                 {
                                     Text = "Download as file",
                                     CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
@@ -199,26 +206,26 @@ namespace Pic_finder
                                         );
                                     }
                                 }
-
-                                exc = System.String.Empty;
-                                succ = true;
-
                             }
+                            exc = System.String.Empty;
+                            succ = true;
                         }
                     }
                     catch (Exception ex)
                     {
-                        bool t_exc = !(ex is Telegram.Bot.Exceptions.ApiRequestException || ex is BotGetsWrongException);
+                        bool t_exc = !(ex is Telegram.Bot.Exceptions.ApiRequestException);
+                        if (ex.Message.Contains("not enough rights"))
+                        {
+                            throw new BotGetsWrongException("Bot can\'t send messages here", ex);
+                        }
                         if (t_exc) serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
                         exc = ex.Message;
                         if (sd_fl)
                         {
-                            if (tr_snd_file) break; //hotfix
-                            else tr_snd_file = true;
                             await serving.Client.SendTextMessageAsync(msg.Chat.Id, exc + (t_exc ? "\nURL which has caused this:\n" + url : System.String.Empty));
-                            if (t_exc) exc = System.String.Empty;
+                            break;
                         }
-                        sd_fl = true;
+                        else sd_fl = true;
                         succ = false;
                     }
                 }
