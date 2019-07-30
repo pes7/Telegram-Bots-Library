@@ -155,20 +155,8 @@ namespace Pic_finder
 
     public class SauceNAO_Mod : Module
     {
-        //public IBot Bot;
-        //public List<ArgC> Args;
-        //public Message Msg;
-        //private HttpClient Client = new HttpClient();
         private System.String ConnStr;
-        /*
-        public DataContext dataContext;
-        private Table<SauceNAO_Acc> Users;
-        private Table<SearchQuery> SearchQueries;
-        private Table<SearchResult> SearchResults;
-        private Table<ExternalUrls> ExternalUrls;
-        */
         private ImageHashes imageHasher = new ImageHashes(new ImageMagickTransformer());
-        //private int db_bitmask;
         public System.String SavePicsDir;
         public readonly UInt16 DefNumres = 7;
         private readonly System.String TooManyReq = "Unfortunatelly you had reached out from search limit.\nPlease try again in a next day.";
@@ -306,9 +294,6 @@ namespace Pic_finder
         {
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
-                //Table<SearchQuery> SearchQueries = dataContext.GetTable<SearchQuery>();
-                //Table<SearchResult> SearchResults = dataContext.GetTable<SearchResult>();
-                //Table<ExternalUrls> ExternalUrls = dataContext.GetTable<ExternalUrls>();
                 try
                 {
                     Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
@@ -335,7 +320,7 @@ namespace Pic_finder
                 catch (Exception ex)
                 {
                     serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong.\n" + ex.Message);
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.GotWrong + "\n" + ex.Message);
                 }
             }
         }
@@ -391,34 +376,39 @@ namespace Pic_finder
 
         public async void SearchPic(Message msg, IBot serving, List<ArgC> args)
         {
+            this.SearchPic(msg, serving, args, real_owner: null);
+        }
+        public async void SearchPic(Message msg, IBot serving, List<ArgC> args, User real_owner = null)
+        {
             if (msg.Type != Telegram.Bot.Types.Enums.MessageType.Photo) return;
+            Task<Message> sent_msg = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching");
             args = serving.GetModule<micro_logic>().NormalizeArgs(msg, serving, args);
             using (DataContext dataContext = new DataContext(this.ConnStr))
             {
                 Table<SauceNAO_Acc> Users = dataContext.GetTable<SauceNAO_Acc>();
                 try
                 {
+                    if (real_owner == null) real_owner = msg.From;
                     bool use_iqdb = false;
                     var users = from key in Users
-                                where key.UserId == msg.From.Id
+                                where key.UserId == real_owner.Id
                                 select key;
                     if (users.Count() == 0)
                     {
-                        //await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.NoKey);
-                        this.SearchWithoutSauceNAO(msg, serving, args);
+                        this.SearchWithoutSauceNAO(msg, serving, args, sent_msg: sent_msg);
                         return;
                     }
                     SauceNAO_Acc user = users.FirstOrDefault();
                     if (user.LongRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalHours < 24.0)
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally your count of searches didn\'t restocked.\'nYou have to wait for it about " + (user.LastRequestTime - DateTime.Now).Value.TotalHours.ToString() + " hours.");
+                        await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunally your count of searches didn\'t restocked.\'nYou have to wait for it about " + (user.LastRequestTime - DateTime.Now).Value.TotalHours.ToString() + " hours.");
                         return;
                     }
                     else if (user.LongRemaining != 0 && user.ShortRemaining == 0 && (DateTime.Now - user.LastRequestTime).Value.TotalSeconds < 10.0) Thread.Sleep(new TimeSpan(0, 0, 10));
                     JObject results = null;
                     if (msg.Photo.Length<=0)
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
+                        await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Images wasn`t found.\nSorry…");
                         return;
                     }
                     System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.Last().FileId).Result.FilePath);
@@ -432,7 +422,7 @@ namespace Pic_finder
                     do
                     {
                         th = this.DoASearchAsync(photo, user.ApiKey, numres);
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching…" + (i > 0 ? ("\nNumber of retry – " + i.ToString()) : ""), disableNotification: true);
+                        await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Searching…" + (i > 0 ? ("\nNumber of retry – " + i.ToString()) : ""));
                         if (th.Result.IsSuccessStatusCode) break;
                         if (this.IsSt429(th.Result)) System.Threading.Thread.Sleep(10 * 1000);
                         else break;
@@ -440,7 +430,7 @@ namespace Pic_finder
                     while (i++ < 5 - 1);
                     if (IsSt429(th.Result))
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunally there was too many requests from you.\n" +
+                        await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunally there was too many requests from you.\n" +
                             "Please wait until a next day.");
                         use_iqdb = true;
                     }
@@ -450,31 +440,31 @@ namespace Pic_finder
                         results = JObject.Parse(res);
                         if (results == null)
                         {
-                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have an error with results.");
+                            await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunatelly we have an error with results.");
                             use_iqdb = true;
                         }
                         if (!use_iqdb)
                         {
                             if (Convert.ToInt32(results["header"]["user_id"]?.Value<int>()) <= 0)
                             {
-                                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly API didn\'t responded.");
+                                await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunatelly API didn\'t responded.");
                                 use_iqdb = true;
                             }
                             if (Convert.ToInt32(results["header"]["results_returned"]?.Value<int>()) <= 0)
                             {
-                                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly SauceNAO didn\'t returned results for this image, sorry…");
+                                await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunatelly SauceNAO didn\'t returned results for this image, sorry…");
                                 return;
                             }
                         }
                         if (results?["results"].Count() == 0)
                         {
-                            await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly we have no results some how, sorry…");
+                            await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Unfortunatelly we have no results some how, sorry…");
                             use_iqdb = true;
                         }
                     }
                     if (use_iqdb)
                     {
-                        await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Trying to use the IQDB instead.");
+                        await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Trying to use the IQDB instead.");
                         this.SearchWithoutSauceNAO(msg, serving, args);
                         return;
                     }
@@ -516,38 +506,12 @@ namespace Pic_finder
                             Thumbnail = result["header"]["thumbnail"].Value<String>()
                         }, urls);
                     }
-                    Dictionary<SearchResult, List<ExternalUrls>> ResSim = new Dictionary<SearchResult, List<ExternalUrls>>();
-                    try
-                    {
-                        if (ArgC.GetArg(args, "unsimilar") != null) this.SendResults(serving, msg, Results);
-                        else
-                        {
-                            ResSim = (Dictionary<SearchResult, List<ExternalUrls>>)Results.Where(res => res.Key.Similarity >= query.MinimumSimularity);
-                            this.SendResults(serving, msg, ResSim);
-                        }
-                    }
-                    catch(NullReferenceException)
-                    {
-                        ResSim = Results.Where(res => res.Key.Similarity >= query.MinimumSimularity).ToDictionary(x => x.Key, x => x.Value);
-                        this.SendResults(serving, msg, ResSim);
-                    }
-                    this.SaveResultsToDB(photo, query, Results);
-                    if (Results.Count>ResSim.Count)
-                    {
-                        await serving.Client.SendTextMessageAsync(
-                            msg.Chat.Id,
-                            "There are results which marked as unsimilar.",
-                            replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
-                            {
-                                Text = "Show it",
-                                CallbackData = "action=receive_unsimilar query_id=" + query.Id.ToString()
-                            }), disableNotification: true);
-                    }
+                    this.SaveAndSendResults(serving, photo, query, Results, sent_msg.Result);
                 }
                 catch (Exception ex)
                 {
                     if (ex.Message != TooManyReq) serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong…");
+                    await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, this.GotWrong);
                 }
             }
         }
@@ -634,7 +598,7 @@ namespace Pic_finder
             catch(Exception ex)
             {
                 serving.Exceptions.Add(ex);
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.GotWrong);
             }
         }
 
@@ -893,7 +857,9 @@ namespace Pic_finder
                 if (query == null || results == null) return;
 
                 if (msg != null && callback == null) result = results.First();
-                res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%.\nSource URLs:";
+                res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString();
+                if (query.SearchStatus != 0 || query.MinimumSimularity>result.Key.Similarity) res_str += " <b>(low similarity or unsimilar)</b>";
+                res_str += "%.\nSource URLs:";
                 if (result.Key.Thumbnail != null) res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
                 if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                 else
@@ -965,7 +931,7 @@ namespace Pic_finder
                     UInt16 i = 1;
                     foreach (SearchResult result in results) buttons.Add(new InlineKeyboardButton()
                     {
-                        Text = (i++).ToString() + ". " + result.IndexName,
+                        Text = (i++).ToString() + ". " + result.IndexName+(query.SearchStatus!=0 || query.MinimumSimularity>result.Similarity ?" (unsimilar)":System.String.Empty),
                         CallbackData = "action=switch_res q_id=" + query.Id.ToString() + " res_id=" + result.Id.ToString()
                     });
                     i = 0;
@@ -1006,14 +972,15 @@ namespace Pic_finder
                                           select u;
                             results.Add(res_db, urls_db.ToList());
                         }
-                        this.SendResults(serving, msg, results);
+                        //this.SendResults(serving, msg, results);
+                        this.ChangeResultMessage(serving, query, results, msg);
                     }
                     else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "There is no query with this Id.");
                 }
                 catch (Exception ex)
                 {
                     serving.Exceptions.Add(ex);
-                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                    await serving.Client.SendTextMessageAsync(msg.Chat.Id, this.GotWrong);
                 }
             }
         }
@@ -1045,7 +1012,7 @@ namespace Pic_finder
                 {
                     System.String inc = msg.Text ?? System.String.Empty;
                     inc += msg.Caption ?? System.String.Empty;
-                    if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo /*&& inc.ToLower().Contains("anipic")*/ && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args);
+                    if (msg.ReplyToMessage.Type == Telegram.Bot.Types.Enums.MessageType.Photo /*&& inc.ToLower().Contains("anipic")*/ && inc.ToLower().Contains("sauce")) this.SearchPic(msg.ReplyToMessage, serving, args, real_owner: msg.From);
                 }
                 if (msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Private && msg.Type == Telegram.Bot.Types.Enums.MessageType.Photo && (msg.Caption == null ? true : (msg.Caption == System.String.Empty || !(/*msg.Caption.ToLower().Contains("anipic") &&*/ msg.Caption.ToLower().Contains("sauce"))))) this.SearchPic(msg, serving, args);
             }
@@ -1055,18 +1022,18 @@ namespace Pic_finder
             }
         }
 
-        public async void SearchWithoutSauceNAO(Message msg, IBot serving, List<ArgC> args)
+        public async void SearchWithoutSauceNAO(Message msg, IBot serving, List<ArgC> args, Task<Message> sent_msg = null)
         {
-            this.SearchWithoutSauceNAO(serving, msg, null);
+            this.SearchWithoutSauceNAO(serving, msg, sent_msg: sent_msg);
         }
-        public async void SearchWithoutSauceNAO(IBot serving, Message msg = null, ChosenInlineResult inlineResult = null)
+        public async void SearchWithoutSauceNAO(IBot serving, Message msg = null, Task<Message> sent_msg = null)
         {
             try
             {
+                if (sent_msg == null) sent_msg = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching", disableNotification: true);
                 if (msg.Photo.Count() <= 0)
                 {
-                    if (inlineResult == null) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Images wasn`t found.\nSorry…");
-                    else await serving.Client.EditMessageTextAsync(inlineResult.InlineMessageId, "Images wasn`t found.\nSorry…");
+                    await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, "Images wasn`t found.\nSorry…");
                     return;
                 }
                 System.IO.Stream photo = await serving.Client.DownloadFileAsync(serving.Client.GetFileAsync(msg.Photo.Last().FileId).Result.FilePath);
@@ -1074,12 +1041,9 @@ namespace Pic_finder
                 System.String res = await httpResponse.Content.ReadAsStringAsync();
                 if (!httpResponse.IsSuccessStatusCode)
                 {
-                    if (inlineResult == null) await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops, something got wrong…");
-                    else await serving.Client.EditMessageTextAsync(inlineResult.InlineMessageId, "Oops, something got wrong…");
+                    await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, this.GotWrong);
                     return;
                 }
-                Task<Message> srch_msg_async = null;
-                if (inlineResult == null) srch_msg_async = serving.Client.SendTextMessageAsync(msg.Chat.Id, "Searching", disableNotification: true);
                 HtmlDocument parse = new HtmlDocument();
                 parse.LoadHtml(res);
                 HtmlNodeCollection pages = parse.DocumentNode.SelectNodes("//div[contains(@id, 'pages')]/div");
@@ -1109,7 +1073,6 @@ namespace Pic_finder
                             {
                                 query.SearchStatus = 1;
                                 query.ResultsReturned = Convert.ToUInt16(query.ResultsReturned - 1);
-                                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Unfortunatelly there`s no images that close to your`s, so the`re some of them, that can possibly match.");
                                 continue;
                             }
                             else { query.SearchStatus = 0; }
@@ -1182,15 +1145,12 @@ namespace Pic_finder
                         serving.Exceptions.Add(e);
                     }
                 }
-                /*await serving.Client.DeleteMessageAsync(srch_msg_async.Result.Chat.Id, srch_msg_async.Result.MessageId);
-                this.SendResults(serving, msg, Results);
-                this.SaveResultsToDB(photo, query, Results);*/
-                this.SaveAndSendResults(serving, photo, query, Results, sent_msg: srch_msg_async?.Result);
+                this.SaveAndSendResults(serving, photo, query, Results, sent_msg: sent_msg?.Result);
             }
             catch (Exception e)
             {
                 serving.Exceptions.Add(e);
-                await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Oops… Something got wrong.");
+                await serving.Client.EditMessageTextAsync(sent_msg.Result.Chat.Id, sent_msg.Result.MessageId, this.GotWrong);
             }
         }
     }

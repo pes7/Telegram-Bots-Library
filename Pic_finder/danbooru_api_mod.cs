@@ -162,25 +162,40 @@ namespace Pic_finder
                         {
                             if (succ && rate == erate && !shw_a && exc == System.String.Empty)
                             {
-                                //throw new BotGetsWrongException("This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!"); //Prevention of sending an explicit pic without confirmation.
                                 exc = "This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!";
                                 sd_fl = true;
                             }
-                            System.IO.Stream get_pic = await httpClient.GetStreamAsync(url);
-                            /*if (get_pic.Length > (10 * 1024) && !sd_fl && exc == System.String.Empty)
-                            {
-                                sd_fl = true;
-                                exc = "Image is too large";
-                            }*/
+                            Task<System.IO.Stream> get_pic =  httpClient.GetStreamAsync(url);
                             is_res = true;
-                            if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), exc, disableNotification: true/*, replyToMessageId: this.Msg.MessageId*/);
-                            else
-                            {
-                                if (!url.ToLower().EndsWith(".webm") && !url.ToLower().EndsWith(".mp4")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
+
+
+                            InlineKeyboardButton delBut = msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Group || msg.Chat.Type == Telegram.Bot.Types.Enums.ChatType.Supergroup ?
+                                new InlineKeyboardButton()
+                                {
+                                    Text = "Delete this from the chat",
+                                    CallbackData = "action=delete"
+                                } : null,
+                            downBut = !sd_fl ? new InlineKeyboardButton()
                                 {
                                     Text = "Download as file",
                                     CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                                }))/*, replyToMessageId: this.Msg.MessageId)*/;
+                                } : null;
+                            InlineKeyboardMarkup keyboardMarkup = null;
+                            if (downBut!=null ^ delBut != null) keyboardMarkup = new InlineKeyboardMarkup(downBut ?? delBut);
+                            if (downBut != null && delBut != null) keyboardMarkup = new InlineKeyboardMarkup(
+                                new InlineKeyboardButton[][]
+                                {
+                                    new InlineKeyboardButton[]{delBut},
+                                    new InlineKeyboardButton[]{downBut}
+                                });
+
+                            if (sd_fl)
+                            {
+                                await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), exc, disableNotification: true, replyMarkup: keyboardMarkup);
+                            }
+                            else
+                            {
+                                if (!url.ToLower().EndsWith(".webm") && !url.ToLower().EndsWith(".mp4")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup);
                                 else
                                 {
 
@@ -193,11 +208,7 @@ namespace Pic_finder
                                         converter.GetVideoThumbnail(url, outputJpegStream: ms);
                                         ms.Seek(0, SeekOrigin.Begin);
 
-                                        await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic, url.Split('/').Last()), disableNotification: true, replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
-                                        {
-                                            Text = "Download as file",
-                                            CallbackData = "action=get_pics " + command_name + " file show_any id=" + post_id.ToString()
-                                        }),
+                                        await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup,
                                         supportsStreaming: true,
                                         height: height,
                                         width: width,
@@ -216,7 +227,7 @@ namespace Pic_finder
                         bool t_exc = !(ex is Telegram.Bot.Exceptions.ApiRequestException);
                         if (ex.Message.Contains("not enough rights"))
                         {
-                            throw new BotGetsWrongException("Bot can\'t send messages here", ex);
+                            throw new BotGetsWrongException("Bot can\'t send some kind of messages here", ex);
                         }
                         if (t_exc) serving.Exceptions.Add(ex); //If Exception was untypical, it`s recording.
                         exc = ex.Message;

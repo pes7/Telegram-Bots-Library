@@ -15,16 +15,14 @@ namespace Pic_finder
                 switch (update.Type)
                 {
                     case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
-                        if (update.CallbackQuery.Data.Contains("help="))
+                        if (args == null) args = new List<ArgC>();
+                        foreach (System.String n_arg in update.CallbackQuery.Data.Split(' '))
                         {
-                            if (args == null) args = new List<ArgC>();
-                            foreach (System.String n_arg in update.CallbackQuery.Data.Split(' '))
-                            {
-                                System.String[] arg_s = n_arg.Split('=');
-                                args.Add(new ArgC(arg_s[0], arg_s.Length > 1 ? arg_s[1] : null));
-                            }
-                            this.Help_new(update.CallbackQuery.Message, serving, args);
+                            System.String[] arg_s = n_arg.Split('=');
+                            args.Add(new ArgC(arg_s[0], arg_s.Length > 1 ? arg_s[1] : null));
                         }
+                        if (update.CallbackQuery.Data.Contains("help=")) this.Help_new(update.CallbackQuery.Message, serving, args);
+                        if (update.CallbackQuery.Data.Contains("action=delete")) await serving.Client.DeleteMessageAsync(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.MessageId);
                         break;
                     case Telegram.Bot.Types.Enums.UpdateType.Message:
                         if (update.Message.Text != null ? update.Message.Text.Contains("/help") && !update.Message.Text.Contains("@") && update.Message.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Supergroup : false)
@@ -299,9 +297,9 @@ If you need more about commands, you can call /help.");
         
         public async void DeleteMyMessage(Message msg, IBot serving, List<ArgC> args)
         {
-            if (msg.ReplyToMessage.From.Username == serving.Name) await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);
+            if (msg.ReplyToMessage.From.Id == serving.Client.BotId) await serving.Client.DeleteMessageAsync(msg.Chat.Id, msg.MessageId);
             else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "Sorry, but it\'s not my bussines.\n" +
-                "I can delete only my own message.");
+                "I can delete only my own messages.");
         }
 
         public async void EmExit(Message msg, IBot serving, List<ArgC> args)

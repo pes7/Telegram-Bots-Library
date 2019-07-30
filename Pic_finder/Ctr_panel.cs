@@ -85,28 +85,28 @@ namespace Pic_finder
                 "/getyandere",
                 "/getyandere@anime_pic_finder_bot"
             },
-            commandName:"yandere", descr:"Get\'s images from yande.re."));
+            commandName:"yandere", descr:"Get\'s images from yande.re.", clearcommand: false));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetDanbooruAsync, new List<string>()
             {
                 "/getdanbooru",
                 "/getdanbooru@anime_pic_finder_bot"
             },
-            commandName:"danbooru", descr:"Get\'s images from Danbooru."));
+            commandName:"danbooru", descr:"Get\'s images from Danbooru.", clearcommand: false));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetGelboorruAsync, new List<string>()
             {
                 "/getgelbooru",
                 "/getgelbooru@anime_pic_finder_bot"
             },
-            commandName:"gelbooru", descr: "Get\'s images from Gelbooru."));
+            commandName:"gelbooru", descr: "Get\'s images from Gelbooru.", clearcommand: false));
 
             Robot.SynkCommands.Add(new SynkCommand(Robot.GetModule<danbooru_api_mod>().GetKonachanAsync, new List<string>()
             {
                 "/getkonachan",
                 "/getkonachan@anime_pic_finder_bot"
             },
-            commandName: "konachan", descr: "Get\'s images from Konachan."));
+            commandName: "konachan", descr: "Get\'s images from Konachan.", clearcommand: false));
 
             /*Robot.SynkCommands.Add(new SynkCommand(
                 Robot.GetModule<danbooru_api_mod>().GetYandereTagsAsync,
@@ -231,6 +231,7 @@ namespace Pic_finder
                                 sendProc.Wait();
                                 AddMsgToLog(sendProc.Result);
                             }
+                            snd.Content.Close();
                         }
                     }
                 }
