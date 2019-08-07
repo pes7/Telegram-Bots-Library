@@ -150,7 +150,7 @@ namespace Pic_finder
 
         private async Task GetAndSendPicAsync(System.String url, Message msg, IBot serving, System.String rate = "", System.String erate = "e", System.String command_name = "", Int64 post_id = 0, bool sd_fl = false, bool shw_a = false, int height = 0, int width = 0) //Getting and sending a pic from API-result`s.
         {
-            bool succ = true, is_res = false; //If current operation was successed.
+            bool succ = true, is_res = false, video = url.ToLower().EndsWith(".webm") || url.ToLower().EndsWith(".mp4"); //If current operation was successed.
             if (rate == null) rate = System.String.Empty;
             if (erate == null) erate = "e";
             System.String exc = System.String.Empty;
@@ -165,6 +165,9 @@ namespace Pic_finder
                                 exc = "This post is \"unsafe\" or has undefined rating.\nPlease be careful before open it!";
                                 sd_fl = true;
                             }
+                            if (sd_fl) await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadDocument);
+                            else if (video) await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadVideo);
+                            else await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadPhoto);
                             Task<System.IO.Stream> get_pic =  httpClient.GetStreamAsync(url);
                             is_res = true;
 
@@ -189,16 +192,12 @@ namespace Pic_finder
                                     new InlineKeyboardButton[]{downBut}
                                 });
 
-                            if (sd_fl)
-                            {
-                                await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), exc, disableNotification: true, replyMarkup: keyboardMarkup);
-                            }
+                            if (sd_fl) await serving.Client.SendDocumentAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), exc, disableNotification: true, replyMarkup: keyboardMarkup);
                             else
                             {
-                                if (!url.ToLower().EndsWith(".webm") && !url.ToLower().EndsWith(".mp4")) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup);
+                                if (!video) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup);
                                 else
                                 {
-
                                     using (MemoryStream ms = new MemoryStream())
                                     {
                                         FFProbe probe = new FFProbe();
@@ -288,7 +287,7 @@ namespace Pic_finder
                         cm += command.Arg ?? System.String.Empty;
                         await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a, height: Convert.ToInt32(post["height"] ?? 0.0), width: Convert.ToInt32(post["width"] ?? 0.0));
                     }
-                    if (before_prep.Exists(p => p.Name.Contains("id"))) return;
+                    if (before_prep.Exists(p => p.Name == "id")) return;
                     System.String next_req = System.String.Empty;
                     before_prep.Insert(0, command);
                     if (ArgC.GetArg(before_prep, "page") == null) before_prep.Add(new ArgC("page", "2"));

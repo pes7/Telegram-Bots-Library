@@ -857,9 +857,9 @@ namespace Pic_finder
                 if (query == null || results == null) return;
 
                 if (msg != null && callback == null) result = results.First();
-                res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString();
+                res_str = result.Key.IndexName + ".\nSimilarity – " + result.Key.Similarity.ToString() + "%";
                 if (query.SearchStatus != 0 || query.MinimumSimularity>result.Key.Similarity) res_str += " <b>(low similarity or unsimilar)</b>";
-                res_str += "%.\nSource URLs:";
+                res_str += ".\nSource URLs:";
                 if (result.Key.Thumbnail != null) res_str += "<a href=\"" + result.Key.Thumbnail + "\" > &#8205;</a>\n";
                 if (result.Value != null ? result.Value.Count == 0 : true) res_str += "\nunfortunally links wasn\'t provided.";
                 else
@@ -972,7 +972,6 @@ namespace Pic_finder
                                           select u;
                             results.Add(res_db, urls_db.ToList());
                         }
-                        //this.SendResults(serving, msg, results);
                         this.ChangeResultMessage(serving, query, results, msg);
                     }
                     else await serving.Client.SendTextMessageAsync(msg.Chat.Id, "There is no query with this Id.");
