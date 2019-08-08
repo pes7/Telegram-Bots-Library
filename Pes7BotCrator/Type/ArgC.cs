@@ -28,30 +28,42 @@ namespace Pes7BotCrator.Type
                 string realArc = null;
                 try
                 {
-                    args_parse = message.Split('-');
+                    args_parse = message.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 }
                 catch { return null; }
 
-                if(args_parse.Length == 1 || args_parse[0].ToUpper().Contains(Parent.NameString.ToUpper()))
+                args_parse = args_parse.Select(delegate (System.String inp)
                 {
-                    args_parse = message.Split(' ');
+                    inp = inp.Trim();
+                    return inp.StartsWith("-") ? System.String.Concat(inp.Skip(1).ToArray()) : inp;
+                }).Select(p=>p.ToString()).ToArray();
+                if(args_parse[0].Trim().ToUpper().Contains(Parent.NameString.ToUpper()))
+                {
                     if (args_parse.Length > 1)
                     {
                         if (args_parse[0].ToUpper() == Parent.NameString.ToUpper())
                         {
                             if(args_parse[0]?.Length > 0)
-                                message = message.Replace(args_parse[0], "");
+                                message = message.Replace(args_parse[0], System.String.Empty);
                             if (args_parse[1]?.Length > 0)
-                                message = message.Replace(args_parse[1], "");
+                                message = message.Replace(args_parse[1], System.String.Empty);
                             Args.Add(new ArgC($"{args_parse[1]}", null, TypeOfArg.Named));
-                            var andorelse = message.Split(new string[] { " и ", " или ", " И ", " ИЛИ " }, StringSplitOptions.None);
-                            for (int i = 0; i < andorelse.Length; i++)
+                            var andorelse = message.Split(new string[] { " и ", " или ", " И ", " ИЛИ ", "and", "AND", "or", "OR" }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i < andorelse.Length && andorelse.Length>1; i++)
                             {
                                 if (andorelse[i].Trim() != "")
                                 {
-                                    andorelse[i] = Regex.Replace(andorelse[i], @"^\s+", "");
-                                    andorelse[i] = Regex.Replace(andorelse[i], @"\s+$", "");
+                                    andorelse[i] = Regex.Replace(andorelse[i], @"^\s+", System.String.Empty);
+                                    andorelse[i] = Regex.Replace(andorelse[i], @"\s+$", System.String.Empty);
                                     Args.Add(new ArgC($"{i}", andorelse[i], TypeOfArg.Named));
+                                }
+                            }
+                            if (andorelse.Length==1 && args_parse.Length>2)
+                            {
+                                foreach (System.String arg_parse in args_parse.Skip(2))
+                                {
+                                    string[] mspl = arg_parse.Trim().Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                                    Args.Add(new ArgC(mspl[0], mspl.Length > 1 ? mspl[1] : null, TypeOfArg.Named));
                                 }
                             }
                             return Args;
@@ -80,15 +92,17 @@ namespace Pes7BotCrator.Type
                         var sf = new ArgC();
                         try
                         {
-                            string[] ssf = args_parse[i].Split(':');
+                            string[] ssf = args_parse[i].IndexOfAny(new char[] { ':', '=' }) >= 0 ?
+                                args_parse[i].Split(args_parse[i].ElementAt(args_parse[i].IndexOfAny(new char[] { ':', '=' }))) : 
+                                new string[] { args_parse[i] };
                             if (ssf.Length > 1)
                             {
-                                sf.Name = ssf[0];
-                                sf.Arg = ssf[1];
+                                sf.Name = ssf[0].Trim();
+                                sf.Arg = ssf[1].Trim();
                             }
                             else
                             {
-                                sf.Name = ssf[0];
+                                sf.Name = ssf[0].Trim();
                             }
                         }
                         catch { sf.Name = args_parse[i]; }

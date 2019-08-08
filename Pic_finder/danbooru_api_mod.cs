@@ -168,7 +168,8 @@ namespace Pic_finder
                             if (sd_fl) await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadDocument);
                             else if (video) await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadVideo);
                             else await serving.Client.SendChatActionAsync(msg.Chat.Id, Telegram.Bot.Types.Enums.ChatAction.UploadPhoto);
-                            Task<System.IO.Stream> get_pic =  httpClient.GetStreamAsync(url);
+                            Task<System.IO.Stream> get_pic = null;
+                            if ((video && url.ToUpper().EndsWith("MP4")) || !video || sd_fl) get_pic = httpClient.GetStreamAsync(url);
                             is_res = true;
 
 
@@ -198,21 +199,23 @@ namespace Pic_finder
                                 if (!video) await serving.Client.SendPhotoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup);
                                 else
                                 {
-                                    using (MemoryStream ms = new MemoryStream())
+                                    using (MemoryStream pms = new MemoryStream(), vms=new MemoryStream())
                                     {
                                         FFProbe probe = new FFProbe();
                                         MediaInfo mediaInfo = probe.GetMediaInfo(url);
 
                                         FFMpegConverter converter = new FFMpegConverter();
-                                        converter.GetVideoThumbnail(url, outputJpegStream: ms);
-                                        ms.Seek(0, SeekOrigin.Begin);
-
-                                        await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(get_pic.Result, url.Split('/').Last()), disableNotification: true, replyMarkup: keyboardMarkup,
+                                        converter.GetVideoThumbnail(url, outputJpegStream: pms);
+                                        if (!url.ToUpper().EndsWith("MP4")) converter.ConvertMedia(url, vms, NReco.VideoConverter.Format.mp4);
+                                        else get_pic.Result.CopyTo(vms);
+                                        pms.Seek(0, SeekOrigin.Begin);
+                                        vms.Seek(0, SeekOrigin.Begin);
+                                        await serving.Client.SendVideoAsync(msg.Chat.Id, new InputOnlineFile(vms), disableNotification: true, replyMarkup: keyboardMarkup,
                                         supportsStreaming: true,
                                         height: height,
                                         width: width,
                                         duration: (int)mediaInfo.Duration.TotalSeconds,
-                                        thumb: new InputMedia(ms, "thumb.jpg")
+                                        thumb: new InputMedia(pms, "thumb.jpg")
                                         );
                                     }
                                 }
@@ -267,6 +270,7 @@ namespace Pic_finder
                             ));
                     }
                 else command = new ArgC(msg.Text);
+                command.Name = command.Name.Split('@')[0];
                 if (prep_args != null) args = prep_args(args, serving, msg);
                 resp = await this.GetResAsync(req_url, max_lim, msg, serving, args: args); //Getting a doc.
                 dynamic result = JsonConvert.DeserializeObject(await resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
@@ -285,6 +289,7 @@ namespace Pic_finder
                             cm = System.String.Empty;
                         cm += command.Name ?? System.String.Empty;
                         cm += command.Arg ?? System.String.Empty;
+                        cm = cm.Split('@')[0];
                         await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a, height: Convert.ToInt32(post["height"] ?? 0.0), width: Convert.ToInt32(post["width"] ?? 0.0));
                     }
                     if (before_prep.Exists(p => p.Name == "id")) return;

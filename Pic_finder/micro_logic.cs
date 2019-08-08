@@ -95,20 +95,18 @@ If you need more about commands, you can call /help.");
                 "Then you need to type an actual phrase of it.\n" +
                 "It should look like \"anipic <command>\"\n" +
                 "Avalible named and usual commands are:\n" +
-                " yandere, or /getyandere — gather pics from yande.re;\n" +
+                " yandere, or /getyandere — gather pics from Yande.re;\n" +
                 " danbooru, or /getdanbooru — gather pics from Danbooru;\n" +
                 " gelbooru, or /getgelbooru — gather pics from Gelbooru;\n" +
-                " yandere_tags, or /getyandere_tags — gather names of avalible tags on yande.re;\n" +
+                /*" yandere_tags, or /getyandere_tags — gather names of avalible tags on yande.re;\n" +
                 " danbooru_tags, or /getdanbooru_tags — gather names of avalible tags on Danbooru;\n" +
-                " gelbooru_tags, or /getgelbooru_tags — gather names of avalible tags on Gelbooru;\n" +
-                " sauce — (experimental function) gets links to the pic, which was sent to the bot, with caption \"AniPic sauce\" (without qoutation marks) (requires SauceNAO account);\n" +
-                " (Actually, you can just send a photo as private message to the bot, even forward someone\'s photo-message, and it will be do a search of original with default parameters.)\n" +
+                " gelbooru_tags, or /getgelbooru_tags — gather names of avalible tags on Gelbooru;\n" +*/
+                " sauce — (experimental function) gets links to the picture in a replied meassage;\n" +
                 " putkey or /putkey — puts your API-key of your SauceNAO account, which is in parameter \"key\";\n" +
                 " deletekey or /deletekey — deletes API-key of your SauceNAO account from bot\'s database;\n" +
                 " stats or /getstats — gets count of avalieble searches via SauceNAO.\n" +
                 "To use parameters, to adjust search with commands, you need type them with an actual command.\n" +
-                "With default commands you need to type parameter in this way: \"-<key>:<value>\"(without qoutation marks), if parameter doesn't have a value — -<key>.\n" +
-                "If you use named command, just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".\n" +
+                "With commands you can use parameters, which should be typed like this \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".\n" +
                 "Avalible keys are:" +
                 "limit — apply a count of results, which bot shoud returned;\n" +
                 "tag – apply tag for a search, many tags can be combined with \'plus\' sign, like \"tag1+tag2\";\n" +
@@ -175,9 +173,8 @@ If you need more about commands, you can call /help.");
                             });
                         break;
                     case parameters:
-                        contain = "To use parameters, to adjust search with commands, you need type them with an actual command.\n" +
-                            "With default commands you need to type parameter in this way: \"-<key>:<value>\"(without qoutation marks), if parameter doesn't have a value — -<key>.\n" +
-                            "If you use \"named\" command, just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".";
+                        contain = "To use parameters for adjusting a search via commands, you need type them with an actual command.\n" +
+                            "Just type \"<key>=<value>\"(without qoutation marks), without value – just a \"<key>\".";
                         markup.Add(new InlineKeyboardButton()
                             {
                                 Text = "Essential parameters of search",
@@ -230,7 +227,7 @@ If you need more about commands, you can call /help.");
                             "It would be great, if you donate to them, in case they apply financial help.\n" +
                             "Also you can support this bot by that kind of thing.\n" +
                             "If you interested, you can visit the [GitHub](https://github.com/pes7/Telegram-Bots-Library/tree/tedechan) page.\n\n" +
-                            "***DISCLAIMER: Any art which was sent by the bot is an intellectual property of it's authour or rights holder.***";
+                            "***DISCLAIMER: Any media which was sent by the bot is an intellectual property of it's authours or rights holders.***";
                         /*markup.Add(new InlineKeyboardButton()
                         {
                             Text = "How to donate",
