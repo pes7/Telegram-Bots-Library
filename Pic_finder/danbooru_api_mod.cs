@@ -31,13 +31,6 @@ namespace Pic_finder
             "page",
             "id"
         };
-        //private HttpResponseMessage resp = null;
-        //private IBot Serving;
-        //private Message Msg;
-        //private List<ArgC> Args = null;
-        //private bool to_file = false; //Do file must be sent as just file.
-        //private bool show_a = false; //Do picture`s showing even if they has non-safe rating.
-        //private bool is_res = false; //Did the result`s has been sent.
         public danbooru_api_mod():base("Danbooru API service\'s collection", typeof(danbooru_api_mod)) { }
         
         public async void UpdateRequests(Update update, IBot serving, List<ArgC> args)
@@ -55,7 +48,7 @@ namespace Pic_finder
                             call_args.Add(new ArgC(n_as[0], n_as.Length > 1 ? n_as[1] : null));
                         }
                         call_args.RemoveAt(0);
-                        if (update.CallbackQuery.Data.Contains("action=get_pics"))
+                        if (update.CallbackQuery.Data.Contains("get_pics"))
                         {
                             if (call_args.FirstOrDefault().Name.Contains("yandere")) this.GetYandereAsync(update.CallbackQuery.Message, serving, call_args);
                             if (call_args.FirstOrDefault().Name.Contains("danbooru")) this.GetDanbooruAsync(update.CallbackQuery.Message, serving, call_args);
@@ -252,27 +245,15 @@ namespace Pic_finder
             try
             {
                 HttpResponseMessage resp = null;
-                bool to_file = false, show_a = false;
-                ArgC command = args?.First();
-                args = serving.GetModule<micro_logic>().NormalizeArgs(msg, serving, args);
-                if (args != null)
-                {
-                    to_file = ArgC.GetArg(args, "file") != null ? true : false;
-                    show_a = ArgC.GetArg(args, "show_any") != null ? true : false;
-                }
-                List<ArgC> before_prep = new List<ArgC>();
-                if (args != null)
-                    foreach (ArgC arg in args)
-                    {
-                        before_prep.Add(new ArgC(
-                            name: arg.Name ?? System.String.Empty,
-                            arg: arg.Arg ?? System.String.Empty
-                            ));
-                    }
-                else command = new ArgC(msg.Text);
-                command.Name = command.Name.Split('@')[0];
-                if (prep_args != null) args = prep_args(args, serving, msg);
-                resp = await this.GetResAsync(req_url, max_lim, msg, serving, args: args); //Getting a doc.
+                bool
+                    to_file = args?.Any(p => p.Name == "file") ?? false,
+                    show_a = args?.Any(p => p.Name == "show_any") ?? false;
+                ArgC command = args?.FirstOrDefault() ?? new ArgC(msg.Text);
+                command.Name = command.Name.Trim().Split('@')[0];
+                List<ArgC> p_args = args != null ? new List<ArgC>() : null;
+                args?.ForEach((ArgC arg) => { p_args.Add(new ArgC(arg.Name, arg.Arg)); });
+                resp = await this.GetResAsync(req_url, max_lim, msg, serving, args: (args != null && prep_args != null ? prep_args(args, serving, msg) : args)?.Skip(1).ToList()); //Getting a doc.
+                args = p_args;
                 dynamic result = JsonConvert.DeserializeObject(await resp.Content.ReadAsStringAsync()); //Doing it`s dynamical parsing.
                 if (((JArray)result).Count() == 0)
                 {
@@ -283,35 +264,36 @@ namespace Pic_finder
                 }
                 else
                 {
+                    if (args == null) args = new List<ArgC>() { command };
+                    else args[0] = command;
                     foreach (var post in result)
                     {
-                        System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop],
-                            cm = System.String.Empty;
-                        cm += command.Name ?? System.String.Empty;
-                        cm += command.Arg ?? System.String.Empty;
-                        cm = cm.Split('@')[0];
-                        await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: cm, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a, height: Convert.ToInt32(post["height"] ?? 0.0), width: Convert.ToInt32(post["width"] ?? 0.0));
+                        System.String url = post[fl_url] != null ? url_prefix + post[fl_url] : null, rating = post[rt_prop];
+                        await this.GetAndSendPicAsync(url, msg, serving, rating, e_rate, command_name: command.Name ?? System.String.Empty, post_id: Convert.ToInt64(post.id), sd_fl: to_file, shw_a: show_a, height: Convert.ToInt32(post["height"] ?? 0.0), width: Convert.ToInt32(post["width"] ?? 0.0));
                     }
-                    if (before_prep.Exists(p => p.Name == "id")) return;
+                    if (args.Exists(p => p.Name == "id")) return;
                     System.String next_req = System.String.Empty;
-                    before_prep.Insert(0, command);
-                    if (ArgC.GetArg(before_prep, "page") == null) before_prep.Add(new ArgC("page", "2"));
+                    if (ArgC.GetArg(args, "page") == null) args.Add(new ArgC("page", "2"));
                     else
                     {
-                        ArgC page_arg = before_prep.Where(a => a.Name?.ToLower() == "page").FirstOrDefault();
+                        args.ForEach(delegate (ArgC arg)
+                        {
+                            if (arg.Name.ToLower() == "page") arg.Arg = (Convert.ToInt32(arg.Arg) + 1).ToString();
+                        });
+                        /*
                         int ind = before_prep.IndexOf(page_arg);
                         if (page_arg.Arg != null)
                         {
                             page_arg.Arg = (Convert.ToUInt32(page_arg.Arg) + 1).ToString();
                             before_prep.RemoveAt(ind);
                             before_prep.Add(page_arg);
-                        }
+                        }*/
                     }
-                    foreach (ArgC arg in before_prep)
+                    foreach (ArgC arg in args)
                     {
                         next_req += arg.Name ?? System.String.Empty;
-                        next_req += arg.Arg != null ? "=" : System.String.Empty;
-                        next_req += arg.Arg ?? System.String.Empty;
+                        next_req += arg.Arg != null ? ("=" + arg.Arg) : System.String.Empty;
+                        //next_req += arg.Arg ?? System.String.Empty;
                         next_req += " ";
                     }
                     next_req = next_req.Remove(next_req.Count() - 1);
@@ -321,7 +303,7 @@ namespace Pic_finder
                         replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton()
                         {
                             Text = "Get it",
-                            CallbackData = "action=get_pics " + next_req
+                            CallbackData = "get_pics " + next_req
                         }), disableNotification: true);
                 }
             }

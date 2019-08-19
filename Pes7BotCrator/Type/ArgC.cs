@@ -85,32 +85,28 @@ namespace Pes7BotCrator.Type
                     catch { Args.Clear(); }
                 }
                
-                if (args_parse.Length > 1)
+                for (int i = 0; i < args_parse.Length; i++)
                 {
-                    for (int i = 0; i < args_parse.Length; i++)
+                    var sf = new ArgC();
+                    try
                     {
-                        var sf = new ArgC();
-                        try
+                        string[] ssf = args_parse[i].IndexOfAny(new char[] { ':', '=' }) >= 0 ?
+                            args_parse[i].Split(args_parse[i].ElementAt(args_parse[i].IndexOfAny(new char[] { ':', '=' }))) : 
+                            new string[] { args_parse[i] };
+                        if (ssf.Length > 1)
                         {
-                            string[] ssf = args_parse[i].IndexOfAny(new char[] { ':', '=' }) >= 0 ?
-                                args_parse[i].Split(args_parse[i].ElementAt(args_parse[i].IndexOfAny(new char[] { ':', '=' }))) : 
-                                new string[] { args_parse[i] };
-                            if (ssf.Length > 1)
-                            {
-                                sf.Name = ssf[0].Trim();
-                                sf.Arg = ssf[1].Trim();
-                            }
-                            else
-                            {
-                                sf.Name = ssf[0].Trim();
-                            }
+                            sf.Name = ssf[0].Trim();
+                            sf.Arg = ssf[1].Trim();
                         }
-                        catch { sf.Name = args_parse[i]; }
-                        Args.Add(sf);
+                        else
+                        {
+                            sf.Name = ssf[0].Trim();
+                        }
                     }
-                    return Args;
+                    catch { sf.Name = args_parse[i]; }
+                    Args.Add(sf);
                 }
-                else return null;
+                return Args;
             }
             else return null;
         }

@@ -58,7 +58,7 @@ namespace Pic_finder
                     }
                     else if (args.ElementAt(0).Type == ArgC.TypeOfArg.Named)
                     {
-                        foreach (System.String to_arg in args.ElementAt(0).Arg.Split(' '))
+                        foreach (System.String to_arg in args.ElementAt(0).Arg?.Split(' '))
                         {
                             System.String[] to_arg_div = to_arg.Split('=');
                             args.Add(new ArgC(to_arg_div.ElementAt(0), to_arg_div.Length > 1 ? to_arg_div.ElementAt(1) : null));
